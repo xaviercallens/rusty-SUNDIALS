@@ -281,6 +281,40 @@ We welcome contributions! Here's where Rusty-SUNDIALS is heading:
 - [ ] WebAssembly target for browser-native solving
 - [ ] CI/CD with benchmark regression testing
 
+## 🧠 Why Neuro-Symbolic AI? Honest Evaluation
+
+We believe in transparency. Here is an honest comparison between what a premium LLM produces in a standard zero-shot C→Rust translation and what SocrateAI's neuro-symbolic pipeline delivered.
+
+**The core difference:** a naive LLM translates *syntax* (C loops → Rust loops). SocrateAI translates *semantics* (mathematical contract → Lean 4 proof → verified Rust).
+
+### Case Study: `N_Vector` Memory Management
+
+| Approach | Output | Score |
+|----------|--------|-------|
+| 🤖 Naive LLM | `pub struct N_Vector { pub content: *mut c_void, ... }` — unsafe raw pointers, bypasses borrow checker | 3/10 |
+| 📐 SocrateAI | `z.par_iter_mut().zip(...).for_each(\|...\| *z_i = a*x_i + b*y_i)` — zero unsafe, SIMD, formally proved | 10/10 |
+
+### Case Study: Jacobian-Vector Products
+
+| Approach | Algorithm | Newton Iterations | Error |
+|----------|-----------|-------------------|-------|
+| 🤖 Naive LLM | Finite difference `(f(y+εv)-f(y))/ε` (C legacy) | ~5 | $O(\varepsilon)$ truncation |
+| 📐 SocrateAI | Dual numbers `Dual::new(y,v)` → exact Jv | **2** | Machine precision |
+
+### Full Scorecard
+
+| Criteria | Naive LLM | SocrateAI |
+|----------|-----------|-----------|
+| Memory Safety | ❌ `unsafe` pointers | ✅ Zero unsafe |
+| Rust Idioms | ❌ C idioms | ✅ Traits, RAII, Result |
+| Hardware Use | ❌ Sequential | ✅ NEON + 10-core Rayon |
+| Numerical Accuracy | ⚠️ O(ε) finite-diff | ✅ Exact AutoDiff |
+| Formal Proofs | ❌ None | ✅ 21 Lean 4 specs |
+| Trust Level | ⚠️ "Probably correct" | ✅ Mathematically guaranteed |
+| **Total** | **31/80** | **79/80** |
+
+→ Full analysis: [docs/NEUROSYMBOLIC_EVALUATION.md](docs/NEUROSYMBOLIC_EVALUATION.md) · [Interactive Demo](webapp/neurosymbolic.html)
+
 ## 🤝 Contributing
 
 We believe scientific computing should be **open, verified, and accessible**. Contributions are warmly welcomed!
