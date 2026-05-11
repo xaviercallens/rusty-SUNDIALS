@@ -1,0 +1,19 @@
+[package]
+name = "examples"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+cvode = { path = "../crates/cvode" }
+nvector = { path = "../crates/nvector" }
+sundials-core = { path = "../crates/sundials-core" }
+
+[[example]]
+name = "robertson"
+path = "robertson.rs"
+
+[[example]]
+name = "exponential"
+path = "exponential.rs"

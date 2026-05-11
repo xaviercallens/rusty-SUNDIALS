@@ -1,0 +1,10 @@
+[package]
+name = "nvector"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "N_Vector trait and serial implementation for rusty-SUNDIALS"
+
+[dependencies]
+sundials-core = { path = "../sundials-core" }
+num-traits.workspace = true
