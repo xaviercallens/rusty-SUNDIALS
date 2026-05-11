@@ -14,6 +14,7 @@ pub mod gmres;
 pub mod dual;
 pub mod mpir;
 pub mod epirk;
+pub mod pinn;
 
 
 pub use context::Context;
