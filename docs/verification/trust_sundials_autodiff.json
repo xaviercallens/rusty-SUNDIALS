@@ -1,0 +1,16 @@
+{
+  "module": "sundials_autodiff",
+  "rust_target": "crates/sundials-core/src/dual.rs",
+  "lean_spec": "proofs/lean4/jfnk_autodiff.lean",
+  "status": "verified",
+  "axioms": ["ieee754_rounding"],
+  "test_coverage": "2 unit tests passing (100% logic coverage)",
+  "mathematical_invariants": [
+    {
+      "name": "autodiff_exactness",
+      "description": "Evaluations over the Dual number field accurately return the exact Jacobian-vector product Jv in the dual component, without finite-difference O(epsilon^2) truncation error."
+    }
+  ],
+  "verified_by": "SocrateAI SpecToRust / Lean 4",
+  "date": "2026-05-11"
+}
