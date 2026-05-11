@@ -9,6 +9,8 @@ function buildSidebar() {
     <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
       <a href="cray.html" style="color:var(--accent2);font-size:.7rem;text-decoration:none;border:1px solid rgba(6,182,212,.3);padding:4px 8px;border-radius:4px">🚀 Cray-1 Narrative Demo</a>
       <a href="lean.html" style="color:#c678dd;font-size:.7rem;text-decoration:none;border:1px solid rgba(198,120,221,.3);padding:4px 8px;border-radius:4px">📐 Lean 4 Verification Demo</a>
+      <a href="neurosymbolic.html" style="color:#10b981;font-size:.7rem;text-decoration:none;border:1px solid rgba(16,185,129,.3);padding:4px 8px;border-radius:4px">🧠 Neuro-Symbolic Evaluation</a>
+      <a href="grand_unified.html" style="color:#f59e0b;font-size:.7rem;text-decoration:none;border:1px solid rgba(245,158,11,.3);padding:4px 8px;border-radius:4px">🌍 Grand Unified Validation</a>
     </div>
   </div>`;
   DOMAINS.forEach(d => {
