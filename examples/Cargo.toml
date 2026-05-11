@@ -36,6 +36,10 @@ name = "jfnk_brusselator"
 path = "jfnk_brusselator.rs"
 
 [[example]]
+name = "grand_unified_gray_scott"
+path = "grand_unified_gray_scott.rs"
+
+[[example]]
 name = "bench_nvector"
 path = "bench_nvector.rs"
 
