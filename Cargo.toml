@@ -7,9 +7,6 @@ version = "0.1.0"
 edition = "2024"
 license = "BSD-3-Clause"
 repository = "https://github.com/xaviercallens/rusty-SUNDIALS"
-description = "Production-quality ODE solver in pure Rust — a SpecToRust translation of SUNDIALS CVODE"
-
 [workspace.dependencies]
-thiserror = "2"
-num-traits = "0.2"
-nalgebra = "0.33"
+rayon = "1.10"
+faer = "0.19"

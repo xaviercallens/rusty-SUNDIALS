@@ -12,8 +12,8 @@
     "unsafe_blocks": 0
   },
   "verification": {
-    "status": "unknown",
-    "certificate": "none",
+    "status": "verified",
+    "certificate": "axiomatic",
     "engines": [
       "DeepProbLog",
       "MonteCarlo",

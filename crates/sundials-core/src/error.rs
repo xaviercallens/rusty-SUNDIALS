@@ -3,7 +3,7 @@
 //! Replaces the C integer return codes with a proper Rust error enum.
 //! Each variant maps to a specific SUNDIALS error condition.
 
-use thiserror::Error;
+
 
 /// Result type alias for SUNDIALS operations.
 pub type Result<T> = std::result::Result<T, SundialsError>;
@@ -11,105 +11,143 @@ pub type Result<T> = std::result::Result<T, SundialsError>;
 /// Errors that can occur during SUNDIALS operations.
 ///
 /// Maps directly to CV_* error codes from the C implementation.
-#[derive(Debug, Error, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum SundialsError {
     // --- Solver errors ---
-    #[error("too much work: solver took max internal steps but not reached tout")]
+
     TooMuchWork,
 
-    #[error("too much accuracy requested: tolerances too tight")]
+
     TooMuchAccuracy,
 
-    #[error("error test failures: too many error test failures at one step")]
+
     ErrTestFailure,
 
-    #[error("convergence failure: nonlinear solver failed to converge")]
+
     ConvFailure,
 
     // --- Linear solver errors ---
-    #[error("linear solver initialization failed")]
+
     LinInitFail,
 
-    #[error("linear solver setup failed")]
+
     LinSetupFail,
 
-    #[error("linear solver solve failed")]
+
     LinSolveFail,
 
     // --- RHS function errors ---
-    #[error("RHS function failed unrecoverably")]
+
     RhsFuncFail,
 
-    #[error("first RHS function call failed")]
+
     FirstRhsFuncErr,
 
-    #[error("repeated recoverable RHS function errors")]
+
     RepeatedRhsFuncErr,
 
-    #[error("unrecoverable RHS function error")]
+
     UnrecRhsFuncErr,
 
     // --- Root finding errors ---
-    #[error("root function failed")]
+
     RootFuncFail,
 
     // --- Nonlinear solver errors ---
-    #[error("nonlinear solver initialization failed")]
+
     NlsInitFail,
 
-    #[error("nonlinear solver setup failed")]
+
     NlsSetupFail,
 
-    #[error("nonlinear solver failed")]
+
     NlsFail,
 
-    #[error("constraint satisfaction failed")]
+
     ConstraintFail,
 
     // --- Memory/input errors ---
-    #[error("memory allocation failed")]
+
     MemFail,
 
-    #[error("solver memory is null (not initialized)")]
+
     MemNull,
 
-    #[error("illegal input: {0}")]
+
     IllInput(String),
 
-    #[error("solver not initialized (CVodeInit not called)")]
+
     NoMalloc,
 
-    #[error("bad k value for derivative interpolation")]
+
     BadK,
 
-    #[error("bad t value: time is outside interpolation interval")]
+
     BadT,
 
-    #[error("bad dky computation")]
+
     BadDky,
 
-    #[error("tout too close to t0")]
+
     TooClose,
 
-    #[error("vector operation error")]
+
     VectorOpErr,
 
     // --- Projection errors ---
-    #[error("projection memory is null")]
+
     ProjMemNull,
 
-    #[error("projection function failed")]
+
     ProjFuncFail,
 
-    #[error("repeated projection function errors")]
+
     RepeatedProjFuncErr,
 
     // --- Context errors ---
-    #[error("context error")]
+
     ContextErr,
 
-    #[error("unrecognized error: {0}")]
     Unrecognized(i32),
+}
+
+impl std::error::Error for SundialsError {}
+
+impl std::fmt::Display for SundialsError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::TooMuchWork => write!(f, "too much work: solver took max internal steps but not reached tout"),
+            Self::TooMuchAccuracy => write!(f, "too much accuracy requested: tolerances too tight"),
+            Self::ErrTestFailure => write!(f, "error test failures: too many error test failures at one step"),
+            Self::ConvFailure => write!(f, "convergence failure: nonlinear solver failed to converge"),
+            Self::LinInitFail => write!(f, "linear solver initialization failed"),
+            Self::LinSetupFail => write!(f, "linear solver setup failed"),
+            Self::LinSolveFail => write!(f, "linear solver solve failed"),
+            Self::RhsFuncFail => write!(f, "RHS function failed unrecoverably"),
+            Self::FirstRhsFuncErr => write!(f, "first RHS function call failed"),
+            Self::RepeatedRhsFuncErr => write!(f, "repeated recoverable RHS function errors"),
+            Self::UnrecRhsFuncErr => write!(f, "unrecoverable RHS function error"),
+            Self::RootFuncFail => write!(f, "root function failed"),
+            Self::NlsInitFail => write!(f, "nonlinear solver initialization failed"),
+            Self::NlsSetupFail => write!(f, "nonlinear solver setup failed"),
+            Self::NlsFail => write!(f, "nonlinear solver failed"),
+            Self::ConstraintFail => write!(f, "constraint satisfaction failed"),
+            Self::MemFail => write!(f, "memory allocation failed"),
+            Self::MemNull => write!(f, "solver memory is null (not initialized)"),
+            Self::IllInput(s) => write!(f, "illegal input: {}", s),
+            Self::NoMalloc => write!(f, "solver not initialized (CVodeInit not called)"),
+            Self::BadK => write!(f, "bad k value for derivative interpolation"),
+            Self::BadT => write!(f, "bad t value: time is outside interpolation interval"),
+            Self::BadDky => write!(f, "bad dky computation"),
+            Self::TooClose => write!(f, "tout too close to t0"),
+            Self::VectorOpErr => write!(f, "vector operation error"),
+            Self::ProjMemNull => write!(f, "projection memory is null"),
+            Self::ProjFuncFail => write!(f, "projection function failed"),
+            Self::RepeatedProjFuncErr => write!(f, "repeated projection function errors"),
+            Self::ContextErr => write!(f, "context error"),
+            Self::Unrecognized(code) => write!(f, "unrecognized error: {}", code),
+        }
+    }
 }
 
 impl SundialsError {

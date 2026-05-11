@@ -6,4 +6,3 @@ license.workspace = true
 description = "Core types for rusty-SUNDIALS: Real, Context, error handling"
 
 [dependencies]
-thiserror.workspace = true

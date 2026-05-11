@@ -8,4 +8,3 @@ description = "CVODE ODE solver — BDF and Adams methods for stiff and non-stif
 [dependencies]
 sundials-core = { path = "../sundials-core" }
 nvector = { path = "../nvector" }
-thiserror.workspace = true

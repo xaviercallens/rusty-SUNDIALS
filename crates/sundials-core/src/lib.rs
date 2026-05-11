@@ -8,6 +8,10 @@
 pub mod context;
 pub mod error;
 pub mod math;
+pub mod generated;
+pub mod band_solver;
+pub mod gmres;
+
 
 pub use context::Context;
 pub use error::{SundialsError, Result};

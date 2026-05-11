@@ -9,6 +9,7 @@ publish = false
 cvode = { path = "../crates/cvode" }
 nvector = { path = "../crates/nvector" }
 sundials-core = { path = "../crates/sundials-core" }
+rayon.workspace = true
 
 [[example]]
 name = "robertson"
@@ -17,3 +18,63 @@ path = "robertson.rs"
 [[example]]
 name = "exponential"
 path = "exponential.rs"
+
+[[example]]
+name = "vanderpol"
+path = "vanderpol.rs"
+
+[[example]]
+name = "oregonator"
+path = "oregonator.rs"
+
+[[example]]
+name = "brusselator1d"
+path = "brusselator1d.rs"
+
+[[example]]
+name = "bench_nvector"
+path = "bench_nvector.rs"
+
+[[example]]
+name = "heat1d_banded"
+path = "heat1d_banded.rs"
+
+[[example]]
+name = "lorenz"
+path = "lorenz.rs"
+
+[[example]]
+name = "hodgkin_huxley"
+path = "hodgkin_huxley.rs"
+
+[[example]]
+name = "sir_epidemic"
+path = "sir_epidemic.rs"
+
+[[example]]
+name = "lotka_volterra"
+path = "lotka_volterra.rs"
+
+[[example]]
+name = "hires"
+path = "hires.rs"
+
+[[example]]
+name = "double_pendulum"
+path = "double_pendulum.rs"
+
+[[example]]
+name = "rigid_body"
+path = "rigid_body.rs"
+
+[[example]]
+name = "rossler"
+path = "rossler.rs"
+
+[[example]]
+name = "fitzhugh_nagumo"
+path = "fitzhugh_nagumo.rs"
+
+[[example]]
+name = "three_body"
+path = "three_body.rs"
