@@ -32,6 +32,10 @@ name = "brusselator1d"
 path = "brusselator1d.rs"
 
 [[example]]
+name = "jfnk_brusselator"
+path = "jfnk_brusselator.rs"
+
+[[example]]
 name = "bench_nvector"
 path = "bench_nvector.rs"
 
