@@ -56,6 +56,12 @@ impl Dual {
     }
 }
 
+impl From<f64> for Dual {
+    fn from(real: f64) -> Self {
+        Self::constant(real)
+    }
+}
+
 // Implement standard arithmetic operations
 
 impl Add for Dual {
