@@ -32,6 +32,12 @@
 - [ ] Write WGSL shaders for basic vector arithmetic (add, scale, wrms-norm).
 - [ ] Support custom WGSL injection for user-defined RHS evaluations directly on the GPU.
 
+## Phase 5: Next Generation Academic Improvements (v0.2)
+- [x] Implement Forward-Mode AutoDiff (Dual Numbers) for exact JFNK (`crates/sundials-core/src/dual.rs`).
+- [x] Write Lean 4 formal specification of dual number mathematical exactness (`proofs/lean4/jfnk_autodiff.lean`).
+- [ ] Integrate Dual type generic evaluation into GMRES solver loop.
+- [ ] Implement Mixed-Precision Iterative Refinement.
+
 ## Formal Verification
 - [x] Scoped floating-point monotonicity axiom in `cvode.lean` (convert `admit` → `axiom`).
 - [x] Extended `nvector_parallel.lean` with Separation Logic for multi-threaded memory disjointness.
