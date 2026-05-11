@@ -84,6 +84,50 @@ fn main() -> Result<(), cvode::CvodeError> {
 RUSTFLAGS="-C target-cpu=native" cargo run --release --example lorenz
 ```
 
+## 🛠️ Installation Guide
+
+### macOS via Homebrew (Recommended)
+
+For macOS users (Intel or Apple Silicon), you can install the necessary toolchain using Homebrew:
+
+1. **Install Homebrew** (if not already installed):
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. **Install the Rust toolchain**:
+   ```bash
+   brew install rust
+   ```
+
+3. **Install additional required libraries**:
+   ```bash
+   brew install cmake python
+   ```
+
+4. **Clone and Build**:
+   ```bash
+   git clone https://github.com/xaviercallens/rusty-SUNDIALS
+   cd rusty-SUNDIALS
+   
+   # Build the project, enabling Apple Silicon optimizations automatically
+   RUSTFLAGS="-C target-cpu=native" cargo build --release
+   ```
+
+### Other Platforms (Linux / Windows)
+
+1. **Install Rust via rustup** (the official installer):
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   ```
+
+2. **Clone and Build**:
+   ```bash
+   git clone https://github.com/xaviercallens/rusty-SUNDIALS
+   cd rusty-SUNDIALS
+   cargo build --release
+   ```
+
 ## 🏗️ Architecture
 
 ```
