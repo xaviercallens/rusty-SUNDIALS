@@ -3,7 +3,14 @@ let currentCase = null;
 
 function buildSidebar() {
   const sb = document.getElementById('sidebar');
-  let html = `<div class="sidebar-header"><h1>🔬 Rusty-SUNDIALS</h1><div class="subtitle">Scientific Computing Lab</div></div>`;
+  let html = `<div class="sidebar-header">
+    <h1>🔬 Rusty-SUNDIALS</h1>
+    <div class="subtitle">Scientific Computing Lab</div>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+      <a href="cray.html" style="color:var(--accent2);font-size:.7rem;text-decoration:none;border:1px solid rgba(6,182,212,.3);padding:4px 8px;border-radius:4px">🚀 Cray-1 Narrative Demo</a>
+      <a href="lean.html" style="color:#c678dd;font-size:.7rem;text-decoration:none;border:1px solid rgba(198,120,221,.3);padding:4px 8px;border-radius:4px">📐 Lean 4 Verification Demo</a>
+    </div>
+  </div>`;
   DOMAINS.forEach(d => {
     const icon = CASES.find(c=>c.domain===d)?.icon||'';
     html += `<div class="domain-group"><div class="domain-title"><span class="icon">${icon}</span>${d}</div>`;
