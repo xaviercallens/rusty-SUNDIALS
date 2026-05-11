@@ -11,6 +11,7 @@ pub mod math;
 pub mod generated;
 pub mod band_solver;
 pub mod gmres;
+pub mod dual;
 
 
 pub use context::Context;
