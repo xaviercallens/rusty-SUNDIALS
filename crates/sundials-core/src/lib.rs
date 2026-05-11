@@ -12,6 +12,7 @@ pub mod generated;
 pub mod band_solver;
 pub mod gmres;
 pub mod dual;
+pub mod mpir;
 
 
 pub use context::Context;
