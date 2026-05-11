@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "batch_id": "sundials-full-20260511-150934",
+  "timestamp": "2026-05-11T13:47:22.206345+00:00",
+  "source": {
+    "file": "sundials_context.c",
+    "loc": 314
+  },
+  "target": {
+    "file": "sundials_context.rs",
+    "lines": 335,
+    "unsafe_blocks": 0
+  },
+  "verification": {
+    "status": "unknown",
+    "certificate": "none",
+    "engines": [
+      "DeepProbLog",
+      "MonteCarlo",
+      "Heuristic",
+      "Lean4"
+    ]
+  },
+  "pipeline": "SpecToRust Premium v1.0 (GPT-5.3-Codex + SocrateDev)"
+}
