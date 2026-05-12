@@ -60,6 +60,50 @@ impl NordsieckArray {
         }
     }
 
+    /// Rescale the Nordsieck array with interpolation when the step size change is large.
+    ///
+    /// When `η = h_new / h` is far from 1.0, simple rescaling is inaccurate.
+    /// This method interpolates the polynomial to the new scaled time points to
+    /// maintain numerical correctness and accuracy for high-order methods.
+    ///
+    /// The interpolating transformation matrix is upper triangular with elements:
+    ///   $T_{i,j} = \binom{j}{i} \eta^i$  for $j \ge i$
+    ///
+    /// Corresponds to `CVAdjustNordsieck` in SUNDIALS CVODE.
+    pub fn rescale_with_interpolation(&mut self, eta: Real, order: usize) {
+        let n = self.n;
+        // Scratch buffer for the new scaled array
+        let mut new_z = vec![vec![0.0; n]; order + 1];
+        
+        // Compute combinations C(j, i) dynamically or via simple loops.
+        // For Nordsieck size q <= 5, Pascal's triangle is trivial.
+        let mut binom = [[0.0; NORDSIECK_SIZE]; NORDSIECK_SIZE];
+        for j in 0..NORDSIECK_SIZE {
+            binom[j][0] = 1.0;
+            for i in 1..=j {
+                binom[j][i] = binom[j-1][i-1] + binom[j-1][i];
+            }
+        }
+
+        // T_{i,j} = C(j, i) * η^i
+        let mut factor = eta;
+        for i in 1..=order {
+            for j in i..=order {
+                let coeff = binom[j][i] * factor;
+                let z_j = self.z[j].as_slice();
+                for k in 0..n {
+                    new_z[i][k] += coeff * z_j[k];
+                }
+            }
+            factor *= eta;
+        }
+
+        // Apply back to self (z_0 remains unchanged)
+        for i in 1..=order {
+            self.z[i].as_mut_slice().copy_from_slice(&new_z[i]);
+        }
+    }
+
     /// Apply the predictor: compute y_predicted from the Nordsieck array.
     ///
     /// y_pred = sum_{i=0}^{q} z[i]  (Pascal's triangle evaluation)
