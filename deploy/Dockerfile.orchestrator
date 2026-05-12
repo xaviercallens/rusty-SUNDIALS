@@ -1,0 +1,31 @@
+# Auto-Research Orchestrator Dockerfile
+# This container runs the lightweight python orchestrator on GCP Cloud Run (Serverless CPU).
+# It routes LLM inference to Vertex AI Serverless A100 endpoints.
+
+FROM python:3.12-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Lean 4 via Elan (Lightweight installation for REPL access)
+RUN curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+ENV PATH="/root/.elan/bin:${PATH}"
+
+WORKDIR /app
+
+# Copy the orchestrator
+COPY autoresearch_agent/ /app/autoresearch_agent/
+COPY formal_proofs/ /app/formal_proofs/
+
+# Install python dependencies
+RUN pip install --no-cache-dir -r autoresearch_agent/requirements.txt
+RUN pip install --no-cache-dir google-cloud-aiplatform # Required for Vertex AI
+
+WORKDIR /app/autoresearch_agent
+
+# The entrypoint can be an API (if using Cloud Run webserver) or a Cron Job
+CMD ["python3", "orchestrator.py"]
