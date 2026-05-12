@@ -1,0 +1,16 @@
+[package]
+name = "rusty-sundials-py"
+version = "0.1.0"
+edition = "2021"
+authors = ["Xavier Callens <x.callens@example.com>"]
+description = "Python bindings for Rusty-SUNDIALS SciML engine"
+
+[lib]
+name = "rusty_sundials"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.20", features = ["extension-module"] }
+cvode = { path = "../cvode" }
+nvector = { path = "../nvector" }
+sundials-core = { path = "../sundials-core" }

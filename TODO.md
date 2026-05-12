@@ -51,7 +51,7 @@
 - [x] Sparse matrix support (CSR/CSC storage + sparse LU)
 - [x] Reproducible floating-point via compensated summation (Demmel & Nguyen 2015)
 - [ ] `no_std` support for embedded scientific computing
-- [ ] Python bindings via PyO3
+- [x] Python bindings via PyO3
 
 ### v2.5 / v3.0 — Advanced Solvers
 - [ ] Forward sensitivity analysis (`cvodes`)
