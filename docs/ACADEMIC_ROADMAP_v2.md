@@ -9,6 +9,8 @@
 
 Rusty-SUNDIALS has achieved a strong foundation: BDF(1-5), Adams-Moulton, GMRES, MPIR, EPIRK, PINN initial guess, Dual-number AutoDiff, 99.5% function coverage, and 20 Lean 4 specifications. However, an honest academic review reveals **critical gaps** that separate it from being a publishable, industrial-grade solver. This document identifies 12 improvements across 4 tiers.
 
+**The "Hero" Benchmark for Worldwide Recognition:** To truly disrupt the scientific computing ecosystem and attract Tier 1 partnerships (e.g., CEA Cadarache, EUROfusion), rusty-SUNDIALS will target **Extended Magnetohydrodynamics (xMHD)** for Nuclear Fusion. By simulating the extreme stiffness of the *Tearing Mode Instability*, we will validate the SciML Engine (Zero-Cost Auto-Diff, Deep Preconditioners, Mixed-Precision, and RRK), proving that safe Rust can out-perform 30 years of legacy Fortran/C++ stacks in Exascale environments.
+
 ---
 
 ## Tier 1 — Algorithmic Correctness *(Critical for any academic publication)*
