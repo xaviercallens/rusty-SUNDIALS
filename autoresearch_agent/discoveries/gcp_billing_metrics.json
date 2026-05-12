@@ -1,0 +1,23 @@
+[
+    {
+        "timestamp": "2026-05-12T20:38:47.009541",
+        "event": "GPU_WAKE",
+        "message": "Serverless A100 Scaling up from 0 to 1 replica.",
+        "cost_added": 0.0,
+        "total_cost_so_far": 0.0
+    },
+    {
+        "timestamp": "2026-05-12T20:38:52.213113",
+        "event": "GPU_SLEEP",
+        "message": "A100 scaled to 0. Billed for 120.0s.",
+        "cost_added": 0.131,
+        "total_cost_so_far": 0.131
+    },
+    {
+        "timestamp": "2026-05-12T20:38:55.382990",
+        "event": "SESSION_END",
+        "message": "Session terminated. Total Cloud Run + CodeBERT + A100 costs finalized.",
+        "cost_added": 0.00604637009747823,
+        "total_cost_so_far": 0.13704637009747822
+    }
+]

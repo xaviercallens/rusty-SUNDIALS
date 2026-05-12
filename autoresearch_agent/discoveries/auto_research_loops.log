@@ -12,3 +12,4 @@
 [Loop 1/10] [Auto-LaTeX] Generating LaTeX paper and submitting to arXiv...
 [Loop 1/10] 🎉 Run Successful. Loop cycle complete.
 [Loop 1/10] Auto-Research limit reached or discovery published. Shutting down orchestrator.
+[Loop 1/10] Discovery Loop Completed! Artifacts exported to discoveries/. Total Compute Cost: $0.1370

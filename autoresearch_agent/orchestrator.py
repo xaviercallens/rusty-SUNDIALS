@@ -15,6 +15,7 @@ from syntax_codebert import CodeBERTSynthesizer
 from lean_repl_hook import verify_lean_proof
 from physics_gatekeeper import evaluate_physics
 from slurm_exascale import submit_job
+from cost_monitor import CostMonitor
 
 class Orchestrator:
     def __init__(self):
@@ -24,6 +25,7 @@ class Orchestrator:
         self.loop_count = 0
         self.max_loops = 10
         self.history = []
+        self.billing = CostMonitor()
 
     def log(self, msg: str):
         print(f"[Loop {self.loop_count}/{self.max_loops}] {msg}")
@@ -70,13 +72,16 @@ class Orchestrator:
             except:
                 method_name = "AI_Solver"
                 
+            self.billing.wake_a100()
             proof_valid = verify_lean_proof(lean_code, method_name)
             if not proof_valid:
                 self.log("❌ REJECTED: Lean 4 failed to prove iteration matrix bounded norm.")
+                self.billing.sleep_a100()
                 continue # Back to hypothesize
             
             # Certificate generated!
             self.log("✅ ACCEPTED: Lean 4 proved bounded state norm. Q.E.D. generated.")
+            self.billing.sleep_a100()
             self.context['lean_certificate'] = f"CERT-LEAN4-{hash(rust_code)}"
             self.state = "EXECUTE_MPI"
 
@@ -138,9 +143,12 @@ class Orchestrator:
         
         # Save history
         os.makedirs("discoveries", exist_ok=True)
+        total_cost = self.billing.finalize_session()
+        self.log(f"Discovery Loop Completed! Artifacts exported to discoveries/. Total Compute Cost: ${total_cost:.4f}")
+        
         with open("discoveries/auto_research_loops.log", "w") as f:
             f.write("\n".join(self.history))
-        print("Discovery Loop Completed! Artifacts exported to discoveries/")
+        print(f"Discovery Loop Completed! Artifacts exported to discoveries/. Total Compute Cost: ${total_cost:.4f}")
 
 class SecurityError(Exception):
     pass
