@@ -89,12 +89,12 @@
 - [ ] Abstract `SUNPreconditioner` and `SUNLinearSolver` into pure safe Rust traits in `core_engine/src/traits.rs`
 - [ ] Install Charon toolchain: `cargo install --git https://github.com/AeneasVerif/charon.git charon`
 - [ ] Write `Makefile`/`justfile` for `charon → aeneas` LLBC extraction pipeline
-- [ ] Write anchor axioms in `formal_proofs/RustySundials.lean` (energy conservation, exact Jacobian bounds)
-- [ ] Scaffold monorepo: `core_engine/`, `formal_proofs/`, `autoresearch_agent/`, `discoveries/`
+- [x] Write anchor axioms in `formal_proofs/RustySundials.lean` (energy conservation, exact Jacobian bounds)
+- [x] Scaffold monorepo: `core_engine/`, `formal_proofs/`, `autoresearch_agent/`, `discoveries/`
 - [x] Lean 4 Phase 6 formal spec: `proofs/lean4/roadmap/v6_autodiscovery.lean` (9 theorems/classes)
 
 ### M6.2 — DeepProbLog Physics Gatekeeper (Weeks 4–6)
-- [ ] Write `autoresearch_agent/physics_gatekeeper.pl` encoding xMHD invariants:
+- [x] Write `autoresearch_agent/physics_gatekeeper.pl` encoding xMHD invariants:
   - `valid_topology(AST) :- preserves_divergence_free(AST)`
   - `thermo_safe(AST) :- conserves_energy(AST)`
   - `evaluate_proposal(AST) :- method_approved(AST), Prob_Stable > 0.99`
@@ -104,15 +104,15 @@
 
 ### M6.3 — CodeBERT Synthesizer (Weeks 7–9)
 - [ ] Fine-tune CodeBERT on rusty-SUNDIALS codebase + SUNDIALS C-API corpus
-- [ ] Implement `autoresearch_agent/syntax_codebert.py` for Rust/Lean AST generation
+- [x] Implement `autoresearch_agent/syntax_codebert.py` for Rust/Lean AST generation
 - [ ] Validate synthesized Rust compiles and passes `cargo check`
 - [ ] Test on 3 known SciML preconditioner implementations (ILU, FLAGNO mock, AMG)
 
 ### M6.4 — LangGraph Orchestrator Loop (Weeks 10–13)
-- [ ] Implement `autoresearch_agent/orchestrator.py` with 6-node LangGraph state machine:
+- [x] Implement `autoresearch_agent/orchestrator.py` with 6-node LangGraph state machine:
   - `Hypothesize → PhysicsCheck → CodeSynthesize → LeanVerify → ExascaleDeploy → AutoPublish`
-- [ ] Implement `autoresearch_agent/hypothesizer_llm.py` (Claude 3.5 Opus / Llama-4 ArXiv-RAG)
-- [ ] Implement `autoresearch_agent/lean_repl_hook.py` (Python ↔ Lean 4 REPL via subprocess)
+- [x] Implement `autoresearch_agent/hypothesizer_llm.py` (Claude 3.5 Opus / Llama-4 ArXiv-RAG)
+- [x] Implement `autoresearch_agent/lean_repl_hook.py` (Python ↔ Lean 4 REPL via subprocess)
 - [ ] Verify `no_shortcut_to_deploy` in practice: attempt to route directly to Deploy without proof
 - [ ] Run 10 full autonomous loops; log hypothesis → proof → rejection/acceptance cycles
 
