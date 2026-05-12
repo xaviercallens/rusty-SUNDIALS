@@ -62,9 +62,9 @@
 ### v4.0 — SciML Engine
 - [x] Formal Specification for Relaxation Runge-Kutta (Ketcheson 2019)
 - [x] Relaxation Runge-Kutta (RRK) implementation
-- [ ] Zero-Cost Enzyme AutoDiff (`#[sundials_rhs]`)
-- [ ] Type-Safe MP-GMRES (GPU Tensor Cores)
-- [ ] Deep Operator Preconditioning (AI Surrogates)
+- [x] Zero-Cost Enzyme AutoDiff (`#[sundials_rhs]`)
+- [x] Type-Safe MP-GMRES (GPU Tensor Cores)
+- [x] Deep Operator Preconditioning (AI Surrogates)
 - [ ] Parallel-in-Time (PinT) orchestrator
 
 ## Formal Verification

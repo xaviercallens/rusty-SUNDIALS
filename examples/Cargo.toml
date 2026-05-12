@@ -86,3 +86,7 @@ path = "fitzhugh_nagumo.rs"
 [[example]]
 name = "three_body"
 path = "three_body.rs"
+
+[[example]]
+name = "fusion_mhd_benchmark"
+path = "fusion_mhd_benchmark.rs"
