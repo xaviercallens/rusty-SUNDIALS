@@ -1,0 +1,12 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/rusty-sundials-autoresearch'
+      - '-f'
+      - 'deploy/cloudrun/Dockerfile'
+      - '.'
+images:
+  - 'gcr.io/$PROJECT_ID/rusty-sundials-autoresearch'
+timeout: '600s'

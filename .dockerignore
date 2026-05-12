@@ -1,0 +1,17 @@
+.git
+target
+*.png
+*.pdf
+*.csv
+__pycache__
+.DS_Store
+webapp
+core_engine
+crates
+examples
+proofs
+formal_proofs
+scripts
+docs
+*.md
+!deploy/cloudrun/requirements.txt
