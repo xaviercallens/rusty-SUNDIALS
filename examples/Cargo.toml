@@ -95,3 +95,7 @@ path = "fusion_mhd_benchmark.rs"
 [[example]]
 name = "fusion_sciml_phase5"
 path = "fusion_sciml_phase5.rs"
+
+[[example]]
+name = "tearing_mode_hero_test"
+path = "tearing_mode_hero_test.rs"
