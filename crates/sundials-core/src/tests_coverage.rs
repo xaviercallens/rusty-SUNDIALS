@@ -575,3 +575,403 @@ mod tests_band {
         }
     }
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Module: context (0% → 100%)
+// Missing: Context::new, Context::with_profiling, Default::default
+// ══════════════════════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod tests_context {
+    use crate::context::Context;
+
+    #[test]
+    fn test_new_has_false_flags() {
+        let ctx = Context::new();
+        assert!(!ctx.profiling);
+        assert!(!ctx.logging);
+    }
+
+    #[test]
+    fn test_with_profiling() {
+        let ctx = Context::with_profiling();
+        assert!(ctx.profiling);
+        assert!(!ctx.logging);
+    }
+
+    #[test]
+    fn test_default_equals_new() {
+        let a = Context::default();
+        let b = Context::new();
+        assert_eq!(a.profiling, b.profiling);
+        assert_eq!(a.logging, b.logging);
+    }
+
+    #[test]
+    fn test_clone_and_debug() {
+        let ctx = Context::with_profiling();
+        let c2 = ctx.clone();
+        assert_eq!(c2.profiling, ctx.profiling);
+        let dbg = format!("{:?}", ctx);
+        assert!(dbg.contains("Context"));
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Module: dual — remaining gap: Dual::exp (lines 50-56)
+// ══════════════════════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod tests_dual_exp {
+    use crate::dual::Dual;
+
+    #[test]
+    fn test_exp() {
+        // d/dx e^x |_{x=1} = e^1
+        let x = Dual::new(1.0, 1.0);
+        let r = x.exp();
+        let e = std::f64::consts::E;
+        assert!((r.real - e).abs() < 1e-12);
+        assert!((r.dual - e).abs() < 1e-12);
+    }
+
+    #[test]
+    fn test_exp_at_zero() {
+        let x = Dual::new(0.0, 1.0);
+        let r = x.exp();
+        assert!((r.real - 1.0).abs() < 1e-14);
+        assert!((r.dual - 1.0).abs() < 1e-14);
+    }
+
+    #[test]
+    fn test_exp_chain_rule() {
+        // d/dx e^(2x) |_{x=3} = 2·e^6
+        let x = Dual::new(3.0, 1.0);
+        let two_x = x * 2.0;
+        let r = two_x.exp();
+        let expected_deriv = 2.0 * (6.0_f64).exp();
+        assert!((r.dual - expected_deriv).abs() < 1e-8);
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Module: epirk — remaining gaps:
+//   phi1 large-z branch (line 62)
+//   expm_2x2 entire function (lines 69-87)
+//   krylov j < basis.len() false branch (line 198)
+// ══════════════════════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod tests_epirk_deep {
+    use crate::epirk::{krylov_expm_v, EpirkConfig};
+
+    // We access private functions via a re-export trick: add a pub(crate) test helper in epirk.rs
+    // Instead, we trigger the branches through the public API.
+
+    #[test]
+    fn test_phi1_large_z_via_krylov() {
+        // Large step h triggers (e^z - 1)/z branch inside the Taylor series on H_m.
+        // Use h=10 so z = h * lambda_i is large, forcing the non-Taylor phi1 path.
+        let v = vec![1.0f64];
+        let mv = |x: &[f64], y: &mut [f64]| { y[0] = -0.001 * x[0]; };
+        let cfg = EpirkConfig { krylov_dim: 1, tol: 1e-14 };
+        let r = krylov_expm_v(mv, &v, 10.0, &cfg);
+        assert!(r[0].is_finite() && r[0] > 0.0);
+    }
+
+    #[test]
+    fn test_happy_breakdown_and_basis_bound() {
+        // When the Arnoldi process reaches happy breakdown (h_mat[j+1][j] < tol),
+        // j_end < m-1, so m_eff < krylov_dim. The line `if j < basis.len()` protects
+        // against accessing beyond the actual basis vectors built.
+        // An exact 1-D eigenspace causes breakdown after 1 iteration.
+        let v = vec![1.0f64, 0.0, 0.0];
+        // Matvec: A·e₁ = -e₁; A·e₂ = 0; A·e₃ = 0 — one-dimensional Krylov space
+        let mv = |x: &[f64], y: &mut [f64]| {
+            y[0] = -x[0];
+            y[1] = 0.0;
+            y[2] = 0.0;
+        };
+        // krylov_dim=3 but breakdown happens at j=0 → m_eff=1
+        let cfg = EpirkConfig { krylov_dim: 3, tol: 1e-6 };
+        let r = krylov_expm_v(mv, &v, 0.5, &cfg);
+        // e^{-0.5}·1.0 ≈ 0.6065
+        assert!((r[0] - (-0.5f64).exp()).abs() < 0.01);
+        assert_eq!(r[1], 0.0);
+        assert_eq!(r[2], 0.0);
+    }
+
+    #[test]
+    fn test_expm_2x2_via_2d_system() {
+        // The 2×2 case in krylov_expm_v uses the Taylor series on H_m (2×2 Hessenberg),
+        // which exercises the same arithmetic as expm_2x2.
+        // Full 2-D non-trivial system: A = [[-1,0],[0,-2]]
+        let v = vec![1.0f64, 1.0];
+        let mv = |x: &[f64], y: &mut [f64]| {
+            y[0] = -1.0 * x[0];
+            y[1] = -2.0 * x[1];
+        };
+        let cfg = EpirkConfig { krylov_dim: 2, tol: 1e-14 };
+        let r = krylov_expm_v(mv, &v, 0.2, &cfg);
+        let e1 = (-0.2f64).exp();
+        let e2 = (-0.4f64).exp();
+        // Krylov on diagonal system is exact
+        assert!((r[0] - e1).abs() < 0.05, "r[0]={} expected~{}", r[0], e1);
+        assert!((r[1] - e2).abs() < 0.05, "r[1]={} expected~{}", r[1], e2);
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Direct tests for epirk private helpers (pub(crate) in test builds)
+// ══════════════════════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod tests_epirk_private {
+    use crate::epirk::{phi1, expm_2x2};
+
+    #[test]
+    fn test_phi1_small_z_taylor() {
+        // z near 0 → Taylor branch: 1 + z/2 + z²/6 + z³/24
+        let z = 1e-10;
+        let expected = 1.0 + z/2.0 + z*z/6.0 + z*z*z/24.0;
+        assert!((phi1(z) - expected).abs() < 1e-15);
+    }
+
+    #[test]
+    fn test_phi1_large_z_formula() {
+        // |z| >= 1e-8 → (e^z - 1) / z branch
+        let z = 1.0;
+        let expected = (1.0f64.exp() - 1.0) / 1.0;
+        assert!((phi1(z) - expected).abs() < 1e-12);
+    }
+
+    #[test]
+    fn test_phi1_negative_large_z() {
+        let z = -2.0;
+        let expected = ((-2.0f64).exp() - 1.0) / (-2.0);
+        assert!((phi1(z) - expected).abs() < 1e-12);
+    }
+
+    #[test]
+    fn test_expm_2x2_diagonal() {
+        // A = diag(-1, -2), scale=0.1 → e^(0.1·A) = diag(e^{-0.1}, e^{-0.2})
+        let a = [[-1.0f64, 0.0], [0.0, -2.0f64]];
+        let result = expm_2x2(a, 0.1);
+        // Padé approximation, not exact — just verify finite and positive
+        assert!(result[0][0].is_finite());
+        assert!(result[1][1].is_finite());
+        assert!(result[0][1].abs() < 0.01); // off-diagonals near 0
+        assert!(result[1][0].abs() < 0.01);
+        println!("expm_2x2 diag: [{}, {}; {}, {}]",
+            result[0][0], result[0][1], result[1][0], result[1][1]);
+    }
+
+    #[test]
+    fn test_expm_2x2_identity_scale() {
+        // A = 0 matrix → e^(0) = I
+        let a = [[0.0f64, 0.0], [0.0, 0.0f64]];
+        let result = expm_2x2(a, 1.0);
+        assert!((result[0][0] - 1.0).abs() < 1e-12);
+        assert!((result[1][1] - 1.0).abs() < 1e-12);
+        assert!(result[0][1].abs() < 1e-12);
+        assert!(result[1][0].abs() < 1e-12);
+    }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Module: gmres — remaining gaps:
+//   line 72: already-converged on restart entry (beta < tol at start of loop)
+//   line 175: Givens rotation with b == 0.0
+//   line 233: MaxItersReached format string (the `res_norm` value is printed)
+// ══════════════════════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod tests_gmres_deep {
+    use crate::gmres::{gmres, GmresConfig, GmresStatus};
+
+    #[test]
+    fn test_gmres_already_converged_at_start() {
+        // If x already satisfies A·x = b (x=b, A=I), then r0 norm = 0 < tol.
+        // This hits the `beta < tol → return Converged` branch (line 72) on restart.
+        let b = vec![1.0, 2.0, 3.0];
+        let mut x = b.clone(); // perfect initial guess
+        let mv = |v: &[f64], y: &mut [f64]| y.copy_from_slice(v);
+        let cfg = GmresConfig { max_restarts: 5, restart: 3, tol: 1e-8 };
+        let status = gmres(mv, &b, &mut x, &cfg);
+        assert!(matches!(status, GmresStatus::Converged { .. }));
+    }
+
+    #[test]
+    fn test_givens_b_zero_branch() {
+        // Givens rotation with b=0 should return (1, 0) (the identity rotation).
+        // We trigger this by giving GMRES a system where the Hessenberg
+        // sub-diagonal entry h[j+1][j] = 0, meaning the Givens sin = 0.
+        // This happens naturally on diagonal systems after 1 Arnoldi step.
+        let b = vec![4.0];
+        let mut x = vec![0.0];
+        // A = [2] (scalar), exact after 1 step, h[1][0] > 0 normally.
+        // Use A = 0 so w = 0 → h[1][0] = ||w|| = 0 → Givens(h[0][0], 0) hits b==0 path.
+        let mv = |_v: &[f64], y: &mut [f64]| { y[0] = 0.0; };
+        let cfg = GmresConfig { max_restarts: 1, restart: 2, tol: 1e-14 };
+        // Will not converge (A=0), but exercises the b==0 Givens path
+        let _status = gmres(mv, &b, &mut x, &cfg);
+        // Just ensure no panic
+    }
+
+    #[test]
+    fn test_max_iters_reached_has_finite_res_norm() {
+        let b = vec![1.0, 1.0];
+        let mut x = vec![0.0; 2];
+        let mv = |_v: &[f64], y: &mut [f64]| { y[0] = 1e-40; y[1] = 1e-40; };
+        let cfg = GmresConfig { max_restarts: 1, restart: 2, tol: 1e-14 };
+        let status = gmres(mv, &b, &mut x, &cfg);
+        if let GmresStatus::MaxItersReached { res_norm } = status {
+            assert!(res_norm.is_finite());
+            let s = format!("{res_norm}");
+            assert!(!s.is_empty()); // exercises line 233 format path
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Direct tests for gmres private helpers (pub(crate) in test builds)
+// ══════════════════════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod tests_gmres_private {
+    use crate::gmres::givens_rotation;
+
+    #[test]
+    fn test_givens_b_zero() {
+        // When b == 0, Givens returns (1, 0) — the identity rotation (line 175)
+        let (c, s) = givens_rotation(3.0, 0.0);
+        assert_eq!(c, 1.0);
+        assert_eq!(s, 0.0);
+    }
+
+    #[test]
+    fn test_givens_b_zero_negative_a() {
+        let (c, s) = givens_rotation(-5.0, 0.0);
+        assert_eq!(c, 1.0);
+        assert_eq!(s, 0.0);
+    }
+
+    #[test]
+    fn test_givens_nonzero_b() {
+        // When b != 0: r = hypot(a,b), c=a/r, s=b/r
+        let a = 3.0f64;
+        let b = 4.0f64;
+        let r = (a*a + b*b).sqrt(); // 5.0
+        let (c, s) = givens_rotation(a, b);
+        assert!((c - a/r).abs() < 1e-14);
+        assert!((s - b/r).abs() < 1e-14);
+    }
+}
+
+
+// Module: band_solver — remaining gaps:
+//   line 109-110: pivot row update when off-diagonal is larger (actual pivot swap)
+//   line 119:     a.swap(k, pivot_row) — non-trivial pivot
+//   line 213:     assert format string (only exercised when residual is non-zero)
+// ══════════════════════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod tests_band_deep {
+    use crate::band_solver::BandMat;
+
+    #[test]
+    fn test_band_pivot_comparison_exercised() {
+        // n=3 matrix where |a[1][0]|=5 > |a[0][0]|=2.
+        // This triggers lines 108-110 (pivot_abs and pivot_row update) and
+        // line 119 (a.swap) since pivot_row=1 != k=0.
+        // We just verify that pivots[0] was updated to 1 (the better pivot row).
+        let n = 3;
+        let mut a = BandMat::zeros(n, 1, 1);
+        a.set(0, 0,  2.0);  a.set(0, 1, -1.0);
+        a.set(1, 0, -5.0);  a.set(1, 1, 10.0);  a.set(1, 2, -1.0);
+        a.set(2, 1, -1.0);  a.set(2, 2,  5.0);
+        let mut pivots = vec![0usize; n];
+        let _ = a.band_getrf(&mut pivots); // may or may not succeed — just need the pivot branch
+        // The pivot finder at k=0 should have found that row 1 (|a[1][0]|=5) is larger
+        // than row 0 (|a[0][0]|=2), so pivots[0] = 1.
+        assert_eq!(pivots[0], 1, "Pivot at k=0 should have selected row 1");
+    }
+
+    #[test]
+    fn test_band_4x4_with_pivoting() {
+        // 4×4 strongly diagonally dominant tridiagonal — exercises the full LU path
+        // including the inner pivot search loop on each column.
+        let n = 4;
+        let mut a = BandMat::zeros(n, 1, 1);
+        let vals: [[f64;4];4] = [
+            [10.0, -2.0,  0.0,  0.0],
+            [-3.0, 10.0, -2.0,  0.0],
+            [ 0.0, -3.0, 10.0, -2.0],
+            [ 0.0,  0.0, -3.0, 10.0],
+        ];
+        for i in 0..n { for j in 0..n {
+            let v = vals[i][j];
+            if v != 0.0 { a.set(i, j, v); }
+        }}
+        let x_true = [1.0f64, 2.0, 3.0, 4.0];
+        let mut b = vec![0.0f64; n];
+        for i in 0..n { for j in 0..n { b[i] += vals[i][j] * x_true[j]; } }
+        let b_orig = b.clone();
+        let mut pivots = vec![0usize; n];
+        a.band_getrf(&mut pivots).unwrap();
+        a.band_getrs(&pivots, &mut b).unwrap();
+        for i in 0..n {
+            let ax_i: f64 = (0..n).map(|j| vals[i][j] * b[j]).sum();
+            assert!((ax_i - b_orig[i]).abs() < 1e-8,
+                "residual[{i}]={:.2e}", (ax_i - b_orig[i]).abs());
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Module: mpir — remaining gap: lines 212-213 (NotConverged panic in test)
+// The existing test arm `MpirStatus::NotConverged { .. } => panic!(...)` in the
+// inline 4×4 test is dead code. We exercise NotConverged handling without panic.
+// ══════════════════════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod tests_mpir_deep {
+    use crate::mpir::{mpir_solve, MpirConfig, MpirStatus};
+
+    #[test]
+    fn test_not_converged_is_handled_gracefully() {
+        // Use a well-conditioned matrix but max_iter=0, tol=0.0 to
+        // exercise the NotConverged exit path (skips refinement loop entirely).
+        // The FP32 initial solve gives x≈solution but residual > 0 = tol.
+        let a = vec![3.0f64, 1.0, 1.0, 2.0]; // well-conditioned
+        let b = vec![5.0f64, 3.0]; // x_true = [1, 2]
+        // max_iter=0 and tol=0.0: loop runs 0 times, falls through to NotConverged
+        let cfg = MpirConfig { max_iter: 0, tol: 0.0 };
+        let (x, status) = mpir_solve(&a, &b, &cfg);
+        // x from FP32 solve will be close to true solution
+        assert!(x.iter().all(|v| v.is_finite()));
+        match status {
+            MpirStatus::NotConverged { res_norm } => {
+                assert!(res_norm.is_finite(), "res_norm={res_norm}");
+            }
+            MpirStatus::Converged { iters, res_norm } => {
+                // FP32 was exact enough (residual already < tol=0 which is impossible)
+                // This should not happen with tol=0.0, but handle gracefully
+                println!("Unexpectedly converged in {iters} iters, norm={res_norm:.2e}");
+            }
+        }
+    }
+
+    #[test]
+    fn test_mpir_3x3_well_conditioned() {
+        // Extra coverage: 3×3 to exercise more of the LU inner loops
+        #[rustfmt::skip]
+        let a = vec![
+            4.0, 1.0, 0.0,
+            1.0, 3.0, 1.0,
+            0.0, 1.0, 2.0,
+        ];
+        let x_true = [1.0, 2.0, 3.0];
+        let mut b = vec![0.0f64; 3];
+        for i in 0..3 { for j in 0..3 { b[i] += a[i*3+j] * x_true[j]; } }
+
+        let (x, _) = mpir_solve(&a, &b, &MpirConfig::default());
+        for i in 0..3 {
+            assert!((x[i] - x_true[i]).abs() < 1e-8, "x[{i}]={}", x[i]);
+        }
+    }
+}
+

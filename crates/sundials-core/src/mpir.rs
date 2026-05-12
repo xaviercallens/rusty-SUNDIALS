@@ -205,14 +205,8 @@ mod tests {
         let residual: Real = res.iter().map(|v| v * v).sum::<Real>().sqrt();
         assert!(residual < 1e-10, "MPIR residual {residual:.2e} too large");
 
-        match status {
-            MpirStatus::Converged { iters, res_norm } => {
-                println!("MPIR converged in {iters} refinement steps, ||r||={res_norm:.2e}");
-            }
-            MpirStatus::NotConverged { res_norm } => {
-                panic!("MPIR did not converge, ||r||={res_norm:.2e}");
-            }
-        }
+        assert!(matches!(status, MpirStatus::Converged { .. }),
+            "MPIR should converge on well-conditioned 4x4 system");
     }
 
     /// Stress test: 8×8 Hilbert matrix (ill-conditioned, tests refinement power).

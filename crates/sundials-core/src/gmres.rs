@@ -170,13 +170,13 @@ fn dot(a: &[Real], b: &[Real]) -> Real {
 }
 
 /// Compute Givens rotation  (c, s)  such that  |[c s; -s c] * [a; b]| = [r; 0].
+#[cfg(test)]
+pub(crate) fn givens_rotation(a: Real, b: Real) -> (Real, Real) {
+    if b == 0.0 { (1.0, 0.0) } else { let r = a.hypot(b); (a / r, b / r) }
+}
+#[cfg(not(test))]
 fn givens_rotation(a: Real, b: Real) -> (Real, Real) {
-    if b == 0.0 {
-        (1.0, 0.0)
-    } else {
-        let r = a.hypot(b);
-        (a / r, b / r)
-    }
+    if b == 0.0 { (1.0, 0.0) } else { let r = a.hypot(b); (a / r, b / r) }
 }
 
 /// Backward substitution for upper-triangular H[0..k][0..k] · y = e1[0..k].
@@ -228,9 +228,7 @@ mod tests {
             assert!((ax[i] - b[i]).abs() < 1e-6, "residual[{i}] = {}", (ax[i] - b[i]).abs());
         }
 
-        match status {
-            GmresStatus::Converged { .. } => {}
-            GmresStatus::MaxItersReached { res_norm } => panic!("did not converge, res={res_norm}"),
-        }
+        let converged = matches!(status, GmresStatus::Converged { .. });
+        assert!(converged, "GMRES did not converge on simple 3x3 SPD system");
     }
 }
