@@ -68,11 +68,11 @@
 - [ ] Parallel-in-Time (PinT) orchestrator
 
 ### v5.0 — Experimental SciML Paradigms (Fusion xMHD)
-- [ ] Phase 5 Formal Specifications (Lean 4)
-- [ ] Disruption 1: AI-Discovered Dynamic IMEX Splitting (Spectral Manifold Splitting)
-- [ ] Disruption 2: Latent-Space Implicit Integration ($LSI^2$)
-- [ ] Disruption 3: Field-Aligned Graph Preconditioning (FLAGNO)
-- [ ] Disruption 4: Asynchronous "Ghost Sensitivities" (tokio + FP8 Tensor Cores)
+- [x] Phase 5 Formal Specifications (Lean 4)
+- [x] Disruption 1: AI-Discovered Dynamic IMEX Splitting (Spectral Manifold Splitting)
+- [x] Disruption 2: Latent-Space Implicit Integration ($LSI^2$)
+- [x] Disruption 3: Field-Aligned Graph Preconditioning (FLAGNO)
+- [x] Disruption 4: Asynchronous "Ghost Sensitivities" (tokio + FP8 Tensor Cores)
 
 ## Formal Verification
 - [x] Scoped floating-point monotonicity axiom in `cvode.lean` (convert `admit` → `axiom`).
