@@ -129,4 +129,12 @@
 - [ ] Benchmark FoGNO vs FLAGNO on 3D xMHD: target FGMRES iterations < 3
 - [ ] Integrate FoGNO into `SUNPreconditioner` C-ABI trait via safe Rust wrapper
 
+## Phase 7: Code Accessibility, CI/CD, and Verification Polish (Review v5.0)
+- [ ] Implement GitHub Actions CI/CD workflows (testing, benchmarks, docs, cross-platform)
+- [ ] Add `proofs/lean4/` and `docs/verification/` directories for formal proofs and trust certificates
+- [ ] Update `README.md` to include Prerequisites and Windows-specific build instructions
+- [ ] Add Issue and PR templates (`.github/ISSUE_TEMPLATE`, `.github/pull_request_template.md`)
+- [ ] Add `CODE_OF_CONDUCT.md`
+- [ ] Move `examples` out of workspace members, or structure it idiomatically
+- [ ] Add `cargo doc` instructions and docs.rs metadata in `Cargo.toml`
 

@@ -87,6 +87,21 @@ RUSTFLAGS="-C target-cpu=native" cargo run --release --example lorenz
 
 ## 🛠️ Installation Guide
 
+### Prerequisites
+
+Before building rusty-SUNDIALS, ensure you have the required system dependencies installed for your platform.
+
+**Ubuntu / Debian:**
+```bash
+sudo apt-get update
+sudo apt-get install cmake python3 build-essential
+```
+
+**Fedora / RHEL:**
+```bash
+sudo dnf install cmake python3 gcc gcc-c++
+```
+
 ### macOS via Homebrew (Recommended)
 
 For macOS users (Intel or Apple Silicon), you can install the necessary toolchain using Homebrew:
@@ -115,7 +130,22 @@ For macOS users (Intel or Apple Silicon), you can install the necessary toolchai
    RUSTFLAGS="-C target-cpu=native" cargo build --release
    ```
 
-### Other Platforms (Linux / Windows)
+### Windows
+
+Building on Windows is fully supported using the MSVC toolchain.
+
+1. **Install Rust**: Download and run `rustup-init.exe` from [rustup.rs](https://rustup.rs). When prompted, ensure you install the default `x86_64-pc-windows-msvc` toolchain.
+2. **Install CMake**: Download the Windows installer from [cmake.org](https://cmake.org/download/) or use `winget install CMake`.
+3. **Install Python**: Download from [python.org](https://www.python.org/downloads/) or the Microsoft Store. Ensure Python is added to your system `PATH`.
+4. **Clone and Build**:
+   ```powershell
+   git clone https://github.com/xaviercallens/rusty-SUNDIALS
+   cd rusty-SUNDIALS
+   cargo build --release
+   ```
+   *(Note: Ensure you run these commands in a Developer Command Prompt or PowerShell with access to the MSVC build tools).*
+
+### Other Platforms (Linux)
 
 1. **Install Rust via rustup** (the official installer):
    ```bash

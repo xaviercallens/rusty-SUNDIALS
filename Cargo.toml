@@ -10,3 +10,7 @@ repository = "https://github.com/xaviercallens/rusty-SUNDIALS"
 [workspace.dependencies]
 rayon = "1.10"
 faer = "0.19"
+
+[workspace.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/docs_header.html"]
