@@ -13,7 +13,7 @@
   - WRMS norm uses parallel tree-reduce (associativity verified by Lean 4 axiom).
 - [ ] Refactor finite-difference Jacobian assembly in `solver.rs` to use `par_iter_mut()` for parallel column generation.
   - *(Requires Cvode to accept `F: Send + Sync` and ParallelVector as its N_Vector type)*
-- [ ] Ensure `CvodeBuilder` and `Rhs` closures are restricted to `Send + Sync`.
+- [x] Ensure `CvodeBuilder` and `Rhs` closures are restricted to `Send + Sync`.
 
 ## Phase 3: Modern Linear Algebra
 - [x] Implement Banded matrix LU solver (`crates/sundials-core/src/band_solver.rs`).
@@ -44,7 +44,7 @@
 - [x] Newton convergence-rate monitoring (ρ = ||δ_m+1|| / ||δ_m||)
 - [x] Dense output via `CVodeGetDky` (Nordsieck polynomial evaluation)
 - [x] Nordsieck rescaling with interpolation for large step-size changes
-- [ ] Thread-safe `Cvode<F>: Send` for ensemble workflows
+- [x] Thread-safe `Cvode<F>: Send` for ensemble workflows
 
 ### v2.0 — Industrial Solver
 - [ ] Preconditioned GMRES (left/right preconditioner callbacks + ILU(0))

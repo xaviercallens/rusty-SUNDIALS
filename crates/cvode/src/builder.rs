@@ -79,7 +79,7 @@ impl CvodeBuilder {
     /// Build the solver with the given RHS function and initial conditions.
     pub fn build<F>(self, rhs: F, t0: Real, y0: SerialVector) -> Result<Cvode<F>, CvodeError>
     where
-        F: FnMut(Real, &[Real], &mut [Real]) -> Result<(), String>,
+        F: FnMut(Real, &[Real], &mut [Real]) -> Result<(), String> + Send + Sync,
     {
         if self.rtol <= 0.0 {
             return Err(CvodeError::Config("rtol must be positive".into()));

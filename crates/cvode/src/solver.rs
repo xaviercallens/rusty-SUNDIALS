@@ -89,7 +89,7 @@ pub struct Cvode<F> {
 
 impl<F> Cvode<F>
 where
-    F: FnMut(Real, &[Real], &mut [Real]) -> Result<(), String>,
+    F: FnMut(Real, &[Real], &mut [Real]) -> Result<(), String> + Send + Sync,
 {
     /// Create a new CVODE solver (called by builder).
     pub(crate) fn new(
@@ -615,5 +615,16 @@ mod tests {
         // k = 100 is way above the current order → should return BadK
         let result = solver.get_dky(0.1, 100, &mut dky);
         assert!(result.is_err(), "get_dky with k > q should fail");
+    }
+
+    #[test]
+    fn test_cvode_is_send_sync() {
+        fn assert_send<T: Send>() {}
+        fn assert_sync<T: Sync>() {}
+
+        // F is a function pointer which is Send + Sync
+        type F = fn(Real, &[Real], &mut [Real]) -> Result<(), String>;
+        assert_send::<Cvode<F>>();
+        assert_sync::<Cvode<F>>();
     }
 }
