@@ -113,14 +113,14 @@
   - `Hypothesize → PhysicsCheck → CodeSynthesize → LeanVerify → ExascaleDeploy → AutoPublish`
 - [x] Implement `autoresearch_agent/hypothesizer_llm.py` (Claude 3.5 Opus / Llama-4 ArXiv-RAG)
 - [x] Implement `autoresearch_agent/lean_repl_hook.py` (Python ↔ Lean 4 REPL via subprocess)
-- [ ] Verify `no_shortcut_to_deploy` in practice: attempt to route directly to Deploy without proof
-- [ ] Run 10 full autonomous loops; log hypothesis → proof → rejection/acceptance cycles
+- [x] Verify `no_shortcut_to_deploy` in practice: attempt to route directly to Deploy without proof
+- [x] Run 10 full autonomous loops; log hypothesis → proof → rejection/acceptance cycles
 
 ### M6.5 — Exascale Execution & Auto-Publication (Weeks 14–16)
-- [ ] Implement `autoresearch_agent/slurm_exascale.py`: SSH → EuroHPC, `cargo build --release --features="mpi,cuda"`, SLURM submit
-- [ ] Run Hero Benchmark autonomously: 3D Magnetic Tearing Mode vs baseline AMG
+- [x] Implement `autoresearch_agent/slurm_exascale.py`: SSH → EuroHPC, `cargo build --release --features="mpi,cuda"`, SLURM submit
+- [x] Run Hero Benchmark autonomously: 3D Magnetic Tearing Mode vs baseline AMG
 - [ ] Implement Auto-LaTeX: Matplotlib graph injection + Lean proof extraction → `.tex` → PDF
-- [ ] Validate `PublishableDiscovery` safety: auto-publish fires only when speedup ≥ 10×
+- [x] Validate `PublishableDiscovery` safety: auto-publish fires only when speedup ≥ 10×
 - [ ] Submit first autonomously generated discovery to arXiv
 
 ### M6.6 — FoGNO Preconditioner (Disruption 5)
