@@ -350,7 +350,114 @@ gantt
 | 5.2 | MP-GMRES | ★★★★★ | 🔴 | **P4 — v4.0** |
 | 5.3 | AI Preconditioners | ★★★★★ | 🟡 | **P4 — v4.0** |
 | 5.4 | Parallel-in-Time | ★★★★☆ | 🔴 | **P4 — v4.0** |
+| 6.1 | LangGraph Orchestrator | ★★★★★ | 🔴🔴 | **P5 — v6.0** |
+| 6.2 | DeepProbLog Gatekeeper | ★★★★★ | 🔴🔴 | **P5 — v6.0** |
+| 6.3 | Aeneas/Charon Bridge | ★★★★★ | 🔴 | **P5 — v6.0** |
+| 6.4 | FoGNO Preconditioner | ★★★★★ | 🔴🔴 | **P5 — v6.0** |
+| 6.5 | Auto-LaTeX Publisher | ★★★★☆ | 🟡 | **P5 — v6.0** |
+| 6.6 | Slurm/EuroHPC Dispatch | ★★★★★ | 🔴 | **P5 — v6.0** |
 
+
+---
+
+---
+
+## Phase 6 — Formally Verified Neuro-Symbolic Auto-Discovery Engine (v6.0)
+
+> *Inspired by Andrej Karpathy's autoresearch concept. Bounded by Lean 4 + DeepProbLog — the world's first hallucination-proof AI physicist.*
+
+### 6.0 Motivation
+
+Phases 1–5 established a manually curated SciML stack achieving 145× speedup on the 2D RMHD Tearing Mode. Phase 6 makes the **discovery process itself autonomous**. The v6 engine runs 24/7, hypothesizing novel SciML algorithms, proving them in Lean 4, synthesizing Rust implementations via CodeBERT, and deploying them to EuroHPC — without human intervention.
+
+The critical innovation over naive LLM auto-research is the **"Verification Sandwich"**: every hypothesis must pass through (1) DeepProbLog xMHD physics gatekeeper, (2) Lean 4 mathematical proof, and (3) Rust memory safety via Aeneas extraction — before it may consume a single exascale CPU-hour.
+
+### 6.1 The v6 Monorepo Architecture
+
+```
+rusty-SUNDIALS-v6/
+├── core_engine/              # Pure safe Rust over sundials-sys
+├── formal_proofs/            # Lean 4 + Aeneas extraction output
+│   └── roadmap/
+│       └── v6_autodiscovery.lean   ← NEW (7 theorems/classes)
+├── autoresearch_agent/       # Python LangGraph Orchestrator
+│   ├── orchestrator.py       # 6-node state machine
+│   ├── hypothesizer_llm.py   # Claude 3.5 Opus / Llama-4 API
+│   ├── physics_gatekeeper.pl # DeepProbLog xMHD invariants
+│   ├── syntax_codebert.py    # Rust/Lean AST generation
+│   ├── lean_repl_hook.py     # Python ↔ Lean 4 REPL feedback
+│   └── slurm_exascale.py     # SSH → EuroHPC SLURM submission
+└── discoveries/              # Auto-generated .tex papers + plots
+```
+
+### 6.2 The Six Disruptions of Phase 6
+
+#### Disruption 5 — Fractional-Order Graph Neural Preconditioner (FoGNO)
+
+Builds on Phase 5 FLAGNO. The innovation is a **fractional spectral exponent α ∈ (0,1]** that smoothly interpolates between local (α→0) and global (α=1) field-line communication across MPI nodes.
+
+- **Lean 4 Spec:** `fogno_fgmres_convergence` (§5 of `v6_autodiscovery.lean`) — proves FGMRES convergence when spectral radius ρ(P_FoGNO) < 1.
+- **Target:** Drop FGMRES iterations below 3 on 3D xMHD (vs 5 in Phase 5).
+
+#### Disruption 6 — LangGraph Verification Sandwich
+
+A 6-node Python LangGraph state machine (`AgentState` in §6 of Lean spec):
+
+| Node | Tool | Guard |
+|---|---|---|
+| `Hypothesize` | Claude 3.5 Opus (ArXiv-RAG) | None |
+| `PhysicsCheck` | DeepProbLog (`physics_gatekeeper.pl`) | `∇·B=0`, helicity, entropy |
+| `CodeSynthesize` | CodeBERT (rusty-SUNDIALS fine-tune) | AST arity/type check |
+| `LeanVerify` | Lean 4 REPL via `lean_repl_hook.py` | Q.E.D. required |
+| `ExascaleDeploy` | `slurm_exascale.py` → EuroHPC SSH | Lean Q.E.D. gate |
+| `AutoPublish` | LaTeX template injection + PDF compile | Speedup ≥ 10× gate |
+
+**Lean Safety Theorem:** `no_shortcut_to_deploy` proves `ExascaleDeploy` is unreachable without `LeanVerify` proven status — structurally preventing hallucinated code from reaching the supercomputer.
+
+#### Disruption 7 — Aeneas/Charon Rust→Lean Bridge
+
+Formalizes the CodeBERT→Rust→Lean pipeline:
+1. `charon`: extracts Rust source to Low-Level Borrow Calculus (LLBC)
+2. `aeneas`: translates LLBC to pure Lean 4 monadic functions
+3. The Lean theorem prover verifies the extracted function against physics axioms
+
+**Lean Axiom:** `aeneas_soundness` — every safe Rust function's Aeneas extraction preserves its mathematical semantics.
+
+#### Disruption 8 — Auto-LaTeX Publication Pipeline
+
+When `PublishableDiscovery` holds (Lean Q.E.D. + speedup ≥ 10×), the agent:
+1. Extracts Matplotlib convergence graphs from benchmark stdout
+2. Formats the mathematical AST into LaTeX equations
+3. Injects both into a *Journal of Computational Physics* / *NeurIPS* `.tex` template
+4. Compiles the PDF (`pdflatex`/`weasyprint`) and submits to arXiv
+
+**Lean Safety:** `auto_latex_safety` — Auto-LaTeX fires only when `speedup ≥ 10`.
+
+### 6.3 Phase 6 Milestones
+
+| Milestone | Weeks | Deliverable |
+|---|---|---|
+| **M6.1** — Deterministic Bridge | 1–3 | Aeneas/Charon pipeline; Anchor axioms in Lean |
+| **M6.2** — DeepProbLog Gatekeeper | 4–6 | `physics_gatekeeper.pl`; AST interop with LLM |
+| **M6.3** — CodeBERT Synthesizer | 7–9 | Fine-tuned model on rusty-SUNDIALS corpus |
+| **M6.4** — LangGraph Loop | 10–13 | Full 6-node state machine; Lean REPL hook |
+| **M6.5** — Exascale Execution | 14–16 | SLURM automation; Hero Benchmark on EuroHPC |
+
+### 6.4 Formal Specification Summary
+
+File: `proofs/lean4/roadmap/v6_autodiscovery.lean`
+
+| Theorem / Class | Type | Guarantees |
+|---|---|---|
+| `DivergenceFree` | Class | ∇·B = 0 preserved |
+| `HelicityConserving` | Class | Magnetic helicity conserved |
+| `EnergyBounded` | Class | ‖P·s‖ ≤ C·‖s‖ |
+| `PhysicsApproved` | Class | All 3 invariants satisfied |
+| `deploy_safety` | Theorem | PhysicsApproved + VerifiedImpl → safe deploy |
+| `fogno_fgmres_convergence` | Theorem | ρ < 1 → FGMRES converges |
+| `no_shortcut_to_deploy` | Theorem | ExascaleDeploy unreachable without Lean Q.E.D. |
+| `no_shortcut_from_check` | Theorem | PhysicsCheck cannot skip to Deploy |
+| `auto_latex_safety` | Theorem | Auto-publish requires speedup ≥ 10× |
 
 ---
 

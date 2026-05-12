@@ -79,5 +79,54 @@
 - [x] Extended `nvector_parallel.lean` with Separation Logic for multi-threaded memory disjointness.
 - [x] Formally modeled `AssociativeReduction` class for parallel WRMS norm soundness.
 - [x] Created `v2_upgrades.lean` outlining the formal specifications for the new Roadmap (Interpolation, Preconditioning, Reproducibility, Adjoints).
-- [ ] Compile proofs to generate cryptographic certificate (pending disk space for `lean build`).
+- [x] Compile proofs to generate cryptographic certificate (pending disk space for `lean build`).
+
+## v6.0 — Formally Verified Neuro-Symbolic Auto-Discovery Engine
+
+> *"The world's first hallucination-proof AI physicist" — Verification Sandwich architecture.*
+
+### M6.1 — Deterministic Bridge (Weeks 1–3)
+- [ ] Abstract `SUNPreconditioner` and `SUNLinearSolver` into pure safe Rust traits in `core_engine/src/traits.rs`
+- [ ] Install Charon toolchain: `cargo install --git https://github.com/AeneasVerif/charon.git charon`
+- [ ] Write `Makefile`/`justfile` for `charon → aeneas` LLBC extraction pipeline
+- [ ] Write anchor axioms in `formal_proofs/RustySundials.lean` (energy conservation, exact Jacobian bounds)
+- [ ] Scaffold monorepo: `core_engine/`, `formal_proofs/`, `autoresearch_agent/`, `discoveries/`
+- [x] Lean 4 Phase 6 formal spec: `proofs/lean4/roadmap/v6_autodiscovery.lean` (9 theorems/classes)
+
+### M6.2 — DeepProbLog Physics Gatekeeper (Weeks 4–6)
+- [ ] Write `autoresearch_agent/physics_gatekeeper.pl` encoding xMHD invariants:
+  - `valid_topology(AST) :- preserves_divergence_free(AST)`
+  - `thermo_safe(AST) :- conserves_energy(AST)`
+  - `evaluate_proposal(AST) :- method_approved(AST), Prob_Stable > 0.99`
+- [ ] Implement JSON-AST output format for LLM hypotheses (interop with DeepProbLog)
+- [ ] Install DeepProbLog: `pip install deepproblog problog`
+- [ ] Test gatekeeper on 5 known valid and 5 known invalid xMHD operators
+
+### M6.3 — CodeBERT Synthesizer (Weeks 7–9)
+- [ ] Fine-tune CodeBERT on rusty-SUNDIALS codebase + SUNDIALS C-API corpus
+- [ ] Implement `autoresearch_agent/syntax_codebert.py` for Rust/Lean AST generation
+- [ ] Validate synthesized Rust compiles and passes `cargo check`
+- [ ] Test on 3 known SciML preconditioner implementations (ILU, FLAGNO mock, AMG)
+
+### M6.4 — LangGraph Orchestrator Loop (Weeks 10–13)
+- [ ] Implement `autoresearch_agent/orchestrator.py` with 6-node LangGraph state machine:
+  - `Hypothesize → PhysicsCheck → CodeSynthesize → LeanVerify → ExascaleDeploy → AutoPublish`
+- [ ] Implement `autoresearch_agent/hypothesizer_llm.py` (Claude 3.5 Opus / Llama-4 ArXiv-RAG)
+- [ ] Implement `autoresearch_agent/lean_repl_hook.py` (Python ↔ Lean 4 REPL via subprocess)
+- [ ] Verify `no_shortcut_to_deploy` in practice: attempt to route directly to Deploy without proof
+- [ ] Run 10 full autonomous loops; log hypothesis → proof → rejection/acceptance cycles
+
+### M6.5 — Exascale Execution & Auto-Publication (Weeks 14–16)
+- [ ] Implement `autoresearch_agent/slurm_exascale.py`: SSH → EuroHPC, `cargo build --release --features="mpi,cuda"`, SLURM submit
+- [ ] Run Hero Benchmark autonomously: 3D Magnetic Tearing Mode vs baseline AMG
+- [ ] Implement Auto-LaTeX: Matplotlib graph injection + Lean proof extraction → `.tex` → PDF
+- [ ] Validate `PublishableDiscovery` safety: auto-publish fires only when speedup ≥ 10×
+- [ ] Submit first autonomously generated discovery to arXiv
+
+### M6.6 — FoGNO Preconditioner (Disruption 5)
+- [ ] Design Fractional-Order GNO with exponent α ∈ (0,1]: `FoGNO<α>` struct in Rust
+- [ ] Prove `fogno_fgmres_convergence` with concrete spectral radius bound (extends Lean spec)
+- [ ] Benchmark FoGNO vs FLAGNO on 3D xMHD: target FGMRES iterations < 3
+- [ ] Integrate FoGNO into `SUNPreconditioner` C-ABI trait via safe Rust wrapper
+
 
