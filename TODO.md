@@ -47,7 +47,7 @@
 - [x] Thread-safe `Cvode<F>: Send` for ensemble workflows
 
 ### v2.0 — Industrial Solver
-- [ ] Preconditioned GMRES (left/right preconditioner callbacks + ILU(0))
+- [x] Preconditioned GMRES (left/right preconditioner callbacks + ILU(0))
 - [ ] Sparse matrix support (CSR/CSC storage + sparse LU)
 - [ ] Reproducible floating-point via compensated summation (Demmel & Nguyen 2015)
 - [ ] `no_std` support for embedded scientific computing

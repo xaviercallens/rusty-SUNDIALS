@@ -13,6 +13,7 @@ pub mod band_solver;
 pub mod gmres;
 pub mod dual;
 pub mod mpir;
+pub mod ilu;
 pub mod epirk;
 pub mod pinn;
 pub mod arkode;
