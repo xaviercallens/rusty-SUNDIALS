@@ -47,6 +47,9 @@ impl Default for GmresConfig {
 /// * `b`      — right-hand side (length N)
 /// * `x`      — initial guess, modified in-place to the solution
 /// * `cfg`    — solver configuration
+/// GMRES(m) solver without preconditioning.
+///
+/// Convenience wrapper over `gmres_preconditioned` using identity preconditioners.
 pub fn gmres<F>(
     matvec: F,
     b: &[Real],
@@ -56,23 +59,57 @@ pub fn gmres<F>(
 where
     F: Fn(&[Real], &mut [Real]),
 {
+    let identity = |v: &[Real], out: &mut [Real]| {
+        out.copy_from_slice(v);
+    };
+    gmres_preconditioned(matvec, b, x, cfg, identity, identity)
+}
+
+/// Preconditioned GMRES(m) solver.
+///
+/// Solves $(M_L^{-1} A M_R^{-1}) y = M_L^{-1} b$ where $x = M_R^{-1} y$.
+///
+/// # Arguments
+/// * `matvec`     — closure computing `y = A·x`
+/// * `b`          — right-hand side (length N)
+/// * `x`          — initial guess, modified in-place to the solution
+/// * `cfg`        — solver configuration
+/// * `left_prec`  — left preconditioner action $y = M_L^{-1} x$
+/// * `right_prec` — right preconditioner action $y = M_R^{-1} x$
+pub fn gmres_preconditioned<F, PL, PR>(
+    matvec: F,
+    b: &[Real],
+    x: &mut Vec<Real>,
+    cfg: &GmresConfig,
+    mut left_prec: PL,
+    mut right_prec: PR,
+) -> GmresStatus
+where
+    F: Fn(&[Real], &mut [Real]),
+    PL: FnMut(&[Real], &mut [Real]),
+    PR: FnMut(&[Real], &mut [Real]),
+{
     let n = b.len();
     let m = cfg.restart;
 
     let mut total_iters = 0usize;
 
     for _restart in 0..=cfg.max_restarts {
-        // r0 = b - A·x
+        // Compute initial residual: r = b - A·x
         let mut ax = vec![0.0; n];
         matvec(x, &mut ax);
-        let mut r: Vec<Real> = b.iter().zip(ax.iter()).map(|(bi, axi)| bi - axi).collect();
+        let r_unprec: Vec<Real> = b.iter().zip(ax.iter()).map(|(bi, axi)| bi - axi).collect();
+
+        // Apply left preconditioner: r_0 = M_L^{-1} (b - A·x)
+        let mut r = vec![0.0; n];
+        left_prec(&r_unprec, &mut r);
 
         let beta = norm2(&r);
         if beta < cfg.tol {
             return GmresStatus::Converged { iters: total_iters, res_norm: beta };
         }
 
-        // Arnoldi basis  V[0..m+1][n],  Hessenberg H[m+1][m]
+        // Arnoldi basis V[0..m+1][n], Hessenberg H[m+1][m]
         let mut v: Vec<Vec<Real>> = Vec::with_capacity(m + 1);
         let mut h: Vec<Vec<Real>> = vec![vec![0.0; m]; m + 1];
 
@@ -80,10 +117,8 @@ where
         let r0: Vec<Real> = r.iter().map(|ri| ri / beta).collect();
         v.push(r0);
 
-        // Givens rotation cosines and sines
         let mut cs = vec![0.0; m];
         let mut sn = vec![0.0; m];
-        // RHS of the least-squares problem in the Krylov subspace
         let mut e1 = vec![0.0; m + 1];
         e1[0] = beta;
 
@@ -93,9 +128,17 @@ where
             j_end = j;
             total_iters += 1;
 
-            // w = A · v[j]
+            // Apply right preconditioner: zj = M_R^{-1} v[j]
+            let mut zj = vec![0.0; n];
+            right_prec(&v[j], &mut zj);
+
+            // Matrix-vector product: w_unprec = A · zj
+            let mut w_unprec = vec![0.0; n];
+            matvec(&zj, &mut w_unprec);
+
+            // Apply left preconditioner: w = M_L^{-1} w_unprec
             let mut w = vec![0.0; n];
-            matvec(&v[j], &mut w);
+            left_prec(&w_unprec, &mut w);
 
             // Modified Gram-Schmidt orthogonalisation
             for i in 0..=j {
@@ -114,13 +157,13 @@ where
             let wn = w.iter().map(|wi| wi / h[j + 1][j]).collect();
             v.push(wn);
 
-            // Apply previous Givens rotations to column j of H
+            // Apply previous Givens rotations
             for i in 0..j {
                 let tmp =  cs[i] * h[i][j] + sn[i] * h[i + 1][j];
                 h[i + 1][j] = -sn[i] * h[i][j] + cs[i] * h[i + 1][j];
                 h[i][j] = tmp;
             }
-            // Compute new Givens rotation for (h[j][j], h[j+1][j])
+            // Compute new Givens rotation
             let (c, s) = givens_rotation(h[j][j], h[j + 1][j]);
             cs[j] = c; sn[j] = s;
 
@@ -132,22 +175,44 @@ where
 
             let res: Real = e1[j + 1].abs();
             if res < cfg.tol {
-                // Solve upper triangular system and update x
                 let y = back_solve(&h, &e1, j + 1);
-                update_x(x, &v, &y, j + 1);
+                
+                // Form solution: x_new = x_old + M_R^{-1} V y
+                let mut vy = vec![0.0; n];
+                for step_j in 0..=j {
+                    for i in 0..n {
+                        vy[i] += y[step_j] * v[step_j][i];
+                    }
+                }
+                let mut prec_vy = vec![0.0; n];
+                right_prec(&vy, &mut prec_vy);
+                for i in 0..n {
+                    x[i] += prec_vy[i];
+                }
+
                 return GmresStatus::Converged { iters: total_iters, res_norm: res };
             }
         }
 
         // Solve and update x with accumulated subspace
         let y = back_solve(&h, &e1, j_end + 1);
-        update_x(x, &v, &y, j_end + 1);
+        let mut vy = vec![0.0; n];
+        for step_j in 0..=j_end {
+            for i in 0..n {
+                vy[i] += y[step_j] * v[step_j][i];
+            }
+        }
+        let mut prec_vy = vec![0.0; n];
+        right_prec(&vy, &mut prec_vy);
+        for i in 0..n {
+            x[i] += prec_vy[i];
+        }
 
-        // Re-compute residual for restart check
+        // Check un-preconditioned residual for restart
         let mut ax2 = vec![0.0; n];
         matvec(x, &mut ax2);
-        r = b.iter().zip(ax2.iter()).map(|(bi, axi)| bi - axi).collect();
-        let res_norm = norm2(&r);
+        let r_unprec: Vec<Real> = b.iter().zip(ax2.iter()).map(|(bi, axi)| bi - axi).collect();
+        let res_norm = norm2(&r_unprec);
         if res_norm < cfg.tol {
             return GmresStatus::Converged { iters: total_iters, res_norm };
         }
