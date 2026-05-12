@@ -99,3 +99,20 @@ path = "fusion_sciml_phase5.rs"
 [[example]]
 name = "tearing_mode_hero_test"
 path = "tearing_mode_hero_test.rs"
+
+[[example]]
+name = "exp1_dynamic_imex"
+path = "exp1_dynamic_imex.rs"
+
+[[example]]
+name = "exp2_lsi2_latent"
+path = "exp2_lsi2_latent.rs"
+
+[[example]]
+name = "exp3_flagno"
+path = "exp3_flagno.rs"
+
+[[example]]
+name = "exp4_ghost_sensitivities"
+path = "exp4_ghost_sensitivities.rs"
+
