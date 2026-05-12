@@ -15,6 +15,7 @@ pub mod dual;
 pub mod mpir;
 pub mod epirk;
 pub mod pinn;
+pub mod arkode;
 
 #[cfg(test)]
 mod tests_coverage;
