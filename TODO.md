@@ -55,7 +55,7 @@
 
 ### v2.5 / v3.0 — Advanced Solvers
 - [ ] Forward sensitivity analysis (`cvodes`)
-- [ ] IMEX splitting (`arkode`)
+- [x] IMEX Splitting (`arkode`)
 - [ ] DAE solver (`ida`)
 - [ ] Adjoint sensitivity analysis
 
