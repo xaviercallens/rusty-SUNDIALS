@@ -1,13 +1,13 @@
 //! Experiment 5: Disruption 5 - FoGNO Preconditioner Benchmark
-//! 
+//!
 //! Tests the Fractional-Order Graph Neural Operator (FoGNO) preconditioner
 //! against the standard FLAGNO on a 3D xMHD anisotropic setup.
 //! Goal: Target FGMRES iterations < 3.
 
 use std::time::Instant;
-use sundials_core::gmres::{gmres_preconditioned, GmresConfig, GmresStatus};
-use sundials_core::fogno::FoGNO;
 use sundials_core::Real;
+use sundials_core::fogno::FoGNO;
+use sundials_core::gmres::{GmresConfig, GmresStatus, gmres_preconditioned};
 
 fn main() {
     println!("══════════════════════════════════════════════════════════════");
@@ -17,7 +17,7 @@ fn main() {
 
     // Benchmark setup: N=1024
     let n = 1024;
-    
+
     println!(" Grid: {} DOF. Target: FGMRES iters < 3.", n);
     println!("──────────────────────────────────────────────────────────────");
 
@@ -30,18 +30,30 @@ fn main() {
     };
 
     let b = vec![1.0; n];
-    let cfg = GmresConfig { tol: 1e-6, restart: 30, max_restarts: 10 };
+    let cfg = GmresConfig {
+        tol: 1e-6,
+        restart: 30,
+        max_restarts: 10,
+    };
 
     // Baseline: No preconditioner (Identity)
-    let identity = |v: &[Real], out: &mut [Real]| { out.copy_from_slice(v); };
+    let identity = |v: &[Real], out: &mut [Real]| {
+        out.copy_from_slice(v);
+    };
     let mut x_base = vec![0.0; n];
     let start_base = Instant::now();
     let status_base = gmres_preconditioned(matvec, &b, &mut x_base, &cfg, identity, identity);
     let time_base = start_base.elapsed().as_secs_f64();
-    let iters_base = match status_base { GmresStatus::Converged { iters, .. } => iters, _ => 999 };
+    let iters_base = match status_base {
+        GmresStatus::Converged { iters, .. } => iters,
+        _ => 999,
+    };
 
     println!("  [Baseline]  Unpreconditioned GMRES");
-    println!("  [Baseline]  RHS evals: {}, time: {:.6}s", iters_base, time_base);
+    println!(
+        "  [Baseline]  RHS evals: {}, time: {:.6}s",
+        iters_base, time_base
+    );
 
     // Disruption: FoGNO<alpha=0.5> (Fractional Spectral Scaling)
     // We set the weights exactly to the diagonal to precondition it optimally
@@ -61,23 +73,34 @@ fn main() {
 
     let mut x_fogno = vec![0.0; n];
     let start_fogno = Instant::now();
-    let status_fogno = gmres_preconditioned(matvec, &b, &mut x_fogno, &cfg, identity, |v, out| fogno_perfect.apply(v, out));
+    let status_fogno = gmres_preconditioned(matvec, &b, &mut x_fogno, &cfg, identity, |v, out| {
+        fogno_perfect.apply(v, out)
+    });
     let time_fogno = start_fogno.elapsed().as_secs_f64();
-    let iters_fogno = match status_fogno { GmresStatus::Converged { iters, .. } => iters, _ => 999 };
+    let iters_fogno = match status_fogno {
+        GmresStatus::Converged { iters, .. } => iters,
+        _ => 999,
+    };
 
     println!("  [FoGNO<α=1.0>] Fractional Spectral Scaling");
-    println!("  [FoGNO]    RHS evals: {}, time: {:.6}s", iters_fogno, time_fogno);
+    println!(
+        "  [FoGNO]    RHS evals: {}, time: {:.6}s",
+        iters_fogno, time_fogno
+    );
 
     println!("\n══════════════════════════════════════════════════════════════");
     println!(" VALIDATION RESULTS");
     println!("══════════════════════════════════════════════════════════════");
     println!(" Baseline iters: {}", iters_base);
     println!(" FoGNO iters:    {}", iters_fogno);
-    println!(" Target < 3 iterations: {}", if iters_fogno < 3 { "✓" } else { "✗" });
+    println!(
+        " Target < 3 iterations: {}",
+        if iters_fogno < 3 { "✓" } else { "✗" }
+    );
     if time_fogno > 0.0 {
         println!(" Speedup vs Baseline: {:.1}x", time_base / time_fogno);
     }
-    
+
     if iters_fogno < 3 {
         println!(" ✓ FoGNO EXPERIMENT VALIDATED");
     } else {

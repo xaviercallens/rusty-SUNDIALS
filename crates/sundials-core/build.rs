@@ -5,6 +5,8 @@
 //! If the C headers change, run this script to regenerate them using:
 //! `cargo build --features "regenerate-bindings"`
 
+#![allow(unexpected_cfgs)]
+
 #[cfg(feature = "regenerate-bindings")]
 extern crate bindgen;
 

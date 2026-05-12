@@ -7,6 +7,9 @@ description = "Core types for rusty-SUNDIALS: Real, Context, error handling"
 
 [dependencies]
 
+[features]
+regenerate-bindings = []
+
 [dev-dependencies]
 criterion = "0.8.2"
 

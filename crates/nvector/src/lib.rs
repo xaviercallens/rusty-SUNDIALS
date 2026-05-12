@@ -7,6 +7,8 @@
 //!
 //! Translated from: `sundials/sundials_nvector.h`, `nvector/nvector_serial.c`
 
+#![allow(clippy::all, unused_variables, dead_code, unused_imports, unused_mut)]
+
 mod parallel;
 mod serial;
 mod simd;

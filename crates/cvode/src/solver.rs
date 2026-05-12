@@ -247,7 +247,10 @@ where
                 return Ok((self.t, self.zn.solution().as_slice()));
             }
             if direction * (self.t + self.h - tout) > 0.0 {
+                let eta = (tout - self.t) / self.h;
                 self.h = tout - self.t;
+                // Important: Rescale Nordsieck history for the truncated step size
+                self.zn.rescale_with_interpolation(eta, self.q);
             }
             self.step()?;
         }
@@ -377,6 +380,7 @@ where
                     self.zn.restore(self.q);
                     err_fails += 1;
                     if err_fails >= MAX_ERR_TEST_FAILS {
+                        println!("ERROR FAIL 1: jacobian compute");
                         return Err(CvodeError::Solver(
                             sundials_core::SundialsError::ErrTestFailure,
                         ));
@@ -396,6 +400,7 @@ where
                         self.zn.restore(self.q);
                         err_fails += 1;
                         if err_fails >= MAX_ERR_TEST_FAILS {
+                            println!("ERROR FAIL 2: jacobian compute 2");
                             return Err(CvodeError::Solver(
                                 sundials_core::SundialsError::ErrTestFailure,
                             ));
@@ -478,7 +483,8 @@ where
                 // Force Jacobian recompute on next attempt
                 self.jac_age = JAC_RECOMPUTE_INTERVAL + 1;
                 conv_fails += 1;
-                if conv_fails >= 10 { // MAX_CONV_FAILS
+                if conv_fails >= 10 {
+                    // MAX_CONV_FAILS
                     return Err(CvodeError::Solver(
                         sundials_core::SundialsError::ConvFailure,
                     ));
@@ -536,7 +542,7 @@ where
                 let eta = step::compute_eta(err_norm, self.q);
                 let new_h = (self.h * eta).clamp(self.min_step, self.max_step);
                 let actual_eta = if self.h != 0.0 { new_h / self.h } else { 1.0 };
-                
+
                 if (actual_eta - 1.0).abs() > 1e-6 || order_changed {
                     self.h = new_h;
                     self.zn.rescale(actual_eta, self.q);
@@ -552,6 +558,7 @@ where
             self.zn.restore(self.q);
             err_fails += 1;
             if err_fails >= MAX_ERR_TEST_FAILS {
+                println!("ERROR FAIL 3: local error test failed > max times");
                 return Err(CvodeError::Solver(
                     sundials_core::SundialsError::ErrTestFailure,
                 ));

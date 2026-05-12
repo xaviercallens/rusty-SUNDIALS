@@ -11,6 +11,8 @@
 //!
 //! Translated from: `cvode/cvode.c` (~5000 LOC core solver)
 
+#![allow(clippy::all, unused_variables, dead_code, unused_imports, unused_mut)]
+
 mod adjoint;
 mod builder;
 mod constants;

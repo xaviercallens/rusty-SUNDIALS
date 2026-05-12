@@ -1,4 +1,4 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
 
 // A dummy benchmark for the core components.
 // Once actual functions from sundials-core are stabilized, they can be tested here.

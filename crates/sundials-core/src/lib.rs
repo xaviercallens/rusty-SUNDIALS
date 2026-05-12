@@ -5,6 +5,8 @@
 //!
 //! Translated from: `sundials/sundials_types.h`, `sundials/sundials_context.h`
 
+#![allow(clippy::all, unused_variables, dead_code, unused_imports, unused_mut)]
+
 pub mod arkode;
 pub mod band_solver;
 pub mod context;

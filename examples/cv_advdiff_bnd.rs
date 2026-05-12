@@ -69,7 +69,12 @@ fn main() -> Result<(), cvode::CvodeError> {
         match solver.solve(tout, Task::Normal) {
             Ok((t, y)) => {
                 let umax = y.iter().fold(0.0f64, |acc, &val| acc.max(val.abs()));
-                println!("At t = {:.2}   max.norm(u) ={:14.6e}   nst = {}", t, umax, solver.num_steps());
+                println!(
+                    "At t = {:.2}   max.norm(u) ={:14.6e}   nst = {}",
+                    t,
+                    umax,
+                    solver.num_steps()
+                );
             }
             Err(e) => {
                 println!("Error at step: {:?}", e);
