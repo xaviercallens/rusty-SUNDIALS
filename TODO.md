@@ -130,11 +130,14 @@
 - [ ] Integrate FoGNO into `SUNPreconditioner` C-ABI trait via safe Rust wrapper
 
 ## Phase 7: Code Accessibility, CI/CD, and Verification Polish (Review v5.0)
-- [ ] Implement GitHub Actions CI/CD workflows (testing, benchmarks, docs, cross-platform)
-- [ ] Add `proofs/lean4/` and `docs/verification/` directories for formal proofs and trust certificates
-- [ ] Update `README.md` to include Prerequisites and Windows-specific build instructions
-- [ ] Add Issue and PR templates (`.github/ISSUE_TEMPLATE`, `.github/pull_request_template.md`)
-- [ ] Add `CODE_OF_CONDUCT.md`
-- [ ] Move `examples` out of workspace members, or structure it idiomatically
-- [ ] Add `cargo doc` instructions and docs.rs metadata in `Cargo.toml`
+- [x] Implement GitHub Actions CI/CD workflows (testing, benchmarks, docs, cross-platform)
+- [x] Add `proofs/lean4/` and `docs/verification/` directories for formal proofs and trust certificates
+- [x] Update `README.md` to include Prerequisites and Windows-specific build instructions
+- [x] Add Issue and PR templates (`.github/ISSUE_TEMPLATE`, `.github/pull_request_template.md`)
+- [x] Add `CODE_OF_CONDUCT.md`
+- [x] Move `examples` out of workspace members, or structure it idiomatically
+- [x] Add `cargo doc` instructions and docs.rs metadata in `Cargo.toml`
+- [x] Add `criterion` benchmarks for critical paths
+- [x] Add a **Tutorials** section to docs (`docs/tutorials/1_first_ode.md`)
+- [x] Add a Core Correctness Verification GitHub Action (`.github/workflows/verify_core_correctness.yml`) running numerical benchmarks C vs Rust
 

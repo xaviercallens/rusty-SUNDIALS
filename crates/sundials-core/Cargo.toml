@@ -6,3 +6,10 @@ license.workspace = true
 description = "Core types for rusty-SUNDIALS: Real, Context, error handling"
 
 [dependencies]
+
+[dev-dependencies]
+criterion = "0.8.2"
+
+[[bench]]
+name = "core_bench"
+harness = false
