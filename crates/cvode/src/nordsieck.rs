@@ -90,4 +90,82 @@ impl NordsieckArray {
             }
         }
     }
+
+    /// Dense output: evaluate the k-th derivative of the interpolating polynomial
+    /// at time `t = t_n + s`, where `s` is the offset from the current step.
+    ///
+    /// The Nordsieck array at time $t_n$ stores:
+    ///   $z_i = \frac{h^i}{i!} y^{(i)}(t_n)$
+    ///
+    /// The k-th derivative at $t_n + s$ is given by the shifted Taylor polynomial:
+    ///   $\frac{d^k y}{dt^k}(t_n + s) = \sum_{j=k}^{q} \binom{j}{k} \frac{s^{j-k}}{h^j} \cdot j! \cdot z_j / h^0$
+    ///
+    /// For k=0 (the value), this simplifies to Horner evaluation of the Nordsieck
+    /// polynomial in the normalised variable $\sigma = s / h$.
+    ///
+    /// # Arguments
+    /// * `s` — offset from `t_n` (must satisfy `0 ≤ s ≤ h`)
+    /// * `h` — current step size
+    /// * `order` — current method order `q`
+    /// * `k` — derivative order (0 = value, 1 = first derivative, ...)
+    /// * `result` — output vector (must have length `n`)
+    ///
+    /// # Reference
+    /// Hindmarsh & Serban (2005), *CVODE User Guide*, §4.5.8 — `CVodeGetDky`
+    pub fn get_dky(
+        &self,
+        s: Real,
+        h: Real,
+        order: usize,
+        k: usize,
+        result: &mut [Real],
+    ) {
+        let n = self.n;
+        debug_assert!(k <= order, "derivative order k={k} exceeds method order q={order}");
+        debug_assert!(result.len() == n);
+
+        let sigma = if h.abs() > 0.0 { s / h } else { 0.0 };
+
+        // Horner evaluation of the shifted Nordsieck polynomial for derivative k.
+        // For k=0: y(t_n + s) = z[q]*σ^q + z[q-1]*σ^(q-1) + ... + z[0]
+        //        = ((z[q]*σ + z[q-1])*σ + z[q-2])*σ + ... + z[0]
+        //
+        // For k>0: we need the k-th derivative of the polynomial.
+        // The coefficient of z[j] in the k-th derivative is:
+        //   C(j,k) * j!/(j-k)! * σ^(j-k) / h^k
+        // Using Horner scheme starting from z[q].
+
+        // Start: result = z[order] (scaled by the leading combinatorial factor)
+        let z_q = self.z[order].as_slice();
+        for i in 0..n {
+            result[i] = z_q[i];
+        }
+
+        // Horner-like evaluation
+        for j in (k..order).rev() {
+            // Combinatorial factor for derivative k:
+            // For k=0, we just multiply by σ and add z[j]
+            // For k>0, factor in the falling factorial
+            let c = if k == 0 {
+                sigma
+            } else {
+                sigma * ((j + 1) as Real) / ((j + 1 - k) as Real)
+            };
+            let z_j = self.z[j].as_slice();
+            for i in 0..n {
+                result[i] = result[i] * c + z_j[i];
+            }
+        }
+
+        // Scale by 1/h^k for the k-th derivative (convert from Nordsieck scaling)
+        if k > 0 && h.abs() > 0.0 {
+            let h_inv_k = h.powi(-(k as i32));
+            // Multiply by k! (the Nordsieck array stores h^k/k! * y^(k))
+            let k_factorial: Real = (1..=k).map(|i| i as Real).product();
+            let scale = h_inv_k * k_factorial;
+            for i in 0..n {
+                result[i] *= scale;
+            }
+        }
+    }
 }

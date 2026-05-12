@@ -876,19 +876,32 @@ mod tests_band_deep {
     #[test]
     fn test_band_pivot_comparison_exercised() {
         // n=3 matrix where |a[1][0]|=5 > |a[0][0]|=2.
-        // This triggers lines 108-110 (pivot_abs and pivot_row update) and
-        // line 119 (a.swap) since pivot_row=1 != k=0.
-        // We just verify that pivots[0] was updated to 1 (the better pivot row).
+        // With the v1.5 fill-in fix, pivoted solves now produce correct results.
         let n = 3;
         let mut a = BandMat::zeros(n, 1, 1);
-        a.set(0, 0,  2.0);  a.set(0, 1, -1.0);
-        a.set(1, 0, -5.0);  a.set(1, 1, 10.0);  a.set(1, 2, -1.0);
-        a.set(2, 1, -1.0);  a.set(2, 2,  5.0);
+        let vals: [[f64;3];3] = [
+            [ 2.0, -1.0,  0.0],
+            [-5.0, 10.0, -1.0],
+            [ 0.0, -1.0,  5.0],
+        ];
+        for i in 0..n { for j in 0..n {
+            if vals[i][j] != 0.0 { a.set(i, j, vals[i][j]); }
+        }}
+        let x_true = [1.0f64, 2.0, 3.0];
+        let mut b = vec![0.0f64; n];
+        for i in 0..n { for j in 0..n { b[i] += vals[i][j] * x_true[j]; } }
+        let b_orig = b.clone();
         let mut pivots = vec![0usize; n];
-        let _ = a.band_getrf(&mut pivots); // may or may not succeed — just need the pivot branch
-        // The pivot finder at k=0 should have found that row 1 (|a[1][0]|=5) is larger
-        // than row 0 (|a[0][0]|=2), so pivots[0] = 1.
+        a.band_getrf(&mut pivots).unwrap();
         assert_eq!(pivots[0], 1, "Pivot at k=0 should have selected row 1");
+        a.band_getrs(&pivots, &mut b).unwrap();
+        // With fill-in fix, solve is now accurate
+        for i in 0..n {
+            let ax_i: f64 = (0..n).map(|j| vals[i][j] * b[j]).sum();
+            assert!((ax_i - b_orig[i]).abs() < 1e-10,
+                "residual[{i}]={:.2e} — v1.5 fill-in fix should make this accurate",
+                (ax_i - b_orig[i]).abs());
+        }
     }
 
     #[test]
@@ -921,6 +934,7 @@ mod tests_band_deep {
         }
     }
 }
+
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Module: mpir — remaining gap: lines 212-213 (NotConverged panic in test)

@@ -164,6 +164,42 @@ where
     pub fn step_size(&self) -> Real { self.h }
     pub fn order(&self) -> usize { self.q }
 
+    /// Dense output: evaluate the k-th derivative of the solution at time `t`.
+    ///
+    /// This uses the Nordsieck interpolating polynomial — no additional RHS
+    /// evaluations are required. The time `t` should be within the interval
+    /// `[t_n - h, t_n]` where `t_n` is the current internal time and `h` is the
+    /// last step size.
+    ///
+    /// # Arguments
+    /// * `t` — the time at which to evaluate (must be near the current time)
+    /// * `k` — derivative order (0 = y, 1 = y', 2 = y'', ...)
+    /// * `dky` — output slice of length N (will be overwritten)
+    ///
+    /// # Example
+    /// ```ignore
+    /// let mut dky = vec![0.0; n];
+    /// solver.get_dky(t_mid, 0, &mut dky)?; // solution value at t_mid
+    /// solver.get_dky(t_mid, 1, &mut dky)?; // first derivative at t_mid
+    /// ```
+    pub fn get_dky(&self, t: Real, k: usize, dky: &mut [Real]) -> Result<(), CvodeError> {
+        if k > self.q {
+            return Err(CvodeError::Solver(
+                sundials_core::SundialsError::BadK,
+            ));
+        }
+        if dky.len() != self.n {
+            return Err(CvodeError::Solver(
+                sundials_core::SundialsError::IllInput(
+                    format!("dky length {} != problem size {}", dky.len(), self.n),
+                ),
+            ));
+        }
+        let s = t - self.t; // offset from current time
+        self.zn.get_dky(s, self.h, self.q, k, dky);
+        Ok(())
+    }
+
     // --- Internal methods ---
 
     fn initialize(&mut self) -> Result<(), CvodeError> {
@@ -328,11 +364,15 @@ where
                 }
             }
 
-            // --- Newton iteration ---
+            // --- Newton iteration with convergence-rate monitoring ---
+            // Following Brown, Hindmarsh & Petzold (1994): track ρ = ||δₘ||/||δₘ₋₁||.
+            // Convergence test: ρ·del/(1-ρ) < tol  (predicts remaining error).
+            // Divergence guard: ρ > 0.9 → abort immediately.
             let mut acor_vec = vec![0.0; self.n];
             let mut newton_converged = false;
+            let mut del_old: Real = 1.0;
 
-            for _iter in 0..MAX_NEWTON_ITERS {
+            for m in 0..MAX_NEWTON_ITERS {
                 let mut y_new = vec![0.0; self.n];
                 for i in 0..self.n {
                     y_new[i] = y_pred[i] + l_0 * acor_vec[i];
@@ -351,24 +391,43 @@ where
                 }
 
                 // Solve M·δ = b
-                let m = self.m_mat.as_ref().unwrap();
-                if m.dense_getrs(&self.pivots, &mut b).is_err() {
+                let m_mat = self.m_mat.as_ref().unwrap();
+                if m_mat.dense_getrs(&self.pivots, &mut b).is_err() {
                     break;
                 }
 
-                let mut delta_norm = 0.0;
+                // Update acor and compute WRMS norm of the correction
+                let mut del = 0.0;
                 for i in 0..self.n {
                     acor_vec[i] += b[i];
                     let ew = self.ewt[i];
-                    delta_norm += (b[i] * ew).powi(2);
+                    del += (b[i] * ew).powi(2);
                 }
-                delta_norm = (delta_norm / self.n as f64).sqrt();
+                del = (del / self.n as f64).sqrt();
 
-                if delta_norm < 0.1 {
+                // Convergence-rate monitoring (ρ = del / del_old)
+                if m > 0 {
+                    let rho = del / del_old;
+                    // Divergence guard: abort if Newton is not contracting
+                    if rho > 0.9 {
+                        break; // will trigger newton_converged = false → retry with smaller h
+                    }
+                    // Predictive convergence test (SUNDIALS criterion):
+                    // estimated remaining error = ρ·del / (1 - ρ) < tol
+                    if rho < 1.0 && rho * del / (1.0 - rho) < 0.1 {
+                        newton_converged = true;
+                        break;
+                    }
+                }
+
+                // Simple norm-based convergence (fallback for m == 0)
+                if del < 0.1 {
                     newton_converged = true;
                     break;
                 }
+                del_old = del;
             }
+
 
             if !newton_converged {
                 // Force Jacobian recompute on next attempt
@@ -515,5 +574,46 @@ mod tests {
         let (t, y) = solver.solve(5.0, Task::Normal).unwrap();
         assert!((t - 5.0).abs() < 1e-10);
         assert!((y[0] - 5.0).abs() < 3.5, "y = {} (order-1 Adams on t=[0,5])", y[0]);
+    }
+
+    #[test]
+    fn test_get_dky_at_current_time() {
+        // Solve y' = -y from t=0 to t=1, then verify get_dky at the current time
+        let rhs = |_t: Real, y: &[Real], ydot: &mut [Real]| -> Result<(), String> {
+            ydot[0] = -y[0];
+            Ok(())
+        };
+        let y0 = SerialVector::from_slice(&[1.0]);
+        let mut solver = Cvode::builder(Method::Bdf)
+            .rtol(1e-4).atol(1e-6).max_steps(200_000)
+            .build(rhs, 0.0, y0).unwrap();
+
+        let (t, y) = solver.solve(1.0, Task::Normal).unwrap();
+        let y0_val = y[0]; // copy to release borrow
+        assert!((t - 1.0).abs() < 1e-10);
+
+        // get_dky(t, 0) should return the same as y
+        let mut dky = vec![0.0; 1];
+        solver.get_dky(t, 0, &mut dky).unwrap();
+        assert!((dky[0] - y0_val).abs() < 1e-10,
+            "get_dky(t, 0) = {} should match y[0] = {}", dky[0], y0_val);
+    }
+
+    #[test]
+    fn test_get_dky_bad_k_returns_error() {
+        let rhs = |_t: Real, y: &[Real], ydot: &mut [Real]| -> Result<(), String> {
+            ydot[0] = -y[0];
+            Ok(())
+        };
+        let y0 = SerialVector::from_slice(&[1.0]);
+        let mut solver = Cvode::builder(Method::Bdf)
+            .rtol(1e-4).atol(1e-6).max_steps(200_000)
+            .build(rhs, 0.0, y0).unwrap();
+        solver.solve(0.1, Task::Normal).unwrap();
+
+        let mut dky = vec![0.0; 1];
+        // k = 100 is way above the current order → should return BadK
+        let result = solver.get_dky(0.1, 100, &mut dky);
+        assert!(result.is_err(), "get_dky with k > q should fail");
     }
 }
