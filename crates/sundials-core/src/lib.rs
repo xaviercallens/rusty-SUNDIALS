@@ -14,6 +14,7 @@ pub mod gmres;
 pub mod dual;
 pub mod mpir;
 pub mod ilu;
+pub mod sparse;
 pub mod epirk;
 pub mod pinn;
 pub mod arkode;
