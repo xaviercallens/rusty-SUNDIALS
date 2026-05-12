@@ -289,6 +289,12 @@ We welcome contributions! Here's the evidence-based roadmap grounded in academic
 - [ ] WebAssembly target for browser-native solving
 - [ ] Parallel-in-Time (PinT) orchestrator
 
+### v5.0 — Experimental SciML Paradigms (Fusion xMHD)
+- [ ] AI-Discovered Dynamic IMEX Splitting (Spectral Manifold Splitting)
+- [ ] Latent-Space Implicit Integration ($LSI^2$)
+- [ ] Field-Aligned Graph Preconditioning (FLAGNO)
+- [ ] Asynchronous "Ghost Sensitivities" (tokio + FP8 Tensor Cores)
+
 
 ## 🧠 Why Neuro-Symbolic AI? Honest Evaluation
 
