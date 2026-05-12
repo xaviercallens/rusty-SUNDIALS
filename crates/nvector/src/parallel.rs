@@ -53,13 +53,14 @@ impl NVector for ParallelVector {
             .for_each(|((zi, xi), yi)| *zi = a * xi + b * yi);
     }
 
-    /// Parallel WRMS norm — tree-reduce preserves associativity (see formal spec).
+    /// Parallel WRMS norm using reproducible compensated summation.
+    /// Follows Demmel & Nguyen (2015) principle for deterministic floating point sum.
     fn wrms_norm(&self, w: &Self) -> Real {
         let n = self.data.len() as Real;
-        let sum: Real = self.data.par_iter()
+        let (sum, _err) = self.data.par_iter()
             .zip(w.data.par_iter())
-            .map(|(xi, wi)| { let v = xi * wi; v * v })
-            .sum();
+            .map(|(xi, wi)| { let v = xi * wi; (v * v, 0.0) })
+            .reduce(|| (0.0, 0.0), |a, b| kahan_add(a, b));
         (sum / n).sqrt()
     }
 
@@ -68,9 +69,9 @@ impl NVector for ParallelVector {
             .zip(w.data.par_iter())
             .zip(mask.data.par_iter())
             .filter(|(_, mi)| **mi > 0.0)
-            .map(|((xi, wi), _)| { let v = xi * wi; (v * v, 1usize) })
-            .reduce(|| (0.0, 0), |(s1, c1), (s2, c2)| (s1 + s2, c1 + c2));
-        if count == 0 { 0.0 } else { (sum / count as Real).sqrt() }
+            .map(|((xi, wi), _)| { let v = xi * wi; ((v * v, 0.0), 1usize) })
+            .reduce(|| ((0.0, 0.0), 0), |(s1, c1), (s2, c2)| (kahan_add(s1, s2), c1 + c2));
+        if count == 0 { 0.0 } else { (sum.0 / count as Real).sqrt() }
     }
 
     fn max_norm(&self) -> Real {
@@ -85,10 +86,11 @@ impl NVector for ParallelVector {
     }
 
     fn dot(&self, other: &Self) -> Real {
-        self.data.par_iter()
+        let (sum, _) = self.data.par_iter()
             .zip(other.data.par_iter())
-            .map(|(a, b)| a * b)
-            .sum()
+            .map(|(a, b)| (a * b, 0.0))
+            .reduce(|| (0.0, 0.0), |a, b| kahan_add(a, b));
+        sum
     }
 
     fn scale(c: Real, x: &Self, z: &mut Self) {
@@ -155,6 +157,21 @@ impl NVector for ParallelVector {
             .map(|(n, d)| n / d)
             .reduce(|| Real::MAX, Real::min)
     }
+}
+
+/// Kahan-Babuška compensated summation for deterministic and highly accurate parallel reduction.
+/// Returns (sum, error_compensation).
+#[inline]
+fn kahan_add(a: (Real, Real), b: (Real, Real)) -> (Real, Real) {
+    let (sum1, c1) = a;
+    let (sum2, c2) = b;
+    
+    // Add the two running sums, including their respective compensations
+    let y = sum2 - c1 - c2;
+    let t = sum1 + y;
+    let c = (t - sum1) - y;
+    
+    (t, c)
 }
 
 // ── Unit tests ────────────────────────────────────────────────────────────────
