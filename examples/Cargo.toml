@@ -10,6 +10,7 @@ cvode = { path = "../crates/cvode" }
 nvector = { path = "../crates/nvector" }
 sundials-core = { path = "../crates/sundials-core" }
 rayon.workspace = true
+tokio = { version = "1.0", features = ["full"] }
 
 [[example]]
 name = "robertson"
@@ -90,3 +91,7 @@ path = "three_body.rs"
 [[example]]
 name = "fusion_mhd_benchmark"
 path = "fusion_mhd_benchmark.rs"
+
+[[example]]
+name = "fusion_sciml_phase5"
+path = "fusion_sciml_phase5.rs"
