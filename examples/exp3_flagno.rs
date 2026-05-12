@@ -81,7 +81,7 @@ fn run_isotropic_baseline(y0: Vec<f64>) -> (f64, Vec<f64>, u32) {
         f(t, y, ydot)
     };
     let y0v = SerialVector::from_slice(&y0);
-    let mut cv = Cvode::builder(Method::Bdf).max_steps(200_000).build(wrapped, 0.0, y0v).unwrap();
+    let mut cv = Cvode::builder(Method::Bdf).max_order(1).max_steps(200_000).build(wrapped, 0.0, y0v).unwrap();
     let start = Instant::now();
     let (_, y) = cv.solve(0.01, Task::Normal).expect("Isotropic solve failed");
     let elapsed = start.elapsed().as_secs_f64();
@@ -105,7 +105,7 @@ fn run_flagno_aligned(y0: Vec<f64>) -> (f64, Vec<f64>, u32) {
         f_inner(t, y, ydot)
     };
     let y0v = SerialVector::from_slice(&y0);
-    let mut cv = Cvode::builder(Method::Bdf).max_steps(200_000).build(wrapped, 0.0, y0v).unwrap();
+    let mut cv = Cvode::builder(Method::Bdf).max_order(1).max_steps(200_000).build(wrapped, 0.0, y0v).unwrap();
     let start = Instant::now();
     let (_, y) = cv.solve(0.01, Task::Normal).expect("FLAGNO solve failed");
     let elapsed = start.elapsed().as_secs_f64();

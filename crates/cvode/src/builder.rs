@@ -81,8 +81,8 @@ impl CvodeBuilder {
     where
         F: FnMut(Real, &[Real], &mut [Real]) -> Result<(), String> + Send + Sync,
     {
-        if self.rtol <= 0.0 {
-            return Err(CvodeError::Config("rtol must be positive".into()));
+        if self.rtol < 0.0 {
+            return Err(CvodeError::Config("rtol must be non-negative".into()));
         }
         if self.atol <= 0.0 {
             return Err(CvodeError::Config("atol must be positive".into()));

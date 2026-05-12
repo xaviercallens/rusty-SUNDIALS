@@ -128,8 +128,8 @@ impl NordsieckArray {
     /// Restore the Nordsieck array to its previous state (reverse the predictor).
     /// Used when a step is rejected.
     pub fn restore(&mut self, order: usize) {
-        for j in 1..=order {
-            for i in (j..=order).rev() {
+        for j in (1..=order).rev() {
+            for i in j..=order {
                 // z_{i-1} -= z_i
                 let (left, right) = self.z.split_at_mut(i);
                 let z_prev = left[i - 1].as_mut_slice();

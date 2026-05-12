@@ -116,3 +116,7 @@ path = "exp3_flagno.rs"
 name = "exp4_ghost_sensitivities"
 path = "exp4_ghost_sensitivities.rs"
 
+[[example]]
+name = "cv_advdiff_bnd"
+path = "cv_advdiff_bnd.rs"
+

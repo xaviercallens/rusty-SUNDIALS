@@ -338,6 +338,7 @@ where
     /// Take a single internal step with BDF order q.
     fn step(&mut self) -> Result<(), CvodeError> {
         let mut err_fails = 0;
+        let mut conv_fails = 0;
 
         loop {
             // --- Predict ---
@@ -476,10 +477,10 @@ where
                 self.zn.restore(self.q);
                 // Force Jacobian recompute on next attempt
                 self.jac_age = JAC_RECOMPUTE_INTERVAL + 1;
-                err_fails += 1;
-                if err_fails >= MAX_ERR_TEST_FAILS {
+                conv_fails += 1;
+                if conv_fails >= 10 { // MAX_CONV_FAILS
                     return Err(CvodeError::Solver(
-                        sundials_core::SundialsError::ErrTestFailure,
+                        sundials_core::SundialsError::ConvFailure,
                     ));
                 }
                 self.h *= 0.25;

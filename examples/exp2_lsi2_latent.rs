@@ -56,7 +56,7 @@ fn run_physical_solve(n: usize) -> (f64, f64, f64) {
     let y0: Vec<f64> = (0..n).map(|i| ((i+1) as f64 * dx * std::f64::consts::PI).sin()).collect();
     let y0_vec = SerialVector::from_slice(&y0);
     let f = heat_ode(n);
-    let mut cv = Cvode::builder(Method::Bdf).max_steps(50_000).build(f, 0.0, y0_vec).unwrap();
+    let mut cv = Cvode::builder(Method::Bdf).max_order(1).max_steps(50_000).build(f, 0.0, y0_vec).unwrap();
     let start = Instant::now();
     let t_end = 0.5;
     let (t, y_num) = cv.solve(t_end, Task::Normal).expect("Physical solve failed");
@@ -81,7 +81,7 @@ fn run_latent_solve(n: usize, k: usize) -> (f64, f64, f64) {
         }
         Ok(())
     };
-    let mut cv = Cvode::builder(Method::Bdf).max_steps(50_000).build(f, 0.0, y0_vec).unwrap();
+    let mut cv = Cvode::builder(Method::Bdf).max_order(1).max_steps(50_000).build(f, 0.0, y0_vec).unwrap();
     let start = Instant::now();
     let (t, z) = cv.solve(t_end, Task::Normal).expect("Latent solve failed");
     let elapsed = start.elapsed().as_secs_f64();

@@ -16,6 +16,7 @@ fn main() -> Result<(), cvode::CvodeError> {
     let mut solver = Cvode::builder(Method::Bdf)
         .rtol(1e-3)
         .atol(1e-5)
+        .max_order(1)
         .max_steps(50_000_000)
         .build(rhs, 0.0, y0)?;
     println!("Lorenz Attractor (σ={sigma}, ρ={rho}, β={beta:.4})");

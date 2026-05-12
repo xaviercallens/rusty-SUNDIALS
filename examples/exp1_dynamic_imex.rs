@@ -52,7 +52,7 @@ fn run_dynamic_imex() -> (f64, f64, f64, f64) {
         Ok(())
     };
     let y0 = SerialVector::from_slice(&[2.0, 0.0]);
-    let mut cv = Cvode::builder(Method::Bdf).max_steps(2_000_000)
+    let mut cv = Cvode::builder(Method::Bdf).max_order(1).max_steps(2_000_000)
         .rtol(1e-3).atol(1e-5).build(f, 0.0, y0).unwrap();
 
     let start = Instant::now();

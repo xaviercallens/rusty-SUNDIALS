@@ -71,6 +71,7 @@ fn main() -> Result<(), cvode::CvodeError> {
     let mut solver = Cvode::builder(Method::Bdf)
         .rtol(1e-4)
         .atol(1e-6)
+        .max_order(1)
         .max_steps(100000)
         .build(rhs, 0.0, y0)?;
 
