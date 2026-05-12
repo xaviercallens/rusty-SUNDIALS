@@ -13,6 +13,7 @@ from typing import Dict, Any
 from hypothesizer_llm import generate_hypothesis
 from syntax_codebert import CodeBERTSynthesizer
 from lean_repl_hook import verify_lean_proof
+from physics_gatekeeper import evaluate_physics
 from slurm_exascale import submit_job
 
 class Orchestrator:
@@ -42,8 +43,7 @@ class Orchestrator:
             
             # 2. Gatekeep (DeepProbLog)
             self.log("[DeepProbLog] Filtering hypothesis for physical invariants...")
-            # Simulate DeepProbLog rejection 30% of the time (e.g. thermodynamics violation)
-            physics_passed = random.random() > 0.3
+            physics_passed = evaluate_physics(hypothesis_ast)
             if not physics_passed:
                 self.log("❌ REJECTED: Hypothesis violates Extended MHD energy conservation.")
                 continue # Back to hypothesize
@@ -59,8 +59,14 @@ class Orchestrator:
 
             # 4. Lean 4 Verification
             self.log("[Lean 4] Aeneas extraction and theorem proving...")
-            # Simulate Lean 4 proof failure 50% of the time (e.g. non-Lipschitz)
-            proof_valid = random.random() > 0.5
+            # Extract method name for Lean target
+            try:
+                ast_dict = json.loads(hypothesis_ast)
+                method_name = ast_dict.get("method_name", "AI_Solver")
+            except:
+                method_name = "AI_Solver"
+                
+            proof_valid = verify_lean_proof(lean_code, method_name)
             if not proof_valid:
                 self.log("❌ REJECTED: Lean 4 failed to prove iteration matrix bounded norm.")
                 continue # Back to hypothesize
