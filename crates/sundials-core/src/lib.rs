@@ -16,6 +16,9 @@ pub mod mpir;
 pub mod epirk;
 pub mod pinn;
 
+#[cfg(test)]
+mod tests_coverage;
+
 
 pub use context::Context;
 pub use error::{SundialsError, Result};
