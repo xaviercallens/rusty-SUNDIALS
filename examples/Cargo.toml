@@ -120,3 +120,7 @@ path = "exp4_ghost_sensitivities.rs"
 name = "cv_advdiff_bnd"
 path = "cv_advdiff_bnd.rs"
 
+[[example]]
+name = "exp5_fogno_xmhd"
+path = "exp5_fogno_xmhd.rs"
+

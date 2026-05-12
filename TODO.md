@@ -124,10 +124,10 @@
 - [x] Submit first autonomously generated discovery to arXiv
 
 ### M6.6 — FoGNO Preconditioner (Disruption 5)
-- [ ] Design Fractional-Order GNO with exponent α ∈ (0,1]: `FoGNO<α>` struct in Rust
-- [ ] Prove `fogno_fgmres_convergence` with concrete spectral radius bound (extends Lean spec)
-- [ ] Benchmark FoGNO vs FLAGNO on 3D xMHD: target FGMRES iterations < 3
-- [ ] Integrate FoGNO into `SUNPreconditioner` C-ABI trait via safe Rust wrapper
+- [x] Design Fractional-Order GNO with exponent α ∈ (0,1]: `FoGNO<α>` struct in Rust
+- [x] Prove `fogno_fgmres_convergence` with concrete spectral radius bound (extends Lean spec)
+- [x] Benchmark FoGNO vs FLAGNO on 3D xMHD: target FGMRES iterations < 3
+- [x] Integrate FoGNO into `SUNPreconditioner` C-ABI trait via safe Rust wrapper
 
 ## Phase 7: Code Accessibility, CI/CD, and Verification Polish (Review v5.0)
 - [x] Implement GitHub Actions CI/CD workflows (testing, benchmarks, docs, cross-platform)

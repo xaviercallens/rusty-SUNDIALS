@@ -11,6 +11,7 @@ pub mod context;
 pub mod dual;
 pub mod epirk;
 pub mod error;
+pub mod fogno;
 pub mod generated;
 pub mod gmres;
 pub mod ilu;
