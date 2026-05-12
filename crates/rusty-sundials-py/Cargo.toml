@@ -1,6 +1,6 @@
 [package]
 name = "rusty-sundials-py"
-version = "0.1.0"
+version = "6.0.0"
 edition = "2021"
 authors = ["Xavier Callens <x.callens@example.com>"]
 description = "Python bindings for Rusty-SUNDIALS SciML engine"
