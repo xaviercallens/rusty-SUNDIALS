@@ -54,9 +54,19 @@ fn norm2(v: &[Real]) -> Real {
 
 /// Compute φ₁(z) = (e^z − 1) / z  numerically stably.
 /// Uses a Taylor series near z=0 to avoid catastrophic cancellation.
-fn phi1(z: Real) -> Real {
+#[cfg(test)]
+pub(crate) fn phi1(z: Real) -> Real {
     if z.abs() < 1e-8 {
         // Taylor: 1 + z/2 + z²/6 + ...
+        1.0 + z / 2.0 + z * z / 6.0 + z * z * z / 24.0
+    } else {
+        (z.exp() - 1.0) / z
+    }
+}
+
+#[cfg(not(test))]
+fn phi1(z: Real) -> Real {
+    if z.abs() < 1e-8 {
         1.0 + z / 2.0 + z * z / 6.0 + z * z * z / 24.0
     } else {
         (z.exp() - 1.0) / z
@@ -66,10 +76,31 @@ fn phi1(z: Real) -> Real {
 /// Scalar 2×2 matrix exponential (used for the tiny Hessenberg subspace).
 /// We use Padé [3/3] approximation for numerical stability.
 /// Reference: Moler & Van Loan (2003), "Nineteen Dubious Ways to Compute e^A".
-fn expm_2x2(a: [[Real; 2]; 2], scale: Real) -> [[Real; 2]; 2] {
+#[cfg(test)]
+pub(crate) fn expm_2x2(a: [[Real; 2]; 2], scale: Real) -> [[Real; 2]; 2] {
     let h = [[a[0][0] * scale, a[0][1] * scale],
               [a[1][0] * scale, a[1][1] * scale]];
     // e^H using Padé [1/1]: (I + H/2)/(I - H/2)  (first-order Padé, safe for small H)
+    let det = (1.0 - h[0][0] / 2.0) * (1.0 - h[1][1] / 2.0)
+            - (h[1][0] / 2.0) * (h[0][1] / 2.0);
+    let inv = [
+        [(1.0 - h[1][1] / 2.0) / det,  h[0][1] / 2.0 / det],
+        [h[1][0] / 2.0 / det,          (1.0 - h[0][0] / 2.0) / det],
+    ];
+    let num = [[1.0 + h[0][0] / 2.0, h[0][1] / 2.0],
+               [h[1][0] / 2.0,       1.0 + h[1][1] / 2.0]];
+    [
+        [num[0][0] * inv[0][0] + num[0][1] * inv[1][0],
+         num[0][0] * inv[0][1] + num[0][1] * inv[1][1]],
+        [num[1][0] * inv[0][0] + num[1][1] * inv[1][0],
+         num[1][0] * inv[0][1] + num[1][1] * inv[1][1]],
+    ]
+}
+
+#[cfg(not(test))]
+fn expm_2x2(a: [[Real; 2]; 2], scale: Real) -> [[Real; 2]; 2] {
+    let h = [[a[0][0] * scale, a[0][1] * scale],
+              [a[1][0] * scale, a[1][1] * scale]];
     let det = (1.0 - h[0][0] / 2.0) * (1.0 - h[1][1] / 2.0)
             - (h[1][0] / 2.0) * (h[0][1] / 2.0);
     let inv = [
