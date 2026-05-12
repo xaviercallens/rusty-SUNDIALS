@@ -49,7 +49,7 @@
 ### v2.0 — Industrial Solver
 - [x] Preconditioned GMRES (left/right preconditioner callbacks + ILU(0))
 - [ ] Sparse matrix support (CSR/CSC storage + sparse LU)
-- [ ] Reproducible floating-point via compensated summation (Demmel & Nguyen 2015)
+- [x] Reproducible floating-point via compensated summation (Demmel & Nguyen 2015)
 - [ ] `no_std` support for embedded scientific computing
 - [ ] Python bindings via PyO3
 
