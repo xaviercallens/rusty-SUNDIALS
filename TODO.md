@@ -43,7 +43,7 @@
 - [x] Band LU pivoting with fill-in storage (Fixes silent corruption, Golub & Van Loan §4.3.5)
 - [x] Newton convergence-rate monitoring (ρ = ||δ_m+1|| / ||δ_m||)
 - [x] Dense output via `CVodeGetDky` (Nordsieck polynomial evaluation)
-- [ ] Nordsieck rescaling with interpolation for large step-size changes
+- [x] Nordsieck rescaling with interpolation for large step-size changes
 - [ ] Thread-safe `Cvode<F>: Send` for ensemble workflows
 
 ### v2.0 — Industrial Solver
@@ -61,7 +61,7 @@
 
 ### v4.0 — SciML Engine
 - [x] Formal Specification for Relaxation Runge-Kutta (Ketcheson 2019)
-- [ ] Relaxation Runge-Kutta (RRK) implementation
+- [x] Relaxation Runge-Kutta (RRK) implementation
 - [ ] Zero-Cost Enzyme AutoDiff (`#[sundials_rhs]`)
 - [ ] Type-Safe MP-GMRES (GPU Tensor Cores)
 - [ ] Deep Operator Preconditioning (AI Surrogates)
