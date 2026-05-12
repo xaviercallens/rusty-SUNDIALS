@@ -85,6 +85,7 @@ pub struct Cvode<F> {
     pivots: Vec<usize>,
     jac_age: usize,   // steps since last Jacobian computation
     last_gamma: Real, // gamma used for last M = I - γJ
+    qwait: usize,     // countdown until next step/order change
 
     // --- RHS function ---
     rhs: F,
@@ -147,6 +148,7 @@ where
             pivots: vec![0; n],
             jac_age: JAC_RECOMPUTE_INTERVAL + 1, // force initial computation
             last_gamma: 0.0,
+            qwait: 2, // wait q+1 steps before changing h or order
             rhs,
             initialized: false,
         }
@@ -371,6 +373,7 @@ where
                     .compute_jacobian_and_factor(t_new, &y_pred, &f_pred, gamma)
                     .is_err()
                 {
+                    self.zn.restore(self.q);
                     err_fails += 1;
                     if err_fails >= MAX_ERR_TEST_FAILS {
                         return Err(CvodeError::Solver(
@@ -389,6 +392,7 @@ where
                         .compute_jacobian_and_factor(t_new, &y_pred, &f_pred, gamma)
                         .is_err()
                     {
+                        self.zn.restore(self.q);
                         err_fails += 1;
                         if err_fails >= MAX_ERR_TEST_FAILS {
                             return Err(CvodeError::Solver(
@@ -469,6 +473,7 @@ where
             }
 
             if !newton_converged {
+                self.zn.restore(self.q);
                 // Force Jacobian recompute on next attempt
                 self.jac_age = JAC_RECOMPUTE_INTERVAL + 1;
                 err_fails += 1;
@@ -511,26 +516,46 @@ where
                     self.ewt.as_mut_slice(),
                 );
 
-                // Adaptive step size
-                let eta = step::compute_eta(err_norm, self.q);
-                self.h *= eta;
-                self.h = self.h.clamp(self.min_step, self.max_step);
+                if self.qwait > 0 {
+                    self.qwait -= 1;
+                    return Ok(());
+                }
 
                 // --- Adaptive order selection (BDF only) ---
-                if self.method == Method::Bdf && self.nst > 10 * self.q {
+                let mut order_changed = false;
+                if self.method == Method::Bdf {
+                    let old_q = self.q;
                     self.try_order_change(err_norm);
+                    if self.q != old_q {
+                        order_changed = true;
+                    }
+                }
+
+                // Adaptive step size
+                let eta = step::compute_eta(err_norm, self.q);
+                let new_h = (self.h * eta).clamp(self.min_step, self.max_step);
+                let actual_eta = if self.h != 0.0 { new_h / self.h } else { 1.0 };
+                
+                if (actual_eta - 1.0).abs() > 1e-6 || order_changed {
+                    self.h = new_h;
+                    self.zn.rescale(actual_eta, self.q);
+                    self.qwait = self.q + 1; // wait before next change
+                } else {
+                    self.qwait = 1; // wait 1 more step before checking again
                 }
 
                 return Ok(());
             }
 
             // Step rejected
+            self.zn.restore(self.q);
             err_fails += 1;
             if err_fails >= MAX_ERR_TEST_FAILS {
                 return Err(CvodeError::Solver(
                     sundials_core::SundialsError::ErrTestFailure,
                 ));
             }
+            self.qwait = self.q + 1; // reset wait after failure
             let eta = step::compute_eta(err_norm, self.q).min(0.5);
             self.h *= eta;
             self.zn.rescale(eta, self.q);

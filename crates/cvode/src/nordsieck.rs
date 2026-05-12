@@ -104,19 +104,39 @@ impl NordsieckArray {
         }
     }
 
-    /// Apply the predictor: compute y_predicted from the Nordsieck array.
-    ///
-    /// y_pred = sum_{i=0}^{q} z[i]  (Pascal's triangle evaluation)
-    pub fn predict(&self, order: usize, result: &mut SerialVector) {
-        // Start with z[order] and work backwards (Horner-like)
-        let data = result.as_mut_slice();
-        let z_q = self.z[order].as_slice();
-        data.copy_from_slice(z_q);
+    pub fn predict(&mut self, order: usize, result: &mut SerialVector) {
+        // Shift the entire Nordsieck array forward in time by h.
+        // This is mathematically equivalent to z_i <- \sum_{j=i}^q \binom{j}{i} z_j.
+        // The in-place Pascal triangle addition exactly computes this.
+        for j in 1..=order {
+            for i in (j..=order).rev() {
+                // z_{i-1} += z_i
+                let (left, right) = self.z.split_at_mut(i);
+                let z_prev = left[i - 1].as_mut_slice();
+                let z_curr = right[0].as_slice();
+                for k in 0..self.n {
+                    z_prev[k] += z_curr[k];
+                }
+            }
+        }
 
-        for i in (0..order).rev() {
-            let z_i = self.z[i].as_slice();
-            for j in 0..self.n {
-                data[j] += z_i[j];
+        // The predicted solution is now in z[0]
+        let data = result.as_mut_slice();
+        data.copy_from_slice(self.z[0].as_slice());
+    }
+
+    /// Restore the Nordsieck array to its previous state (reverse the predictor).
+    /// Used when a step is rejected.
+    pub fn restore(&mut self, order: usize) {
+        for j in 1..=order {
+            for i in (j..=order).rev() {
+                // z_{i-1} -= z_i
+                let (left, right) = self.z.split_at_mut(i);
+                let z_prev = left[i - 1].as_mut_slice();
+                let z_curr = right[0].as_slice();
+                for k in 0..self.n {
+                    z_prev[k] -= z_curr[k];
+                }
             }
         }
     }
