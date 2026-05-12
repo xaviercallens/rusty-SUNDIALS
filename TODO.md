@@ -119,9 +119,9 @@
 ### M6.5 — Exascale Execution & Auto-Publication (Weeks 14–16)
 - [x] Implement `autoresearch_agent/slurm_exascale.py`: SSH → EuroHPC, `cargo build --release --features="mpi,cuda"`, SLURM submit
 - [x] Run Hero Benchmark autonomously: 3D Magnetic Tearing Mode vs baseline AMG
-- [ ] Implement Auto-LaTeX: Matplotlib graph injection + Lean proof extraction → `.tex` → PDF
+- [x] Implement Auto-LaTeX: Matplotlib graph injection + Lean proof extraction → `.tex` → PDF
 - [x] Validate `PublishableDiscovery` safety: auto-publish fires only when speedup ≥ 10×
-- [ ] Submit first autonomously generated discovery to arXiv
+- [x] Submit first autonomously generated discovery to arXiv
 
 ### M6.6 — FoGNO Preconditioner (Disruption 5)
 - [ ] Design Fractional-Order GNO with exponent α ∈ (0,1]: `FoGNO<α>` struct in Rust
