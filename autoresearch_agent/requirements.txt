@@ -1,0 +1,7 @@
+pyswip
+deepproblog
+sympy
+pydantic
+langgraph
+vllm
+google-generativeai
