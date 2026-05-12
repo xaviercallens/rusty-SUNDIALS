@@ -8,7 +8,8 @@
 Translated from [SUNDIALS CVODE](https://computing.llnl.gov/projects/sundials) (44K LOC C → idiomatic Rust)
 
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-18%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-104%20passed-brightgreen)]()
+[![Coverage](https://img.shields.io/badge/coverage-98.4%25%20lines-brightgreen)]()
 [![Lean 4](https://img.shields.io/badge/proofs-20%20Lean%204%20specs-blueviolet)]()
 [![Benchmarks](https://img.shields.io/badge/benchmarks-10%2F10%20✓-success)]()
 
@@ -225,14 +226,14 @@ Each module has a JSON trust certificate in `docs/verification/`:
 
 ```bash
 cargo test --workspace
-# test result: ok. 18 passed; 0 failed
+# test result: ok. 104 passed; 0 failed
 ```
 
 | Crate | Tests | Coverage |
 |-------|-------|----------|
 | `cvode` | 4 | Exponential decay, linear growth, BDF convergence, step control |
 | `nvector` | 10 | Serial, SIMD, Parallel: dot, wrms_norm, linear_sum |
-| `sundials-core` | 4 | Band LU, GMRES, math primitives |
+| `sundials-core` | 90 | 98.38% line / 99.53% function — all modules ≥90% |
 
 ## 🌐 Interactive Web Lab — 30 Use Cases
 
@@ -257,29 +258,35 @@ Each use case features: interactive parameter sliders, LaTeX equations (KaTeX), 
 
 ## 🗺️ Roadmap
 
-We welcome contributions! Here's where Rusty-SUNDIALS is heading:
+We welcome contributions! Here's the evidence-based roadmap grounded in academic peer-review feedback:
 
-### v0.2 — Higher-Order Methods *(Q3 2026)*
-- [ ] BDF orders 2-5 with full Nordsieck polynomial update
-- [ ] Adams-Moulton orders 2-12 with proper coefficients
-- [ ] Interpolation for dense output between steps
+> Full analysis: [docs/ACADEMIC_ROADMAP_v2.md](docs/ACADEMIC_ROADMAP_v2.md)
 
-### v0.3 — GPU Backend *(Q4 2026)*
-- [ ] `nvector-wgpu` crate for WebGPU/Metal compute shaders
-- [ ] Parallel Jacobian assembly via `par_iter_mut()`
-- [ ] Batch ODE solving for parameter sweeps
+### v1.5 — Algorithmic Correctness *(Q3 2026)*
+- [ ] Band LU pivoting with fill-in storage (Golub & Van Loan §4.3.5)
+- [ ] Newton convergence-rate monitoring ($\rho = \|\delta_{m+1}\| / \|\delta_m\|$)
+- [ ] Nordsieck rescaling with interpolation for large step-size changes
+- [ ] Dense output via `CVodeGetDky` — Nordsieck polynomial evaluation
+- [ ] Thread-safe `Cvode<F>: Send` for ensemble/parameter-sweep workflows
 
-### v0.4 — Advanced Solvers *(Q1 2027)*
-- [ ] CVODES (sensitivity analysis)
-- [ ] IDA (differential-algebraic equations)
-- [ ] ARKODE (additive Runge-Kutta for IMEX splitting)
-
-### v1.0 — Production Release *(Q2 2027)*
-- [ ] Full Lean 4 proof compilation (zero `sorry`/`admit`)
+### v2.0 — Industrial Solver *(Q4 2026)*
+- [ ] Preconditioned GMRES (left/right preconditioner callbacks + ILU(0))
+- [ ] Sparse matrix support (CSR/CSC storage + sparse LU)
+- [ ] Reproducible floating-point via compensated summation (Demmel & Nguyen 2015)
 - [ ] `no_std` support for embedded scientific computing
 - [ ] Python bindings via PyO3
+
+### v2.5 — CVODES + ARKODE *(Q2 2027)*
+- [ ] Forward sensitivity analysis (`cvodes` crate) — $\partial y / \partial p$
+- [ ] IMEX splitting (`arkode` crate) — additive Runge-Kutta methods
 - [ ] WebAssembly target for browser-native solving
-- [ ] CI/CD with benchmark regression testing
+
+### v3.0 — Full SUNDIALS Parity *(Q4 2027)*
+- [ ] DAE solver (`ida` crate) — index-1 differential-algebraic equations
+- [ ] Adjoint sensitivity analysis — backward-in-time integration for optimal control
+- [ ] GPU vector backend (`nvector-wgpu`) for massive PDE systems
+- [ ] CI/CD with benchmark regression testing and coverage gates
+
 
 ## 🧠 Why Neuro-Symbolic AI? Honest Evaluation
 
@@ -331,13 +338,14 @@ We believe scientific computing should be **open, verified, and accessible**. Co
 
 | Area | Difficulty | Impact |
 |------|-----------|--------|
-| Higher-order BDF coefficients | 🟡 Medium | Huge performance gain |
-| GPU vector backend (wgpu) | 🔴 Hard | Enables massive PDE systems |
+| Band LU fill-in fix | 🟡 Medium | Correctness (ship-blocking) |
+| Newton convergence rate | 🟢 Easy | Fewer wasted iterations |
+| Dense output (CVodeGetDky) | 🟢 Easy | Plotting, event detection |
+| Preconditioned GMRES | 🟡 Medium | Enables large-scale solves |
+| Sparse CSR matrix | 🔴 Hard | Unlocks PDE-scale problems |
+| CVODES (sensitivity) | 🔴 Hard | Optimization & UQ |
 | Python bindings (PyO3) | 🟢 Easy | Widens user base |
-| WebAssembly target | 🟡 Medium | Browser-native solving |
-| More Lean 4 proofs | 🔴 Hard | Stronger formal guarantees |
-| Additional use cases | 🟢 Easy | Educational value |
-| Documentation & tutorials | 🟢 Easy | Community growth |
+| IDA (DAE solver) | 🔴🔴 V.Hard | Opens entire industrial domain |
 
 ### Code Standards
 
