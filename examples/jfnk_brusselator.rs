@@ -13,9 +13,9 @@
 //! J * dx = -F inside Newton is performed by GMRES.
 //! Instead of a finite-difference approximation for J * v, we use `Dual` numbers.
 
-use sundials_core::dual::Dual;
-use sundials_core::gmres::{gmres, GmresConfig, GmresStatus};
 use std::time::Instant;
+use sundials_core::dual::Dual;
+use sundials_core::gmres::{GmresConfig, GmresStatus, gmres};
 
 /// The nonlinear reaction function F(y), generic over T: Real or Dual
 fn brusselator_reaction<T>(u: T, v: T, a: f64, b: f64) -> (T, T)
@@ -45,24 +45,30 @@ fn main() {
     let b = 3.0;
 
     // Initial guess
-    let mut y = vec![0.5, 0.5]; // u, v
-    
+    let mut y = [0.5, 0.5]; // u, v
+
     // We want to find the roots of F(y) = 0 using Newton's method
     let mut newton_iters = 0;
     let max_newton_iters = 10;
-    
+
     let start = Instant::now();
 
     while newton_iters < max_newton_iters {
         // 1. Evaluate RHS in standard f64 to get F(y)
         let (fu, fv) = brusselator_reaction(y[0], y[1], a, b);
-        let f_val = vec![fu, fv];
-        
-        let norm_f = (fu*fu + fv*fv).sqrt();
-        println!("Newton Iteration {}: ||F(y)|| = {:.2e}", newton_iters, norm_f);
-        
+        let _f_val = [fu, fv];
+
+        let norm_f = (fu * fu + fv * fv).sqrt();
+        println!(
+            "Newton Iteration {}: ||F(y)|| = {:.2e}",
+            newton_iters, norm_f
+        );
+
         if norm_f < 1e-12 {
-            println!("✅ Newton's method converged in {} iterations.", newton_iters);
+            println!(
+                "✅ Newton's method converged in {} iterations.",
+                newton_iters
+            );
             break;
         }
 
@@ -76,19 +82,22 @@ fn main() {
             // Seed the dual numbers: y_dual = y + v * ε
             let u_dual = Dual::new(y[0], v[0]);
             let v_dual = Dual::new(y[1], v[1]);
-            
+
             // Evaluate RHS generically over Dual
             let (fu_dual, fv_dual) = brusselator_reaction(u_dual, v_dual, a, b);
-            
+
             // The dual part is exactly J * v
             out[0] = fu_dual.dual;
             out[1] = fv_dual.dual;
         };
 
         // 3. Solve the linear system using GMRES
-        let cfg = GmresConfig { tol: 1e-10, ..Default::default() };
+        let cfg = GmresConfig {
+            tol: 1e-10,
+            ..Default::default()
+        };
         let status = gmres(jv_exact, &rhs, &mut dx, &cfg);
-        
+
         match status {
             GmresStatus::Converged { iters, .. } => {
                 println!("   GMRES converged in {} inner iterations", iters);
@@ -112,12 +121,12 @@ fn main() {
     // Theoretical steady state is u = A, v = B/A
     let expected_u = a;
     let expected_v = b / a;
-    
+
     let err_u = (y[0] - expected_u).abs();
     let err_v = (y[1] - expected_v).abs();
-    
+
     assert!(err_u < 1e-10, "u error too large: {}", err_u);
     assert!(err_v < 1e-10, "v error too large: {}", err_v);
-    
+
     println!("✅ Validation Successful: Steady state matches theoretical values exactly.");
 }

@@ -20,19 +20,15 @@ fn main() {
     let bindings = bindgen::Builder::new()
         // The input header we would like to generate bindings for.
         .header("wrapper.h")
-        
         // --- no_std Configuration ---
         // This is critical for embedded environments.
         // It forces bindgen to use `core::` and `alloc::` instead of `std::`.
         .use_core()
-        
         // Define C-types that should use `ctypes` prefix from core::ffi
         .ctypes_prefix("core::ffi")
-
-        // In a strictly no_std environment without an allocator, 
+        // In a strictly no_std environment without an allocator,
         // we might also disable certain features, but CVODE requires allocation.
         // So we keep `alloc` available.
-
         // Generate the bindings
         .generate()
         .expect("Unable to generate bindings");

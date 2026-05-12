@@ -2,8 +2,8 @@
 //!
 //! Standard explicit Runge-Kutta methods suffer from "energy drift" when
 //! simulating conservative physical systems (e.g., orbital mechanics, plasma physics).
-//! 
-//! "Relaxation" Runge-Kutta (RRK) applies a scalar multiplier `γ` to the 
+//!
+//! "Relaxation" Runge-Kutta (RRK) applies a scalar multiplier `γ` to the
 //! standard RK update step, making any RK method strictly energy/entropy conserving.
 //!
 //! `y_{n+1} = y_n + γ * Δy`
@@ -12,7 +12,7 @@
 //! `E(y_n + γ * Δy) = E(y_n)`.
 //!
 //! # Reference
-//! Ketcheson, D. I. (2019). "Relaxation Runge-Kutta Methods: Conservation and 
+//! Ketcheson, D. I. (2019). "Relaxation Runge-Kutta Methods: Conservation and
 //! Stability for Inner-Product Norms." SIAM Journal on Numerical Analysis.
 
 use crate::Real;
@@ -36,7 +36,7 @@ pub enum RrkError {
 /// using Newton's method.
 ///
 /// To perform Newton's method without requiring the user to supply the gradient
-/// `∇E`, we use central finite differences to approximate `g'(γ)` along the 
+/// `∇E`, we use central finite differences to approximate `g'(γ)` along the
 /// direction `Δy`.
 ///
 /// # Arguments
@@ -72,7 +72,7 @@ where
 
     let e_n = invariant_fn(y_n);
     let mut gamma = 1.0; // Initial guess is the standard RK step
-    
+
     // Scratch buffer to hold y_n + γ * Δy
     let mut y_eval = vec![0.0; n];
 
@@ -95,7 +95,7 @@ where
         // g'(γ) = [g(γ + h) - g(γ - h)] / 2h
         // where h is a small perturbation.
         let h_fd = 1e-6_f64.max(1e-8 * gamma.abs());
-        
+
         for i in 0..n {
             y_eval[i] = y_n[i] + (gamma + h_fd) * delta_y[i];
         }
@@ -124,34 +124,34 @@ mod tests {
 
     #[test]
     fn test_rrk_quadratic_invariant() {
-        // Harmonic oscillator: y'' = -y 
+        // Harmonic oscillator: y'' = -y
         // State: [q, p]. Invariant E = (q^2 + p^2)/2
         //
         // Let's take a state and a small step that drifts energy, and see if RRK fixes it.
         let y_n = [1.0, 0.0]; // E = 0.5
         let delta_y = [-0.1, 0.9]; // y_new = [0.9, 0.9] -> E = (0.81 + 0.81)/2 = 0.81 (drift!)
 
-        let invariant = |y: &[Real]| -> Real {
-            0.5 * (y[0] * y[0] + y[1] * y[1])
-        };
+        let invariant = |y: &[Real]| -> Real { 0.5 * (y[0] * y[0] + y[1] * y[1]) };
 
         let e_n = invariant(&y_n);
         assert_eq!(e_n, 0.5);
 
         let gamma = compute_relaxation_parameter(&y_n, &delta_y, invariant, 1e-12, 10).unwrap();
-        
+
         // Compute the relaxed step
-        let y_relaxed = [
-            y_n[0] + gamma * delta_y[0],
-            y_n[1] + gamma * delta_y[1],
-        ];
+        let y_relaxed = [y_n[0] + gamma * delta_y[0], y_n[1] + gamma * delta_y[1]];
 
         let e_relaxed = invariant(&y_relaxed);
-        
+
         // Gamma should not be 1.0 (since 1.0 drifts)
         assert!((gamma - 1.0).abs() > 0.01);
-        
+
         // But the energy should be perfectly conserved
-        assert!((e_relaxed - e_n).abs() < 1e-10, "E_relaxed={} != E_n={}", e_relaxed, e_n);
+        assert!(
+            (e_relaxed - e_n).abs() < 1e-10,
+            "E_relaxed={} != E_n={}",
+            e_relaxed,
+            e_n
+        );
     }
 }

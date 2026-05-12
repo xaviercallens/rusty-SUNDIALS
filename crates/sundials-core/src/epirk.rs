@@ -43,7 +43,10 @@ pub struct EpirkConfig {
 
 impl Default for EpirkConfig {
     fn default() -> Self {
-        Self { krylov_dim: 30, tol: 1e-10 }
+        Self {
+            krylov_dim: 30,
+            tol: 1e-10,
+        }
     }
 }
 
@@ -78,42 +81,56 @@ fn phi1(z: Real) -> Real {
 /// Reference: Moler & Van Loan (2003), "Nineteen Dubious Ways to Compute e^A".
 #[cfg(test)]
 pub(crate) fn expm_2x2(a: [[Real; 2]; 2], scale: Real) -> [[Real; 2]; 2] {
-    let h = [[a[0][0] * scale, a[0][1] * scale],
-              [a[1][0] * scale, a[1][1] * scale]];
-    // e^H using Padé [1/1]: (I + H/2)/(I - H/2)  (first-order Padé, safe for small H)
-    let det = (1.0 - h[0][0] / 2.0) * (1.0 - h[1][1] / 2.0)
-            - (h[1][0] / 2.0) * (h[0][1] / 2.0);
-    let inv = [
-        [(1.0 - h[1][1] / 2.0) / det,  h[0][1] / 2.0 / det],
-        [h[1][0] / 2.0 / det,          (1.0 - h[0][0] / 2.0) / det],
+    let h = [
+        [a[0][0] * scale, a[0][1] * scale],
+        [a[1][0] * scale, a[1][1] * scale],
     ];
-    let num = [[1.0 + h[0][0] / 2.0, h[0][1] / 2.0],
-               [h[1][0] / 2.0,       1.0 + h[1][1] / 2.0]];
+    // e^H using Padé [1/1]: (I + H/2)/(I - H/2)  (first-order Padé, safe for small H)
+    let det = (1.0 - h[0][0] / 2.0) * (1.0 - h[1][1] / 2.0) - (h[1][0] / 2.0) * (h[0][1] / 2.0);
+    let inv = [
+        [(1.0 - h[1][1] / 2.0) / det, h[0][1] / 2.0 / det],
+        [h[1][0] / 2.0 / det, (1.0 - h[0][0] / 2.0) / det],
+    ];
+    let num = [
+        [1.0 + h[0][0] / 2.0, h[0][1] / 2.0],
+        [h[1][0] / 2.0, 1.0 + h[1][1] / 2.0],
+    ];
     [
-        [num[0][0] * inv[0][0] + num[0][1] * inv[1][0],
-         num[0][0] * inv[0][1] + num[0][1] * inv[1][1]],
-        [num[1][0] * inv[0][0] + num[1][1] * inv[1][0],
-         num[1][0] * inv[0][1] + num[1][1] * inv[1][1]],
+        [
+            num[0][0] * inv[0][0] + num[0][1] * inv[1][0],
+            num[0][0] * inv[0][1] + num[0][1] * inv[1][1],
+        ],
+        [
+            num[1][0] * inv[0][0] + num[1][1] * inv[1][0],
+            num[1][0] * inv[0][1] + num[1][1] * inv[1][1],
+        ],
     ]
 }
 
 #[cfg(not(test))]
 fn expm_2x2(a: [[Real; 2]; 2], scale: Real) -> [[Real; 2]; 2] {
-    let h = [[a[0][0] * scale, a[0][1] * scale],
-              [a[1][0] * scale, a[1][1] * scale]];
-    let det = (1.0 - h[0][0] / 2.0) * (1.0 - h[1][1] / 2.0)
-            - (h[1][0] / 2.0) * (h[0][1] / 2.0);
-    let inv = [
-        [(1.0 - h[1][1] / 2.0) / det,  h[0][1] / 2.0 / det],
-        [h[1][0] / 2.0 / det,          (1.0 - h[0][0] / 2.0) / det],
+    let h = [
+        [a[0][0] * scale, a[0][1] * scale],
+        [a[1][0] * scale, a[1][1] * scale],
     ];
-    let num = [[1.0 + h[0][0] / 2.0, h[0][1] / 2.0],
-               [h[1][0] / 2.0,       1.0 + h[1][1] / 2.0]];
+    let det = (1.0 - h[0][0] / 2.0) * (1.0 - h[1][1] / 2.0) - (h[1][0] / 2.0) * (h[0][1] / 2.0);
+    let inv = [
+        [(1.0 - h[1][1] / 2.0) / det, h[0][1] / 2.0 / det],
+        [h[1][0] / 2.0 / det, (1.0 - h[0][0] / 2.0) / det],
+    ];
+    let num = [
+        [1.0 + h[0][0] / 2.0, h[0][1] / 2.0],
+        [h[1][0] / 2.0, 1.0 + h[1][1] / 2.0],
+    ];
     [
-        [num[0][0] * inv[0][0] + num[0][1] * inv[1][0],
-         num[0][0] * inv[0][1] + num[0][1] * inv[1][1]],
-        [num[1][0] * inv[0][0] + num[1][1] * inv[1][0],
-         num[1][0] * inv[0][1] + num[1][1] * inv[1][1]],
+        [
+            num[0][0] * inv[0][0] + num[0][1] * inv[1][0],
+            num[0][0] * inv[0][1] + num[0][1] * inv[1][1],
+        ],
+        [
+            num[1][0] * inv[0][0] + num[1][1] * inv[1][0],
+            num[1][0] * inv[0][1] + num[1][1] * inv[1][1],
+        ],
     ]
 }
 
@@ -131,12 +148,7 @@ fn expm_2x2(a: [[Real; 2]; 2], scale: Real) -> [[Real; 2]; 2] {
 /// # Complexity
 /// O(N·m) where m = cfg.krylov_dim (typically m ≪ N).
 /// For comparison, explicit e^{hA} requires O(N³) — exponential speedup.
-pub fn krylov_expm_v<F>(
-    matvec: F,
-    v: &[Real],
-    h: Real,
-    cfg: &EpirkConfig,
-) -> Vec<Real>
+pub fn krylov_expm_v<F>(matvec: F, v: &[Real], h: Real, cfg: &EpirkConfig) -> Vec<Real>
 where
     F: Fn(&[Real], &mut [Real]),
 {
@@ -301,18 +313,25 @@ mod tests {
 
         // A = diag(-1, -2)
         let matvec = |x: &[Real], y: &mut [Real]| {
-            y[0] = -1.0 * x[0];
+            y[0] = -x[0];
             y[1] = -2.0 * x[1];
         };
 
-        let cfg = EpirkConfig { krylov_dim: 2, tol: 1e-14 };
+        let cfg = EpirkConfig {
+            krylov_dim: 2,
+            tol: 1e-14,
+        };
         let result = krylov_expm_v(matvec, &v, h, &cfg);
 
         // Verify sign and magnitude are reasonable (not exact due to approximation)
         assert!(result[0] > 0.0, "e^(-h)·v₀ should be positive");
         assert!(result[1] > 0.0, "e^(-2h)·v₁ should be positive");
         println!("EPIRK result: [{:.6}, {:.6}]", result[0], result[1]);
-        println!("Expected:     [{:.6}, {:.6}]", (-h).exp(), 2.0 * (-2.0*h).exp());
+        println!(
+            "Expected:     [{:.6}, {:.6}]",
+            (-h).exp(),
+            2.0 * (-2.0 * h).exp()
+        );
     }
 
     /// Integration test: krylov_expm_v on y' = -λy one step matches e^{-λh}·y₀.
@@ -328,13 +347,22 @@ mod tests {
             out[0] = -lambda * x[0];
         };
 
-        let cfg = EpirkConfig { krylov_dim: 1, tol: 1e-14 };
+        let cfg = EpirkConfig {
+            krylov_dim: 1,
+            tol: 1e-14,
+        };
         let result = krylov_expm_v(linear_mv, &v, h, &cfg);
 
         let exact = (-lambda * h).exp();
-        println!("krylov_expm_v(1D): result={:.8}, exact={:.8}", result[0], exact);
+        println!(
+            "krylov_expm_v(1D): result={:.8}, exact={:.8}",
+            result[0], exact
+        );
         // The 1D Krylov is exact for diagonal systems (no approximation)
         let error = (result[0] - exact).abs();
-        assert!(error < 0.05, "Krylov expm error {error:.2e} too large for 1D");
+        assert!(
+            error < 0.05,
+            "Krylov expm error {error:.2e} too large for 1D"
+        );
     }
 }

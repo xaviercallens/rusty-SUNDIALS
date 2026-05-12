@@ -55,13 +55,21 @@ pub fn wrms_norm(v: &[Real], w: &[Real]) -> Real {
     if n == 0 {
         return 0.0;
     }
-    let sum: Real = v.iter().zip(w.iter()).map(|(vi, wi)| (vi * wi).powi(2)).sum();
+    let sum: Real = v
+        .iter()
+        .zip(w.iter())
+        .map(|(vi, wi)| (vi * wi).powi(2))
+        .sum();
     (sum / n as Real).sqrt()
 }
 
 /// Compute the weighted L2 norm: sqrt(sum(v[i]^2 * w[i]^2)).
 pub fn wl2_norm(v: &[Real], w: &[Real]) -> Real {
-    let sum: Real = v.iter().zip(w.iter()).map(|(vi, wi)| (vi * wi).powi(2)).sum();
+    let sum: Real = v
+        .iter()
+        .zip(w.iter())
+        .map(|(vi, wi)| (vi * wi).powi(2))
+        .sum();
     sum.sqrt()
 }
 

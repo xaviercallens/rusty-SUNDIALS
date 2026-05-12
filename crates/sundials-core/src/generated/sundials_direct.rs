@@ -158,7 +158,11 @@ impl SundlsMat {
                 self.data
                     .chunks_exact_mut(self.ldim)
                     .take(self.m)
-                    .for_each(|col| col[start..start + col_size].iter_mut().for_each(|x| *x = 0.0));
+                    .for_each(|col| {
+                        col[start..start + col_size]
+                            .iter_mut()
+                            .for_each(|x| *x = 0.0)
+                    });
             }
         }
     }

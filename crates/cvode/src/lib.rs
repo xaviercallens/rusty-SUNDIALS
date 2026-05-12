@@ -19,6 +19,7 @@ mod nordsieck;
 mod solver;
 mod step;
 
+pub use adjoint::{AdjointSolver, Checkpoint};
 pub use builder::CvodeBuilder;
 pub use constants::{Method, Task};
 pub use error::CvodeError;

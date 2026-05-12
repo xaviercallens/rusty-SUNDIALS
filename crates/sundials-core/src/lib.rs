@@ -5,26 +5,25 @@
 //!
 //! Translated from: `sundials/sundials_types.h`, `sundials/sundials_context.h`
 
-pub mod context;
-pub mod error;
-pub mod math;
-pub mod generated;
-pub mod band_solver;
-pub mod gmres;
-pub mod dual;
-pub mod mpir;
-pub mod ilu;
-pub mod sparse;
-pub mod epirk;
-pub mod pinn;
 pub mod arkode;
+pub mod band_solver;
+pub mod context;
+pub mod dual;
+pub mod epirk;
+pub mod error;
+pub mod generated;
+pub mod gmres;
+pub mod ilu;
+pub mod math;
+pub mod mpir;
+pub mod pinn;
+pub mod sparse;
 
 #[cfg(test)]
 mod tests_coverage;
 
-
 pub use context::Context;
-pub use error::{SundialsError, Result};
+pub use error::{Result, SundialsError};
 
 /// The real number type used throughout SUNDIALS.
 /// Corresponds to `sunrealtype` in C (typically f64).

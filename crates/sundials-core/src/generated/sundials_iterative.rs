@@ -68,7 +68,9 @@ pub trait NVector: Clone {
     #[inline]
     fn dot_prod_multi(x: &Self, ys: &[Self], out: &mut [SunReal]) -> Result<(), CvodeError> {
         if ys.len() != out.len() {
-            return Err(CvodeError::DimensionMismatch("dot_prod_multi output length"));
+            return Err(CvodeError::DimensionMismatch(
+                "dot_prod_multi output length",
+            ));
         }
         for (o, y) in out.iter_mut().zip(ys.iter()) {
             *o = x.dot(y)?;
@@ -77,11 +79,7 @@ pub trait NVector: Clone {
     }
 
     #[inline]
-    fn linear_combination(
-        coeffs: &[SunReal],
-        xs: &[Self],
-        z: &mut Self,
-    ) -> Result<(), CvodeError> {
+    fn linear_combination(coeffs: &[SunReal], xs: &[Self], z: &mut Self) -> Result<(), CvodeError> {
         if coeffs.len() != xs.len() || xs.is_empty() {
             return Err(CvodeError::DimensionMismatch("linear_combination"));
         }

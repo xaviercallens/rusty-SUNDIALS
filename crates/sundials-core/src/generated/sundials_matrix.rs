@@ -250,11 +250,7 @@ where
 
 /// `SUNMatMatvec`: compute `y = A x`.
 #[inline]
-pub fn sun_mat_matvec<M, V>(
-    a: &GenericSunMatrix<M>,
-    x: &V,
-    y: &mut V,
-) -> Result<(), CvodeError>
+pub fn sun_mat_matvec<M, V>(a: &GenericSunMatrix<M>, x: &V, y: &mut V) -> Result<(), CvodeError>
 where
     M: SunMatrix<V>,
     V: NVector,

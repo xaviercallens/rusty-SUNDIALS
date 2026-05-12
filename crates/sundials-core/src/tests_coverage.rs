@@ -126,11 +126,14 @@ mod tests_error {
 
     #[test]
     fn test_from_code_all_known() {
-        for code in [-1i32, -2, -3, -4, -5, -6, -7, -8, -9, -10,
-                     -11, -12, -13, -14, -15, -16, -20, -21, -22,
-                     -23, -24, -25, -26, -27, -28, -29, -30, -31, -32] {
-            assert!(SundialsError::from_code(code).is_some(),
-                "code {code} should map to Some");
+        for code in [
+            -1i32, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -20, -21,
+            -22, -23, -24, -25, -26, -27, -28, -29, -30, -31, -32,
+        ] {
+            assert!(
+                SundialsError::from_code(code).is_some(),
+                "code {code} should map to Some"
+            );
         }
     }
 
@@ -247,7 +250,7 @@ mod tests_dual {
 // ══════════════════════════════════════════════════════════════════════════════
 #[cfg(test)]
 mod tests_mpir {
-    use crate::mpir::{mpir_solve, MpirConfig, MpirStatus};
+    use crate::mpir::{MpirConfig, MpirStatus, mpir_solve};
 
     #[test]
     fn test_default_config() {
@@ -260,7 +263,10 @@ mod tests_mpir {
     fn test_1x1_system() {
         let a = vec![4.0f64];
         let b = vec![8.0f64];
-        let cfg = MpirConfig { max_iter: 5, tol: 1e-12 };
+        let cfg = MpirConfig {
+            max_iter: 5,
+            tol: 1e-12,
+        };
         let (x, status) = mpir_solve(&a, &b, &cfg);
         assert!((x[0] - 2.0).abs() < 1e-8);
         assert!(matches!(status, MpirStatus::Converged { .. }));
@@ -281,7 +287,10 @@ mod tests_mpir {
         // max_iter=0 forces the NotConverged path immediately
         let a = vec![1.0f64, 0.0, 0.0, 1.0];
         let b = vec![1.0, 1.0];
-        let cfg = MpirConfig { max_iter: 0, tol: 1e-15 };
+        let cfg = MpirConfig {
+            max_iter: 0,
+            tol: 1e-15,
+        };
         let (_, status) = mpir_solve(&a, &b, &cfg);
         // Either converged on first pass or not — both are valid paths
         // but max_iter=0 skips the refinement loop entirely
@@ -293,7 +302,13 @@ mod tests_mpir {
 
     #[test]
     fn test_debug_format() {
-        let s1 = format!("{:?}", MpirStatus::Converged { iters: 1, res_norm: 1e-13 });
+        let s1 = format!(
+            "{:?}",
+            MpirStatus::Converged {
+                iters: 1,
+                res_norm: 1e-13
+            }
+        );
         assert!(s1.contains("Converged"));
         let s2 = format!("{:?}", MpirStatus::NotConverged { res_norm: 0.1 });
         assert!(s2.contains("NotConverged"));
@@ -306,12 +321,16 @@ mod tests_mpir {
 // ══════════════════════════════════════════════════════════════════════════════
 #[cfg(test)]
 mod tests_epirk {
-    use crate::epirk::{krylov_expm_v, expeuler_step, EpirkConfig};
+    use crate::epirk::{EpirkConfig, expeuler_step, krylov_expm_v};
 
     #[test]
     fn test_zero_vector_returns_zero() {
         let v = vec![0.0, 0.0, 0.0];
-        let mv = |x: &[f64], y: &mut [f64]| { for i in 0..3 { y[i] = x[i]; } };
+        let mv = |x: &[f64], y: &mut [f64]| {
+            for i in 0..3 {
+                y[i] = x[i];
+            }
+        };
         let cfg = EpirkConfig::default();
         let r = krylov_expm_v(mv, &v, 0.1, &cfg);
         assert_eq!(r, vec![0.0, 0.0, 0.0]);
@@ -325,7 +344,10 @@ mod tests_epirk {
             y[0] = -x[0];
             y[1] = -x[1];
         };
-        let cfg = EpirkConfig { krylov_dim: 100, tol: 1e-12 };
+        let cfg = EpirkConfig {
+            krylov_dim: 100,
+            tol: 1e-12,
+        };
         let r = krylov_expm_v(mv, &v, 0.1, &cfg);
         assert!(r[0].is_finite());
     }
@@ -334,8 +356,13 @@ mod tests_epirk {
     fn test_expeuler_step_zero_nonlinear() {
         // y' = -y; N(y)=0 so only linear term runs
         let mut y = vec![1.0f64];
-        let cfg = EpirkConfig { krylov_dim: 1, tol: 1e-14 };
-        let mv = |x: &[f64], out: &mut [f64]| { out[0] = -x[0]; };
+        let cfg = EpirkConfig {
+            krylov_dim: 1,
+            tol: 1e-14,
+        };
+        let mv = |x: &[f64], out: &mut [f64]| {
+            out[0] = -x[0];
+        };
         let nl = |_: &[f64]| vec![0.0f64];
         expeuler_step(mv, nl, &mut y, 0.1, &cfg);
         assert!(y[0] > 0.0 && y[0] < 1.0);
@@ -345,8 +372,13 @@ mod tests_epirk {
     fn test_expeuler_step_with_nonlinear() {
         // y' = -y + c (constant source), exercises phi1_ny scaling path
         let mut y = vec![1.0f64];
-        let cfg = EpirkConfig { krylov_dim: 1, tol: 1e-14 };
-        let mv = |x: &[f64], out: &mut [f64]| { out[0] = -x[0]; };
+        let cfg = EpirkConfig {
+            krylov_dim: 1,
+            tol: 1e-14,
+        };
+        let mv = |x: &[f64], out: &mut [f64]| {
+            out[0] = -x[0];
+        };
         let nl = |_: &[f64]| vec![0.5f64]; // non-zero N(y)
         expeuler_step(mv, nl, &mut y, 0.1, &cfg);
         assert!(y[0].is_finite());
@@ -366,7 +398,7 @@ mod tests_epirk {
 // ══════════════════════════════════════════════════════════════════════════════
 #[cfg(test)]
 mod tests_pinn {
-    use crate::pinn::{TinyMlp, PinnPredictor};
+    use crate::pinn::{PinnPredictor, TinyMlp};
 
     #[test]
     fn test_mlp_3state() {
@@ -432,7 +464,7 @@ mod tests_pinn {
 // ══════════════════════════════════════════════════════════════════════════════
 #[cfg(test)]
 mod tests_gmres {
-    use crate::gmres::{gmres, GmresConfig, GmresStatus};
+    use crate::gmres::{GmresConfig, GmresStatus, gmres};
 
     #[test]
     fn test_default_config() {
@@ -460,8 +492,15 @@ mod tests_gmres {
         // A system where GMRES never converges in 1 restart × 2 inner steps
         let b = vec![1.0, 1.0];
         let mut x = vec![0.0; 2];
-        let mv = |_v: &[f64], y: &mut [f64]| { y[0] = 1e-40; y[1] = 1e-40; };
-        let cfg = GmresConfig { max_restarts: 1, restart: 2, tol: 1e-14 };
+        let mv = |_v: &[f64], y: &mut [f64]| {
+            y[0] = 1e-40;
+            y[1] = 1e-40;
+        };
+        let cfg = GmresConfig {
+            max_restarts: 1,
+            restart: 2,
+            tol: 1e-14,
+        };
         let status = gmres(mv, &b, &mut x, &cfg);
         assert!(matches!(status, GmresStatus::MaxItersReached { .. }));
     }
@@ -473,15 +512,21 @@ mod tests_gmres {
         let b = vec![6.0, 9.0, 4.0];
         let mut x = vec![0.0; 3];
         let mv = |v: &[f64], y: &mut [f64]| {
-            for i in 0..3 { y[i] = (0..3).map(|j| a[i][j] * v[j]).sum(); }
+            for i in 0..3 {
+                y[i] = (0..3).map(|j| a[i][j] * v[j]).sum();
+            }
         };
         // restart=1 forces many restarts, exercising the outer loop path
-        let cfg = GmresConfig { max_restarts: 50, restart: 1, tol: 1e-6 };
+        let cfg = GmresConfig {
+            max_restarts: 50,
+            restart: 1,
+            tol: 1e-6,
+        };
         let status = gmres(mv, &b, &mut x, &cfg);
         // Should eventually converge even with restart=1
         let mut ax = vec![0.0; 3];
         mv(&x, &mut ax);
-        let res: f64 = (0..3).map(|i| (ax[i]-b[i]).powi(2)).sum::<f64>().sqrt();
+        let res: f64 = (0..3).map(|i| (ax[i] - b[i]).powi(2)).sum::<f64>().sqrt();
         println!("GMRES restart=1 residual: {res:.2e}, status: {:?}", status);
         assert!(res < 0.1, "residual {res} too large");
     }
@@ -493,7 +538,9 @@ mod tests_gmres {
         let b = vec![4.0, 9.0, 15.0];
         let mut x = vec![0.0; 3];
         let mv = move |v: &[f64], y: &mut [f64]| {
-            for i in 0..3 { y[i] = diag[i] * v[i]; }
+            for i in 0..3 {
+                y[i] = diag[i] * v[i];
+            }
         };
         gmres(mv, &b, &mut x, &GmresConfig::default());
         assert!((x[0] - 2.0).abs() < 1e-6);
@@ -508,7 +555,7 @@ mod tests_gmres {
 // ══════════════════════════════════════════════════════════════════════════════
 #[cfg(test)]
 mod tests_band {
-    use crate::band_solver::{BandMat, BandError};
+    use crate::band_solver::{BandError, BandMat};
 
     #[test]
     fn test_get_out_of_bounds_returns_zero() {
@@ -537,7 +584,9 @@ mod tests_band {
     #[test]
     fn test_dimension_mismatch_error() {
         let mut a = BandMat::zeros(3, 1, 1);
-        a.set(0, 0, 1.0); a.set(1, 1, 1.0); a.set(2, 2, 1.0);
+        a.set(0, 0, 1.0);
+        a.set(1, 1, 1.0);
+        a.set(2, 2, 1.0);
         let mut pivots = vec![0usize; 3];
         a.band_getrf(&mut pivots).unwrap();
         // Wrong-length b
@@ -564,7 +613,9 @@ mod tests_band {
     fn test_band_solve_5x5_diagonal() {
         let n = 5;
         let mut a = BandMat::zeros(n, 0, 0); // diagonal only
-        for i in 0..n { a.set(i, i, (i + 1) as f64); }
+        for i in 0..n {
+            a.set(i, i, (i + 1) as f64);
+        }
         let mut b: Vec<f64> = (1..=n).map(|v| (v * v) as f64).collect();
         let mut pivots = vec![0usize; n];
         a.band_getrf(&mut pivots).unwrap();
@@ -660,7 +711,7 @@ mod tests_dual_exp {
 // ══════════════════════════════════════════════════════════════════════════════
 #[cfg(test)]
 mod tests_epirk_deep {
-    use crate::epirk::{krylov_expm_v, EpirkConfig};
+    use crate::epirk::{EpirkConfig, krylov_expm_v};
 
     // We access private functions via a re-export trick: add a pub(crate) test helper in epirk.rs
     // Instead, we trigger the branches through the public API.
@@ -670,8 +721,13 @@ mod tests_epirk_deep {
         // Large step h triggers (e^z - 1)/z branch inside the Taylor series on H_m.
         // Use h=10 so z = h * lambda_i is large, forcing the non-Taylor phi1 path.
         let v = vec![1.0f64];
-        let mv = |x: &[f64], y: &mut [f64]| { y[0] = -0.001 * x[0]; };
-        let cfg = EpirkConfig { krylov_dim: 1, tol: 1e-14 };
+        let mv = |x: &[f64], y: &mut [f64]| {
+            y[0] = -0.001 * x[0];
+        };
+        let cfg = EpirkConfig {
+            krylov_dim: 1,
+            tol: 1e-14,
+        };
         let r = krylov_expm_v(mv, &v, 10.0, &cfg);
         assert!(r[0].is_finite() && r[0] > 0.0);
     }
@@ -690,7 +746,10 @@ mod tests_epirk_deep {
             y[2] = 0.0;
         };
         // krylov_dim=3 but breakdown happens at j=0 → m_eff=1
-        let cfg = EpirkConfig { krylov_dim: 3, tol: 1e-6 };
+        let cfg = EpirkConfig {
+            krylov_dim: 3,
+            tol: 1e-6,
+        };
         let r = krylov_expm_v(mv, &v, 0.5, &cfg);
         // e^{-0.5}·1.0 ≈ 0.6065
         assert!((r[0] - (-0.5f64).exp()).abs() < 0.01);
@@ -705,10 +764,13 @@ mod tests_epirk_deep {
         // Full 2-D non-trivial system: A = [[-1,0],[0,-2]]
         let v = vec![1.0f64, 1.0];
         let mv = |x: &[f64], y: &mut [f64]| {
-            y[0] = -1.0 * x[0];
+            y[0] = -x[0];
             y[1] = -2.0 * x[1];
         };
-        let cfg = EpirkConfig { krylov_dim: 2, tol: 1e-14 };
+        let cfg = EpirkConfig {
+            krylov_dim: 2,
+            tol: 1e-14,
+        };
         let r = krylov_expm_v(mv, &v, 0.2, &cfg);
         let e1 = (-0.2f64).exp();
         let e2 = (-0.4f64).exp();
@@ -723,13 +785,13 @@ mod tests_epirk_deep {
 // ══════════════════════════════════════════════════════════════════════════════
 #[cfg(test)]
 mod tests_epirk_private {
-    use crate::epirk::{phi1, expm_2x2};
+    use crate::epirk::{expm_2x2, phi1};
 
     #[test]
     fn test_phi1_small_z_taylor() {
         // z near 0 → Taylor branch: 1 + z/2 + z²/6 + z³/24
         let z = 1e-10;
-        let expected = 1.0 + z/2.0 + z*z/6.0 + z*z*z/24.0;
+        let expected = 1.0 + z / 2.0 + z * z / 6.0 + z * z * z / 24.0;
         assert!((phi1(z) - expected).abs() < 1e-15);
     }
 
@@ -758,8 +820,10 @@ mod tests_epirk_private {
         assert!(result[1][1].is_finite());
         assert!(result[0][1].abs() < 0.01); // off-diagonals near 0
         assert!(result[1][0].abs() < 0.01);
-        println!("expm_2x2 diag: [{}, {}; {}, {}]",
-            result[0][0], result[0][1], result[1][0], result[1][1]);
+        println!(
+            "expm_2x2 diag: [{}, {}; {}, {}]",
+            result[0][0], result[0][1], result[1][0], result[1][1]
+        );
     }
 
     #[test]
@@ -774,7 +838,6 @@ mod tests_epirk_private {
     }
 }
 
-
 // ══════════════════════════════════════════════════════════════════════════════
 // Module: gmres — remaining gaps:
 //   line 72: already-converged on restart entry (beta < tol at start of loop)
@@ -783,7 +846,7 @@ mod tests_epirk_private {
 // ══════════════════════════════════════════════════════════════════════════════
 #[cfg(test)]
 mod tests_gmres_deep {
-    use crate::gmres::{gmres, GmresConfig, GmresStatus};
+    use crate::gmres::{GmresConfig, GmresStatus, gmres};
 
     #[test]
     fn test_gmres_already_converged_at_start() {
@@ -792,7 +855,11 @@ mod tests_gmres_deep {
         let b = vec![1.0, 2.0, 3.0];
         let mut x = b.clone(); // perfect initial guess
         let mv = |v: &[f64], y: &mut [f64]| y.copy_from_slice(v);
-        let cfg = GmresConfig { max_restarts: 5, restart: 3, tol: 1e-8 };
+        let cfg = GmresConfig {
+            max_restarts: 5,
+            restart: 3,
+            tol: 1e-8,
+        };
         let status = gmres(mv, &b, &mut x, &cfg);
         assert!(matches!(status, GmresStatus::Converged { .. }));
     }
@@ -807,8 +874,14 @@ mod tests_gmres_deep {
         let mut x = vec![0.0];
         // A = [2] (scalar), exact after 1 step, h[1][0] > 0 normally.
         // Use A = 0 so w = 0 → h[1][0] = ||w|| = 0 → Givens(h[0][0], 0) hits b==0 path.
-        let mv = |_v: &[f64], y: &mut [f64]| { y[0] = 0.0; };
-        let cfg = GmresConfig { max_restarts: 1, restart: 2, tol: 1e-14 };
+        let mv = |_v: &[f64], y: &mut [f64]| {
+            y[0] = 0.0;
+        };
+        let cfg = GmresConfig {
+            max_restarts: 1,
+            restart: 2,
+            tol: 1e-14,
+        };
         // Will not converge (A=0), but exercises the b==0 Givens path
         let _status = gmres(mv, &b, &mut x, &cfg);
         // Just ensure no panic
@@ -818,8 +891,15 @@ mod tests_gmres_deep {
     fn test_max_iters_reached_has_finite_res_norm() {
         let b = vec![1.0, 1.0];
         let mut x = vec![0.0; 2];
-        let mv = |_v: &[f64], y: &mut [f64]| { y[0] = 1e-40; y[1] = 1e-40; };
-        let cfg = GmresConfig { max_restarts: 1, restart: 2, tol: 1e-14 };
+        let mv = |_v: &[f64], y: &mut [f64]| {
+            y[0] = 1e-40;
+            y[1] = 1e-40;
+        };
+        let cfg = GmresConfig {
+            max_restarts: 1,
+            restart: 2,
+            tol: 1e-14,
+        };
         let status = gmres(mv, &b, &mut x, &cfg);
         if let GmresStatus::MaxItersReached { res_norm } = status {
             assert!(res_norm.is_finite());
@@ -856,13 +936,12 @@ mod tests_gmres_private {
         // When b != 0: r = hypot(a,b), c=a/r, s=b/r
         let a = 3.0f64;
         let b = 4.0f64;
-        let r = (a*a + b*b).sqrt(); // 5.0
+        let r = (a * a + b * b).sqrt(); // 5.0
         let (c, s) = givens_rotation(a, b);
-        assert!((c - a/r).abs() < 1e-14);
-        assert!((s - b/r).abs() < 1e-14);
+        assert!((c - a / r).abs() < 1e-14);
+        assert!((s - b / r).abs() < 1e-14);
     }
 }
-
 
 // Module: band_solver — remaining gaps:
 //   line 109-110: pivot row update when off-diagonal is larger (actual pivot swap)
@@ -879,17 +958,21 @@ mod tests_band_deep {
         // With the v1.5 fill-in fix, pivoted solves now produce correct results.
         let n = 3;
         let mut a = BandMat::zeros(n, 1, 1);
-        let vals: [[f64;3];3] = [
-            [ 2.0, -1.0,  0.0],
-            [-5.0, 10.0, -1.0],
-            [ 0.0, -1.0,  5.0],
-        ];
-        for i in 0..n { for j in 0..n {
-            if vals[i][j] != 0.0 { a.set(i, j, vals[i][j]); }
-        }}
+        let vals: [[f64; 3]; 3] = [[2.0, -1.0, 0.0], [-5.0, 10.0, -1.0], [0.0, -1.0, 5.0]];
+        for i in 0..n {
+            for j in 0..n {
+                if vals[i][j] != 0.0 {
+                    a.set(i, j, vals[i][j]);
+                }
+            }
+        }
         let x_true = [1.0f64, 2.0, 3.0];
         let mut b = vec![0.0f64; n];
-        for i in 0..n { for j in 0..n { b[i] += vals[i][j] * x_true[j]; } }
+        for i in 0..n {
+            for j in 0..n {
+                b[i] += vals[i][j] * x_true[j];
+            }
+        }
         let b_orig = b.clone();
         let mut pivots = vec![0usize; n];
         a.band_getrf(&mut pivots).unwrap();
@@ -898,9 +981,11 @@ mod tests_band_deep {
         // With fill-in fix, solve is now accurate
         for i in 0..n {
             let ax_i: f64 = (0..n).map(|j| vals[i][j] * b[j]).sum();
-            assert!((ax_i - b_orig[i]).abs() < 1e-10,
+            assert!(
+                (ax_i - b_orig[i]).abs() < 1e-10,
                 "residual[{i}]={:.2e} — v1.5 fill-in fix should make this accurate",
-                (ax_i - b_orig[i]).abs());
+                (ax_i - b_orig[i]).abs()
+            );
         }
     }
 
@@ -910,31 +995,41 @@ mod tests_band_deep {
         // including the inner pivot search loop on each column.
         let n = 4;
         let mut a = BandMat::zeros(n, 1, 1);
-        let vals: [[f64;4];4] = [
-            [10.0, -2.0,  0.0,  0.0],
-            [-3.0, 10.0, -2.0,  0.0],
-            [ 0.0, -3.0, 10.0, -2.0],
-            [ 0.0,  0.0, -3.0, 10.0],
+        let vals: [[f64; 4]; 4] = [
+            [10.0, -2.0, 0.0, 0.0],
+            [-3.0, 10.0, -2.0, 0.0],
+            [0.0, -3.0, 10.0, -2.0],
+            [0.0, 0.0, -3.0, 10.0],
         ];
-        for i in 0..n { for j in 0..n {
-            let v = vals[i][j];
-            if v != 0.0 { a.set(i, j, v); }
-        }}
+        for i in 0..n {
+            for j in 0..n {
+                let v = vals[i][j];
+                if v != 0.0 {
+                    a.set(i, j, v);
+                }
+            }
+        }
         let x_true = [1.0f64, 2.0, 3.0, 4.0];
         let mut b = vec![0.0f64; n];
-        for i in 0..n { for j in 0..n { b[i] += vals[i][j] * x_true[j]; } }
+        for i in 0..n {
+            for j in 0..n {
+                b[i] += vals[i][j] * x_true[j];
+            }
+        }
         let b_orig = b.clone();
         let mut pivots = vec![0usize; n];
         a.band_getrf(&mut pivots).unwrap();
         a.band_getrs(&pivots, &mut b).unwrap();
         for i in 0..n {
             let ax_i: f64 = (0..n).map(|j| vals[i][j] * b[j]).sum();
-            assert!((ax_i - b_orig[i]).abs() < 1e-8,
-                "residual[{i}]={:.2e}", (ax_i - b_orig[i]).abs());
+            assert!(
+                (ax_i - b_orig[i]).abs() < 1e-8,
+                "residual[{i}]={:.2e}",
+                (ax_i - b_orig[i]).abs()
+            );
         }
     }
 }
-
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Module: mpir — remaining gap: lines 212-213 (NotConverged panic in test)
@@ -943,7 +1038,7 @@ mod tests_band_deep {
 // ══════════════════════════════════════════════════════════════════════════════
 #[cfg(test)]
 mod tests_mpir_deep {
-    use crate::mpir::{mpir_solve, MpirConfig, MpirStatus};
+    use crate::mpir::{MpirConfig, MpirStatus, mpir_solve};
 
     #[test]
     fn test_not_converged_is_handled_gracefully() {
@@ -953,7 +1048,10 @@ mod tests_mpir_deep {
         let a = vec![3.0f64, 1.0, 1.0, 2.0]; // well-conditioned
         let b = vec![5.0f64, 3.0]; // x_true = [1, 2]
         // max_iter=0 and tol=0.0: loop runs 0 times, falls through to NotConverged
-        let cfg = MpirConfig { max_iter: 0, tol: 0.0 };
+        let cfg = MpirConfig {
+            max_iter: 0,
+            tol: 0.0,
+        };
         let (x, status) = mpir_solve(&a, &b, &cfg);
         // x from FP32 solve will be close to true solution
         assert!(x.iter().all(|v| v.is_finite()));
@@ -980,7 +1078,11 @@ mod tests_mpir_deep {
         ];
         let x_true = [1.0, 2.0, 3.0];
         let mut b = vec![0.0f64; 3];
-        for i in 0..3 { for j in 0..3 { b[i] += a[i*3+j] * x_true[j]; } }
+        for i in 0..3 {
+            for j in 0..3 {
+                b[i] += a[i * 3 + j] * x_true[j];
+            }
+        }
 
         let (x, _) = mpir_solve(&a, &b, &MpirConfig::default());
         for i in 0..3 {
@@ -988,4 +1090,3 @@ mod tests_mpir_deep {
         }
     }
 }
-

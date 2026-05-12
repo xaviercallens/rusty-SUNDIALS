@@ -4,12 +4,11 @@
 //! where f^E is the explicit (non-stiff) part and f^I is the implicit (stiff) part.
 //!
 //! By splitting the physics, IMEX avoids solving expensive non-linear systems
-//! for the non-stiff advection/convection terms, only treating the stiff 
+//! for the non-stiff advection/convection terms, only treating the stiff
 //! diffusion/reaction terms implicitly. This is critical for plasma physics
 //! where advection is fast but diffusion is ultra-fast.
 
 use crate::Real;
-use crate::generated::sundials_dense::DenseMat;
 
 /// Defines an IMEX Runge-Kutta Tableau.
 #[derive(Debug, Clone)]
@@ -27,7 +26,7 @@ impl ImexTableau {
     pub fn ars222() -> Self {
         let gamma = 1.0 - (1.0 / 2.0_f64).sqrt();
         let delta = 1.0 - 1.0 / (2.0 * gamma);
-        
+
         Self {
             stages: 2,
             c: vec![0.0, gamma, 1.0],
@@ -81,15 +80,15 @@ where
     }
 
     /// Perform a single IMEX step of size `h` from `t` and `y`.
-    /// 
-    /// This uses fixed-point iteration for the implicit solve to keep the 
+    ///
+    /// This uses fixed-point iteration for the implicit solve to keep the
     /// implementation generic without requiring a Jacobian. For highly stiff
     /// systems, this would be replaced with a Newton-Krylov solver.
     pub fn step(&self, t: Real, y: &[Real], h: Real, y_next: &mut [Real]) -> Result<(), String> {
         let s = self.tableau.stages;
         let mut k_e = vec![vec![0.0; self.n]; s + 1];
         let mut k_i = vec![vec![0.0; self.n]; s + 1];
-        
+
         let mut y_stage = vec![0.0; self.n];
         let mut z_i = vec![0.0; self.n];
 
@@ -104,7 +103,7 @@ where
             }
 
             let t_i = t + self.tableau.c[i] * h;
-            
+
             // If the diagonal implicit term is 0, it's fully explicit
             if self.tableau.a_i[i][i] == 0.0 {
                 (self.f_e)(t_i, &y_stage, &mut k_e[i])?;
@@ -114,7 +113,7 @@ where
                 let mut iter = 0;
                 let mut diff = 1.0;
                 let a_ii = self.tableau.a_i[i][i];
-                
+
                 // Initial guess for implicit part
                 for j in 0..self.n {
                     z_i[j] = y_stage[j];
@@ -123,21 +122,26 @@ where
                 while diff > self.rtol && iter < 100 {
                     let mut k_tmp = vec![0.0; self.n];
                     (self.f_i)(t_i, &z_i, &mut k_tmp)?;
-                    
+
                     let mut max_diff = 0.0_f64;
                     for j in 0..self.n {
                         let z_new = y_stage[j] + h * a_ii * k_tmp[j];
                         let d = (z_new - z_i[j]).abs() / (self.atol + self.rtol * z_i[j].abs());
-                        if d > max_diff { max_diff = d; }
+                        if d > max_diff {
+                            max_diff = d;
+                        }
                         z_i[j] = z_new;
                         k_i[i][j] = k_tmp[j];
                     }
                     diff = max_diff;
                     iter += 1;
                 }
-                
+
                 if iter == 100 {
-                    return Err(format!("IMEX fixed-point solver failed to converge at stage {}", i));
+                    return Err(format!(
+                        "IMEX fixed-point solver failed to converge at stage {}",
+                        i
+                    ));
                 }
 
                 // Evaluate explicit part at the final solved stage
@@ -177,10 +181,10 @@ mod tests {
         let solver = ImexSolver::new(ImexTableau::ars222(), f_e, f_i, 1);
         let mut y = [1.0];
         let mut y_next = [0.0];
-        
+
         solver.step(0.0, &y, 0.01, &mut y_next).unwrap();
         y[0] = y_next[0];
-        
+
         // Exact solution for y' = -10y at t=0.01 is exp(-0.1) ~ 0.904837
         assert!((y[0] - (-0.1_f64).exp()).abs() < 1e-3);
     }

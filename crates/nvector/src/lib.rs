@@ -7,12 +7,12 @@
 //!
 //! Translated from: `sundials/sundials_nvector.h`, `nvector/nvector_serial.c`
 
+mod parallel;
 mod serial;
 mod simd;
-mod parallel;
 mod traits;
 
+pub use parallel::ParallelVector;
 pub use serial::SerialVector;
 pub use simd::SimdVector;
-pub use parallel::ParallelVector;
 pub use traits::NVector;

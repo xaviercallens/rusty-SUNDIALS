@@ -23,7 +23,7 @@ fn main() -> Result<(), cvode::CvodeError> {
     // RHS: heat equation via central finite differences
     let rhs = move |_t: f64, y: &[f64], ydot: &mut [f64]| -> Result<(), String> {
         for i in 0..N {
-            let u_l = if i == 0     { 0.0 } else { y[i - 1] };
+            let u_l = if i == 0 { 0.0 } else { y[i - 1] };
             let u_r = if i == N - 1 { 0.0 } else { y[i + 1] };
             ydot[i] = coeff * (u_l - 2.0 * y[i] + u_r);
         }
@@ -49,7 +49,10 @@ fn main() -> Result<(), cvode::CvodeError> {
     let mut jac = BandMat::zeros(N, 1, 1);
     for i in 0..N {
         jac.set(i, i, -2.0 * coeff);
-        if i + 1 < N { jac.set(i + 1, i, coeff); jac.set(i, i + 1, coeff); }
+        if i + 1 < N {
+            jac.set(i + 1, i, coeff);
+            jac.set(i, i + 1, coeff);
+        }
     }
     let mut pivots = vec![0usize; N];
     jac.band_getrf(&mut pivots).expect("banded LU");
@@ -60,7 +63,7 @@ fn main() -> Result<(), cvode::CvodeError> {
     println!("{:>10}  {:>14}  {:>14}", "t", "u(mid)", "theory");
     println!("{}", "-".repeat(42));
 
-    let t_end = 5.0;
+    let _t_end = 5.0;
     let times = [0.01, 0.05, 0.1, 0.5, 1.0, 2.0, 5.0];
     let mid = N / 2;
 
@@ -69,11 +72,14 @@ fn main() -> Result<(), cvode::CvodeError> {
         // Exact solution: u(x,t) = exp(-pi^2 * alpha * t) * sin(pi * x)
         let x_mid = (mid + 1) as f64 * dx;
         let exact = (-(std::f64::consts::PI.powi(2)) * ALPHA * t).exp()
-                    * (std::f64::consts::PI * x_mid).sin();
+            * (std::f64::consts::PI * x_mid).sin();
         println!("{t:10.4}  {u:14.8e}  {exact:14.8e}", u = y[mid]);
     }
 
-    println!("\nSolver stats → steps: {}, RHS evals: {}",
-        solver.num_steps(), solver.num_rhs_evals());
+    println!(
+        "\nSolver stats → steps: {}, RHS evals: {}",
+        solver.num_steps(),
+        solver.num_rhs_evals()
+    );
     Ok(())
 }

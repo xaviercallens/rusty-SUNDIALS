@@ -269,23 +269,25 @@ We welcome contributions! Here's the evidence-based roadmap grounded in academic
 - [ ] Dense output via `CVodeGetDky` — Nordsieck polynomial evaluation
 - [ ] Thread-safe `Cvode<F>: Send` for ensemble/parameter-sweep workflows
 
-### v2.0 — Industrial Solver *(Q4 2026)*
-- [ ] Preconditioned GMRES (left/right preconditioner callbacks + ILU(0))
-- [ ] Sparse matrix support (CSR/CSC storage + sparse LU)
-- [ ] Reproducible floating-point via compensated summation (Demmel & Nguyen 2015)
-- [ ] `no_std` support for embedded scientific computing
-- [ ] Python bindings via PyO3
+### v2.0 — Industrial Solver *(Q4 2026) - Shipped*
+- [x] Preconditioned GMRES (left/right preconditioner callbacks + ILU(0))
+- [x] Sparse matrix support (CSR/CSC storage + sparse LU)
+- [x] Reproducible floating-point via compensated summation (Demmel & Nguyen 2015)
+- [x] `no_std` support for embedded scientific computing
+- [x] Python bindings via PyO3
 
-### v2.5 — CVODES + ARKODE *(Q2 2027)*
-- [ ] Forward sensitivity analysis (`cvodes` crate) — $\partial y / \partial p$
-- [ ] IMEX splitting (`arkode` crate) — additive Runge-Kutta methods
+### v2.5 / v3.0 — Advanced Solvers *(Shipped)*
+- [x] IMEX splitting (`arkode` crate) — additive Runge-Kutta methods
+- [x] DAE solver (`ida` crate) — index-1 differential-algebraic equations
+- [x] Adjoint sensitivity analysis — backward-in-time integration for optimal control
+
+### v4.0 — SciML Exascale Engine *(Shipped)*
+- [x] Zero-Cost Enzyme AutoDiff (`#[sundials_rhs]`)
+- [x] Type-Safe MP-GMRES (GPU Tensor Cores)
+- [x] Deep Operator Preconditioning (AI Surrogates)
+- [x] Mathematical Shadow Tracking bounds in Lean 4
 - [ ] WebAssembly target for browser-native solving
-
-### v3.0 — Full SUNDIALS Parity *(Q4 2027)*
-- [ ] DAE solver (`ida` crate) — index-1 differential-algebraic equations
-- [ ] Adjoint sensitivity analysis — backward-in-time integration for optimal control
-- [ ] GPU vector backend (`nvector-wgpu`) for massive PDE systems
-- [ ] CI/CD with benchmark regression testing and coverage gates
+- [ ] Parallel-in-Time (PinT) orchestrator
 
 
 ## 🧠 Why Neuro-Symbolic AI? Honest Evaluation

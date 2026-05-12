@@ -176,7 +176,9 @@ impl SunContext {
         comm: SunComm,
         config: SunContextConfig,
         logger_factory: Option<Arc<dyn Fn(SunComm) -> SunResult<Arc<dyn SunLogger>> + Send + Sync>>,
-        profiler_factory: Option<Arc<dyn Fn(SunComm, &str) -> SunResult<Arc<dyn SunProfiler>> + Send + Sync>>,
+        profiler_factory: Option<
+            Arc<dyn Fn(SunComm, &str) -> SunResult<Arc<dyn SunProfiler>> + Send + Sync>,
+        >,
         default_err_handler: Option<ErrHandlerFn>,
     ) -> SunResult<Self> {
         let logger = if let Some(f) = logger_factory {
@@ -199,7 +201,9 @@ impl SunContext {
         };
 
         let profiler = if config.profiling_enabled && !config.caliper_enabled {
-            profiler_factory.map(|f| f(comm, "SUNContext Default")).transpose()?
+            profiler_factory
+                .map(|f| f(comm, "SUNContext Default"))
+                .transpose()?
         } else {
             None
         };
@@ -270,7 +274,11 @@ impl SunContext {
 
     #[inline]
     pub fn get_profiler(&self) -> SunResult<Option<Arc<dyn SunProfiler>>> {
-        Ok(self.config.profiling_enabled.then(|| self.profiler.clone()).flatten())
+        Ok(self
+            .config
+            .profiling_enabled
+            .then(|| self.profiler.clone())
+            .flatten())
     }
 
     #[inline]

@@ -305,9 +305,9 @@ impl<V: NVector, M, CData> SunNonlinearSolver<V, M, CData> {
 
             let key = &arg[prefix.len()..];
             if key == Self::MAX_ITERS_KEY {
-                let value = iter
-                    .next()
-                    .ok_or_else(|| NlsError::InvalidOptionValue("missing value for max_iters".into()))?;
+                let value = iter.next().ok_or_else(|| {
+                    NlsError::InvalidOptionValue("missing value for max_iters".into())
+                })?;
                 let maxiters = value
                     .parse::<i32>()
                     .map_err(|_| NlsError::InvalidOptionValue(value.to_string()))?;

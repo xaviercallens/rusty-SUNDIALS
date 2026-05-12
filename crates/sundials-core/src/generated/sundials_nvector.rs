@@ -230,7 +230,13 @@ impl<V: NVector> Vector<V> {
 
     /// Equivalent to `N_VLinearSum`: `z = a x + b y`.
     #[inline]
-    pub fn linear_sum(&self, a: SunReal, y: &Self, b: SunReal, z: &mut Self) -> Result<(), CvodeError> {
+    pub fn linear_sum(
+        &self,
+        a: SunReal,
+        y: &Self,
+        b: SunReal,
+        z: &mut Self,
+    ) -> Result<(), CvodeError> {
         self.content.linear_sum(a, &y.content, b, &mut z.content)?;
         Ok(())
     }

@@ -4,8 +4,8 @@
 //! Elements that are zero in the original matrix remain zero
 //! during the factorisation.
 
-use crate::generated::sundials_dense::DenseMat;
 use crate::Real;
+use crate::generated::sundials_dense::DenseMat;
 
 /// ILU(0) preconditioner.
 pub struct Ilu0 {
@@ -22,7 +22,7 @@ impl Ilu0 {
         if n == 0 {
             return Ok(Self { mat: a });
         }
-        
+
         let m = a.cols[0].len();
         if n != m {
             return Err("Matrix must be square for ILU(0)");
@@ -39,15 +39,15 @@ impl Ilu0 {
         }
 
         // Perform IKJ or KJI ILU(0) factorisation
-        for k in 0..n-1 {
+        for k in 0..n - 1 {
             if a.cols[k][k] == 0.0 {
                 return Err("Zero pivot encountered in ILU(0) (pivoting not supported)");
             }
-            
-            for i in k+1..n {
+
+            for i in k + 1..n {
                 if is_nz[k][i] {
                     a.cols[k][i] /= a.cols[k][k];
-                    for j in k+1..n {
+                    for j in k + 1..n {
                         if is_nz[j][i] {
                             // Only update if it's a structural non-zero
                             a.cols[j][i] -= a.cols[k][i] * a.cols[j][k];
@@ -64,7 +64,9 @@ impl Ilu0 {
     /// x is solved in-place.
     pub fn solve(&self, x: &mut [Real]) {
         let n = self.mat.cols.len();
-        if n == 0 { return; }
+        if n == 0 {
+            return;
+        }
 
         // Forward solve L y = b (L has unit diagonal)
         for i in 0..n {
@@ -80,7 +82,7 @@ impl Ilu0 {
         // Backward solve U x = y
         for i in (0..n).rev() {
             let mut sum = x[i];
-            for j in i+1..n {
+            for j in i + 1..n {
                 if self.mat.cols[j][i] != 0.0 {
                     sum -= self.mat.cols[j][i] * x[j];
                 }
@@ -100,7 +102,7 @@ mod tests {
         mat.cols[0][0] = 1.0;
         mat.cols[1][1] = 1.0;
         mat.cols[2][2] = 1.0;
-        
+
         let ilu = Ilu0::new(mat).unwrap();
         let mut b = [1.0, 2.0, 3.0];
         ilu.solve(&mut b);

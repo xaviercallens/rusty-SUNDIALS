@@ -17,27 +17,33 @@ use nvector::{NVector, SerialVector};
 use sundials_core::Real;
 
 use crate::builder::CvodeBuilder;
-use crate::constants::{Method, Task, MAX_ERR_TEST_FAILS};
+use crate::constants::{MAX_ERR_TEST_FAILS, Method, Task};
 use crate::error::CvodeError;
 use crate::nordsieck::NordsieckArray;
 use crate::step;
-use crate::SolveStatus;
 use sundials_core::generated::sundials_dense::DenseMat;
 
 /// BDF coefficients (l vectors) for orders 1-5.
 /// l[0] = 1 always. l[q] = BDF normalisation.
 /// These are the exact SUNDIALS BDF l-polynomial coefficients.
 const BDF_L: [[f64; 6]; 6] = [
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],           // unused (order 0)
-    [1.0, 1.0, 0.0, 0.0, 0.0, 0.0],           // order 1: implicit Euler
-    [2.0/3.0, 1.0, 1.0/3.0, 0.0, 0.0, 0.0],   // order 2: BDF-2
-    [6.0/11.0, 1.0, 6.0/11.0, 1.0/11.0, 0.0, 0.0], // order 3: BDF-3
-    [12.0/25.0, 1.0, 7.0/10.0, 1.0/5.0, 1.0/50.0, 0.0], // order 4
-    [60.0/137.0, 1.0, 225.0/274.0, 85.0/274.0, 15.0/274.0, 1.0/274.0], // order 5
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],             // unused (order 0)
+    [1.0, 1.0, 0.0, 0.0, 0.0, 0.0],             // order 1: implicit Euler
+    [2.0 / 3.0, 1.0, 1.0 / 3.0, 0.0, 0.0, 0.0], // order 2: BDF-2
+    [6.0 / 11.0, 1.0, 6.0 / 11.0, 1.0 / 11.0, 0.0, 0.0], // order 3: BDF-3
+    [12.0 / 25.0, 1.0, 7.0 / 10.0, 1.0 / 5.0, 1.0 / 50.0, 0.0], // order 4
+    [
+        60.0 / 137.0,
+        1.0,
+        225.0 / 274.0,
+        85.0 / 274.0,
+        15.0 / 274.0,
+        1.0 / 274.0,
+    ], // order 5
 ];
 
 /// BDF error test constants: C(q) = 1/(q+1) for the LTE estimator.
-const BDF_ERR_COEFF: [f64; 6] = [0.0, 0.5, 1.0/3.0, 0.25, 0.2, 1.0/6.0];
+const BDF_ERR_COEFF: [f64; 6] = [0.0, 0.5, 1.0 / 3.0, 0.25, 0.2, 1.0 / 6.0];
 
 /// Jacobian recomputation interval (steps between full Jacobian rebuilds).
 const JAC_RECOMPUTE_INTERVAL: usize = 20;
@@ -77,7 +83,7 @@ pub struct Cvode<F> {
     jac_mat: Option<DenseMat>,
     m_mat: Option<DenseMat>,
     pivots: Vec<usize>,
-    jac_age: usize,  // steps since last Jacobian computation
+    jac_age: usize,   // steps since last Jacobian computation
     last_gamma: Real, // gamma used for last M = I - γJ
 
     // --- RHS function ---
@@ -157,12 +163,24 @@ where
         }
     }
 
-    pub fn t(&self) -> Real { self.t }
-    pub fn y(&self) -> &[Real] { self.zn.solution().as_slice() }
-    pub fn num_steps(&self) -> usize { self.nst }
-    pub fn num_rhs_evals(&self) -> usize { self.nfe }
-    pub fn step_size(&self) -> Real { self.h }
-    pub fn order(&self) -> usize { self.q }
+    pub fn t(&self) -> Real {
+        self.t
+    }
+    pub fn y(&self) -> &[Real] {
+        self.zn.solution().as_slice()
+    }
+    pub fn num_steps(&self) -> usize {
+        self.nst
+    }
+    pub fn num_rhs_evals(&self) -> usize {
+        self.nfe
+    }
+    pub fn step_size(&self) -> Real {
+        self.h
+    }
+    pub fn order(&self) -> usize {
+        self.q
+    }
 
     /// Dense output: evaluate the k-th derivative of the solution at time `t`.
     ///
@@ -184,16 +202,12 @@ where
     /// ```
     pub fn get_dky(&self, t: Real, k: usize, dky: &mut [Real]) -> Result<(), CvodeError> {
         if k > self.q {
-            return Err(CvodeError::Solver(
-                sundials_core::SundialsError::BadK,
-            ));
+            return Err(CvodeError::Solver(sundials_core::SundialsError::BadK));
         }
         if dky.len() != self.n {
-            return Err(CvodeError::Solver(
-                sundials_core::SundialsError::IllInput(
-                    format!("dky length {} != problem size {}", dky.len(), self.n),
-                ),
-            ));
+            return Err(CvodeError::Solver(sundials_core::SundialsError::IllInput(
+                format!("dky length {} != problem size {}", dky.len(), self.n),
+            )));
         }
         let s = t - self.t; // offset from current time
         self.zn.get_dky(s, self.h, self.q, k, dky);
@@ -235,7 +249,10 @@ where
             }
             self.step()?;
         }
-        Err(CvodeError::MaxSteps { max: self.max_steps, t: self.t })
+        Err(CvodeError::MaxSteps {
+            max: self.max_steps,
+            t: self.t,
+        })
     }
 
     fn solve_one_step(&mut self, _tout: Real) -> Result<(Real, &[Real]), CvodeError> {
@@ -273,13 +290,17 @@ where
         for j in 0..n {
             for i in 0..n {
                 m_mat.cols[j][i] = -gamma * j_mat.cols[j][i];
-                if i == j { m_mat.cols[j][i] += 1.0; }
+                if i == j {
+                    m_mat.cols[j][i] += 1.0;
+                }
             }
         }
 
         // LU factorize
         if m_mat.dense_getrf(&mut self.pivots).is_err() {
-            return Err(CvodeError::Solver(sundials_core::SundialsError::ErrTestFailure));
+            return Err(CvodeError::Solver(
+                sundials_core::SundialsError::ErrTestFailure,
+            ));
         }
 
         self.jac_mat = Some(j_mat);
@@ -297,11 +318,15 @@ where
         for j in 0..n {
             for i in 0..n {
                 m_mat.cols[j][i] = -gamma * j_mat.cols[j][i];
-                if i == j { m_mat.cols[j][i] += 1.0; }
+                if i == j {
+                    m_mat.cols[j][i] += 1.0;
+                }
             }
         }
         if m_mat.dense_getrf(&mut self.pivots).is_err() {
-            return Err(CvodeError::Solver(sundials_core::SundialsError::ErrTestFailure));
+            return Err(CvodeError::Solver(
+                sundials_core::SundialsError::ErrTestFailure,
+            ));
         }
         self.m_mat = Some(m_mat);
         self.last_gamma = gamma;
@@ -324,13 +349,16 @@ where
 
             // Evaluate f at predicted point
             let mut f_pred = vec![0.0; self.n];
-            (self.rhs)(t_new, y_pred.as_slice(), &mut f_pred)
-                .map_err(|msg| CvodeError::RhsError { t: t_new, msg: msg.clone() })?;
+            (self.rhs)(t_new, y_pred.as_slice(), &mut f_pred).map_err(|msg| {
+                CvodeError::RhsError {
+                    t: t_new,
+                    msg: msg.clone(),
+                }
+            })?;
             self.nfe += 1;
 
             // --- Jacobian management: recompute or reuse ---
-            let need_new_jac = self.jac_mat.is_none()
-                || self.jac_age >= JAC_RECOMPUTE_INTERVAL;
+            let need_new_jac = self.jac_mat.is_none() || self.jac_age >= JAC_RECOMPUTE_INTERVAL;
 
             let gamma_ratio = if self.last_gamma != 0.0 {
                 (gamma / self.last_gamma - 1.0).abs()
@@ -339,10 +367,15 @@ where
             };
 
             if need_new_jac {
-                if self.compute_jacobian_and_factor(t_new, &y_pred, &f_pred, gamma).is_err() {
+                if self
+                    .compute_jacobian_and_factor(t_new, &y_pred, &f_pred, gamma)
+                    .is_err()
+                {
                     err_fails += 1;
                     if err_fails >= MAX_ERR_TEST_FAILS {
-                        return Err(CvodeError::Solver(sundials_core::SundialsError::ErrTestFailure));
+                        return Err(CvodeError::Solver(
+                            sundials_core::SundialsError::ErrTestFailure,
+                        ));
                     }
                     self.h *= 0.25;
                     self.zn.rescale(0.25, self.q);
@@ -352,10 +385,15 @@ where
                 // gamma changed significantly — refactor with cached Jacobian
                 if self.refactor_m(gamma).is_err() {
                     // Jacobian might be stale → full recompute
-                    if self.compute_jacobian_and_factor(t_new, &y_pred, &f_pred, gamma).is_err() {
+                    if self
+                        .compute_jacobian_and_factor(t_new, &y_pred, &f_pred, gamma)
+                        .is_err()
+                    {
                         err_fails += 1;
                         if err_fails >= MAX_ERR_TEST_FAILS {
-                            return Err(CvodeError::Solver(sundials_core::SundialsError::ErrTestFailure));
+                            return Err(CvodeError::Solver(
+                                sundials_core::SundialsError::ErrTestFailure,
+                            ));
                         }
                         self.h *= 0.25;
                         self.zn.rescale(0.25, self.q);
@@ -379,8 +417,10 @@ where
                 }
 
                 let mut f_new = vec![0.0; self.n];
-                (self.rhs)(t_new, &y_new, &mut f_new)
-                    .map_err(|msg| CvodeError::RhsError { t: t_new, msg: msg.clone() })?;
+                (self.rhs)(t_new, &y_new, &mut f_new).map_err(|msg| CvodeError::RhsError {
+                    t: t_new,
+                    msg: msg.clone(),
+                })?;
                 self.nfe += 1;
 
                 // Form residual b = h*f(y_new) - z[1] - acor
@@ -428,13 +468,14 @@ where
                 del_old = del;
             }
 
-
             if !newton_converged {
                 // Force Jacobian recompute on next attempt
                 self.jac_age = JAC_RECOMPUTE_INTERVAL + 1;
                 err_fails += 1;
                 if err_fails >= MAX_ERR_TEST_FAILS {
-                    return Err(CvodeError::Solver(sundials_core::SundialsError::ErrTestFailure));
+                    return Err(CvodeError::Solver(
+                        sundials_core::SundialsError::ErrTestFailure,
+                    ));
                 }
                 self.h *= 0.25;
                 self.zn.rescale(0.25, self.q);
@@ -445,7 +486,9 @@ where
 
             // --- Error estimation ---
             let acor_s = self.acor.as_mut_slice();
-            for i in 0..self.n { acor_s[i] = acor_vec[i]; }
+            for i in 0..self.n {
+                acor_s[i] = acor_vec[i];
+            }
 
             let err_coeff = if self.method == Method::Bdf && self.q <= 5 {
                 BDF_ERR_COEFF[self.q]
@@ -453,9 +496,7 @@ where
                 1.0 / (self.q as Real + 1.0)
             };
 
-            let err_norm = step::error_estimate_norm(
-                acor_s, self.ewt.as_slice(), err_coeff,
-            );
+            let err_norm = step::error_estimate_norm(acor_s, self.ewt.as_slice(), err_coeff);
 
             if err_norm <= 1.0 {
                 // --- Step accepted ---
@@ -465,7 +506,8 @@ where
 
                 step::compute_ewt(
                     self.zn.solution().as_slice(),
-                    self.rtol, self.atol,
+                    self.rtol,
+                    self.atol,
                     self.ewt.as_mut_slice(),
                 );
 
@@ -485,7 +527,9 @@ where
             // Step rejected
             err_fails += 1;
             if err_fails >= MAX_ERR_TEST_FAILS {
-                return Err(CvodeError::Solver(sundials_core::SundialsError::ErrTestFailure));
+                return Err(CvodeError::Solver(
+                    sundials_core::SundialsError::ErrTestFailure,
+                ));
             }
             let eta = step::compute_eta(err_norm, self.q).min(0.5);
             self.h *= eta;
@@ -496,7 +540,9 @@ where
     /// Try to increase or decrease the BDF order for efficiency.
     fn try_order_change(&mut self, err_norm_q: Real) {
         let max_q = self.max_order.min(5);
-        if max_q <= 1 { return; }
+        if max_q <= 1 {
+            return;
+        }
 
         // Estimate error at order q-1 (lower order = larger LTE, but cheaper)
         // Estimate error at order q+1 (higher order = smaller LTE, need more history)
@@ -524,7 +570,9 @@ where
                 // Adams-Moulton order 1 (trapezoidal implicit)
                 let mut l = vec![0.0; self.q + 1];
                 l[0] = 1.0;
-                for i in 1..=self.q { l[i] = 1.0; }
+                for i in 1..=self.q {
+                    l[i] = 1.0;
+                }
                 l
             }
         }
@@ -549,15 +597,22 @@ mod tests {
         };
         let y0 = SerialVector::from_slice(&[1.0]);
         let mut solver = Cvode::builder(Method::Bdf)
-            .rtol(1e-4).atol(1e-6).max_steps(200_000)
-            .build(rhs, 0.0, y0).unwrap();
+            .rtol(1e-4)
+            .atol(1e-6)
+            .max_steps(200_000)
+            .build(rhs, 0.0, y0)
+            .unwrap();
 
         let (t, y) = solver.solve(1.0, Task::Normal).unwrap();
         let exact = (-1.0_f64).exp();
         let error = (y[0] - exact).abs();
         assert!((t - 1.0).abs() < 1e-10, "t = {t}");
         // With BDF order promotion, accuracy varies; check the solution is reasonable
-        assert!(error < 1.0, "error = {error}, y = {}, exact = {exact}", y[0]);
+        assert!(
+            error < 1.0,
+            "error = {error}, y = {}, exact = {exact}",
+            y[0]
+        );
     }
 
     #[test]
@@ -568,12 +623,19 @@ mod tests {
         };
         let y0 = SerialVector::from_slice(&[0.0]);
         let mut solver = Cvode::builder(Method::Adams)
-            .rtol(1e-4).atol(1e-8).max_steps(200_000)
-            .build(rhs, 0.0, y0).unwrap();
+            .rtol(1e-4)
+            .atol(1e-8)
+            .max_steps(200_000)
+            .build(rhs, 0.0, y0)
+            .unwrap();
 
         let (t, y) = solver.solve(5.0, Task::Normal).unwrap();
         assert!((t - 5.0).abs() < 1e-10);
-        assert!((y[0] - 5.0).abs() < 3.5, "y = {} (order-1 Adams on t=[0,5])", y[0]);
+        assert!(
+            (y[0] - 5.0).abs() < 3.5,
+            "y = {} (order-1 Adams on t=[0,5])",
+            y[0]
+        );
     }
 
     #[test]
@@ -585,8 +647,11 @@ mod tests {
         };
         let y0 = SerialVector::from_slice(&[1.0]);
         let mut solver = Cvode::builder(Method::Bdf)
-            .rtol(1e-4).atol(1e-6).max_steps(200_000)
-            .build(rhs, 0.0, y0).unwrap();
+            .rtol(1e-4)
+            .atol(1e-6)
+            .max_steps(200_000)
+            .build(rhs, 0.0, y0)
+            .unwrap();
 
         let (t, y) = solver.solve(1.0, Task::Normal).unwrap();
         let y0_val = y[0]; // copy to release borrow
@@ -595,8 +660,12 @@ mod tests {
         // get_dky(t, 0) should return the same as y
         let mut dky = vec![0.0; 1];
         solver.get_dky(t, 0, &mut dky).unwrap();
-        assert!((dky[0] - y0_val).abs() < 1e-10,
-            "get_dky(t, 0) = {} should match y[0] = {}", dky[0], y0_val);
+        assert!(
+            (dky[0] - y0_val).abs() < 1e-10,
+            "get_dky(t, 0) = {} should match y[0] = {}",
+            dky[0],
+            y0_val
+        );
     }
 
     #[test]
@@ -607,8 +676,11 @@ mod tests {
         };
         let y0 = SerialVector::from_slice(&[1.0]);
         let mut solver = Cvode::builder(Method::Bdf)
-            .rtol(1e-4).atol(1e-6).max_steps(200_000)
-            .build(rhs, 0.0, y0).unwrap();
+            .rtol(1e-4)
+            .atol(1e-6)
+            .max_steps(200_000)
+            .build(rhs, 0.0, y0)
+            .unwrap();
         solver.solve(0.1, Task::Normal).unwrap();
 
         let mut dky = vec![0.0; 1];

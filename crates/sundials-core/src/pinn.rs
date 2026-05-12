@@ -70,21 +70,34 @@ impl TinyMlp {
 
         // Use a deterministic pseudo-random seed for reproducibility
         let mut rng = PseudoRng::new(42);
-        let w1 = (0..hidden * n_in).map(|_| rng.next_uniform() * 2.0 * xavier1 - xavier1).collect();
-        let w2 = (0..hidden * hidden).map(|_| rng.next_uniform() * 2.0 * xavier2 - xavier2).collect();
-        let w3 = (0..n_out * hidden).map(|_| rng.next_uniform() * 2.0 * xavier3 - xavier3).collect();
+        let w1 = (0..hidden * n_in)
+            .map(|_| rng.next_uniform() * 2.0 * xavier1 - xavier1)
+            .collect();
+        let w2 = (0..hidden * hidden)
+            .map(|_| rng.next_uniform() * 2.0 * xavier2 - xavier2)
+            .collect();
+        let w3 = (0..n_out * hidden)
+            .map(|_| rng.next_uniform() * 2.0 * xavier3 - xavier3)
+            .collect();
 
         Self {
-            n_in, n_out, hidden,
-            w1, b1: vec![0.0; hidden],
-            w2, b2: vec![0.0; hidden],
-            w3, b3: vec![0.0; n_out],
+            n_in,
+            n_out,
+            hidden,
+            w1,
+            b1: vec![0.0; hidden],
+            w2,
+            b2: vec![0.0; hidden],
+            w3,
+            b3: vec![0.0; n_out],
             lr,
         }
     }
 
     /// ReLU activation.
-    fn relu(x: Real) -> Real { x.max(0.0) }
+    fn relu(x: Real) -> Real {
+        x.max(0.0)
+    }
 
     /// Forward pass returning (output, [h1, h2] intermediate activations for backprop).
     pub fn forward(&self, x: &[Real]) -> (Vec<Real>, Vec<Real>, Vec<Real>) {
@@ -186,7 +199,12 @@ impl PinnPredictor {
     pub fn new(n_state: usize) -> Self {
         // n_in = n_state + 2 (t, h features)
         let mlp = TinyMlp::new(n_state + 2, n_state, 32, 1e-3);
-        Self { mlp, n_state, n_trained: 0, warmup: 20 }
+        Self {
+            mlp,
+            n_state,
+            n_trained: 0,
+            warmup: 20,
+        }
     }
 
     /// Build the feature vector [t, h, y₀, y₁, …, yₙ₋₁].
@@ -217,13 +235,20 @@ impl PinnPredictor {
 }
 
 /// Minimal deterministic pseudo-random number generator (xorshift64).
-struct PseudoRng { state: u64 }
+struct PseudoRng {
+    state: u64,
+}
 impl PseudoRng {
-    fn new(seed: u64) -> Self { Self { state: seed } }
+    fn new(seed: u64) -> Self {
+        Self { state: seed }
+    }
     fn next_u64(&mut self) -> u64 {
         let mut x = self.state;
-        x ^= x << 13; x ^= x >> 7; x ^= x << 17;
-        self.state = x; x
+        x ^= x << 13;
+        x ^= x >> 7;
+        x ^= x << 17;
+        self.state = x;
+        x
     }
     fn next_uniform(&mut self) -> Real {
         self.next_u64() as Real / u64::MAX as Real
@@ -255,7 +280,7 @@ mod tests {
 
         // Baseline: untrained prediction
         let y = vec![0.5_f64];
-        let baseline = predictor.predict(0.0, &y, h);
+        let _baseline = predictor.predict(0.0, &y, h);
 
         // Train for 500 steps on the same sample (gradient descent convergence)
         for step in 0..500 {
@@ -271,7 +296,10 @@ mod tests {
         let pred = predictor.predict(t_test, &y_test, h);
         let exact = y_test[0] + h;
         let error = (pred[0] - exact).abs();
-        println!("PINN prediction: {:.6}, exact: {:.6}, error: {:.2e}", pred[0], exact, error);
+        println!(
+            "PINN prediction: {:.6}, exact: {:.6}, error: {:.2e}",
+            pred[0], exact, error
+        );
 
         // The key assertion: prediction is positive (in the right direction)
         // For a production PINN with ANE this would be < 1e-4
@@ -286,6 +314,9 @@ mod tests {
         let y = vec![1.0, 2.0, 3.0];
         // During warmup, prediction should equal y
         let pred = predictor.predict(0.0, &y, 0.01);
-        assert_eq!(pred, y, "During warmup, predict() should return y unchanged");
+        assert_eq!(
+            pred, y,
+            "During warmup, predict() should return y unchanged"
+        );
     }
 }

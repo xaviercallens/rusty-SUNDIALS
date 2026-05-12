@@ -171,7 +171,7 @@ mod tests {
         // Let our system be:
         // f_0(y) = y_0 * y_1
         // f_1(y) = y_0 + sin(y_1)
-        // 
+        //
         // We want to compute exactly J * v at point y
         // y = [2.0, pi/2]
         // v = [0.5, 1.0]

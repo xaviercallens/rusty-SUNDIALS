@@ -256,13 +256,12 @@ impl<V: NVector, M: SunMatrix, O: SunLinearSolverOps<V, M>> SunLinearSolver<V, M
 
             let key = &arg[prefix.len()..];
             if key == "zero_guess" {
-                let raw = iter
-                    .next()
-                    .map(|(_, s)| s.as_str())
-                    .ok_or_else(|| CvodeError::InvalidOptionValue {
+                let raw = iter.next().map(|(_, s)| s.as_str()).ok_or_else(|| {
+                    CvodeError::InvalidOptionValue {
                         key: key_full.clone(),
                         value: "<missing>".to_string(),
-                    })?;
+                    }
+                })?;
 
                 let parsed: i32 = raw.parse().map_err(|_| CvodeError::InvalidOptionValue {
                     key: key_full.clone(),

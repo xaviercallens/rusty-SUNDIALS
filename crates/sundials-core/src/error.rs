@@ -3,8 +3,6 @@
 //! Replaces the C integer return codes with a proper Rust error enum.
 //! Each variant maps to a specific SUNDIALS error condition.
 
-
-
 /// Result type alias for SUNDIALS operations.
 pub type Result<T> = std::result::Result<T, SundialsError>;
 
@@ -14,98 +12,69 @@ pub type Result<T> = std::result::Result<T, SundialsError>;
 #[derive(Debug, Clone, PartialEq)]
 pub enum SundialsError {
     // --- Solver errors ---
-
     TooMuchWork,
-
 
     TooMuchAccuracy,
 
-
     ErrTestFailure,
-
 
     ConvFailure,
 
     // --- Linear solver errors ---
-
     LinInitFail,
 
-
     LinSetupFail,
-
 
     LinSolveFail,
 
     // --- RHS function errors ---
-
     RhsFuncFail,
-
 
     FirstRhsFuncErr,
 
-
     RepeatedRhsFuncErr,
-
 
     UnrecRhsFuncErr,
 
     // --- Root finding errors ---
-
     RootFuncFail,
 
     // --- Nonlinear solver errors ---
-
     NlsInitFail,
-
 
     NlsSetupFail,
 
-
     NlsFail,
-
 
     ConstraintFail,
 
     // --- Memory/input errors ---
-
     MemFail,
-
 
     MemNull,
 
-
     IllInput(String),
-
 
     NoMalloc,
 
-
     BadK,
-
 
     BadT,
 
-
     BadDky,
 
-
     TooClose,
-
 
     VectorOpErr,
 
     // --- Projection errors ---
-
     ProjMemNull,
 
-
     ProjFuncFail,
-
 
     RepeatedProjFuncErr,
 
     // --- Context errors ---
-
     ContextErr,
 
     Unrecognized(i32),
@@ -116,10 +85,19 @@ impl std::error::Error for SundialsError {}
 impl std::fmt::Display for SundialsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::TooMuchWork => write!(f, "too much work: solver took max internal steps but not reached tout"),
+            Self::TooMuchWork => write!(
+                f,
+                "too much work: solver took max internal steps but not reached tout"
+            ),
             Self::TooMuchAccuracy => write!(f, "too much accuracy requested: tolerances too tight"),
-            Self::ErrTestFailure => write!(f, "error test failures: too many error test failures at one step"),
-            Self::ConvFailure => write!(f, "convergence failure: nonlinear solver failed to converge"),
+            Self::ErrTestFailure => write!(
+                f,
+                "error test failures: too many error test failures at one step"
+            ),
+            Self::ConvFailure => write!(
+                f,
+                "convergence failure: nonlinear solver failed to converge"
+            ),
             Self::LinInitFail => write!(f, "linear solver initialization failed"),
             Self::LinSetupFail => write!(f, "linear solver setup failed"),
             Self::LinSolveFail => write!(f, "linear solver solve failed"),
