@@ -86,9 +86,9 @@
 > *"The world's first hallucination-proof AI physicist" — Verification Sandwich architecture.*
 
 ### M6.1 — Deterministic Bridge (Weeks 1–3)
-- [ ] Abstract `SUNPreconditioner` and `SUNLinearSolver` into pure safe Rust traits in `core_engine/src/traits.rs`
-- [ ] Install Charon toolchain: `cargo install --git https://github.com/AeneasVerif/charon.git charon`
-- [ ] Write `Makefile`/`justfile` for `charon → aeneas` LLBC extraction pipeline
+- [x] Abstract `SUNPreconditioner` and `SUNLinearSolver` into pure safe Rust traits in `core_engine/src/traits.rs`
+- [x] Install Charon toolchain: `cargo install --git https://github.com/AeneasVerif/charon.git charon`
+- [x] Write `Makefile`/`justfile` for `charon → aeneas` LLBC extraction pipeline
 - [x] Write anchor axioms in `formal_proofs/RustySundials.lean` (energy conservation, exact Jacobian bounds)
 - [x] Scaffold monorepo: `core_engine/`, `formal_proofs/`, `autoresearch_agent/`, `discoveries/`
 - [x] Lean 4 Phase 6 formal spec: `proofs/lean4/roadmap/v6_autodiscovery.lean` (9 theorems/classes)
@@ -98,9 +98,9 @@
   - `valid_topology(AST) :- preserves_divergence_free(AST)`
   - `thermo_safe(AST) :- conserves_energy(AST)`
   - `evaluate_proposal(AST) :- method_approved(AST), Prob_Stable > 0.99`
-- [ ] Implement JSON-AST output format for LLM hypotheses (interop with DeepProbLog)
-- [ ] Install DeepProbLog: `pip install deepproblog problog`
-- [ ] Test gatekeeper on 5 known valid and 5 known invalid xMHD operators
+- [x] Implement JSON-AST output format for LLM hypotheses (interop with DeepProbLog)
+- [x] Install DeepProbLog: `pip install deepproblog problog`
+- [x] Test gatekeeper on 5 known valid and 5 known invalid xMHD operators
 
 ### M6.3 — CodeBERT Synthesizer (Weeks 7–9)
 - [x] Fine-tune CodeBERT on rusty-SUNDIALS codebase + SUNDIALS C-API corpus
