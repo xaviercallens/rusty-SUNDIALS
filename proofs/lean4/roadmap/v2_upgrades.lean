@@ -147,3 +147,34 @@ axiom adjoint_sensitivity_exactness
       (λ T = 0) ∧
       -- 3. Yields exact total derivative of cost functional
       True -- full functional derivative specification elided for brevity
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- 5. Relaxation Runge-Kutta (Roadmap P4 - SciML)
+-- ═══════════════════════════════════════════════════════════════════════════
+
+/--
+Standard Runge-Kutta methods suffer from "energy drift" when integrating
+conservative systems. Ketcheson (2019) introduced Relaxation Runge-Kutta (RRK),
+which applies a scalar multiplier γ to the step Δy such that the invariant E(y)
+is exactly conserved:  E(y_n + γ Δy) = E(y_n).
+
+We define a class for Conservative Systems and specify the exact conservation
+property of the RRK method.
+-/
+
+/-- A conservative dynamical system with an invariant function E -/
+class ConservativeSystem (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℝ V] :=
+  (f : ℝ → V → V)
+  (E : V → ℝ)
+  -- The fundamental conservation law: dE/dt = ⟨∇E, y'⟩ = 0
+  (conserved : ∀ (y : ℝ → V) (t : ℝ), deriv y t = f t (y t) → deriv (E ∘ y) t = 0)
+
+/--
+The Relaxation Runge-Kutta exactness theorem.
+Given a baseline RK step `Δy`, there exists a relaxation parameter `γ` such that
+the modified step `y_next = y + γ * Δy` EXACTLY preserves the invariant `E`.
+-/
+axiom relaxation_rk_exact_conservation 
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
+    [ConservativeSystem V] (y : V) (Δy : V) :
+    ∃ (γ : ℝ), ConservativeSystem.E (y + γ • Δy) = ConservativeSystem.E y

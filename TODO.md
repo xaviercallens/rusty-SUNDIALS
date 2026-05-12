@@ -59,6 +59,14 @@
 - [ ] DAE solver (`ida`)
 - [ ] Adjoint sensitivity analysis
 
+### v4.0 — SciML Engine
+- [x] Formal Specification for Relaxation Runge-Kutta (Ketcheson 2019)
+- [ ] Relaxation Runge-Kutta (RRK) implementation
+- [ ] Zero-Cost Enzyme AutoDiff (`#[sundials_rhs]`)
+- [ ] Type-Safe MP-GMRES (GPU Tensor Cores)
+- [ ] Deep Operator Preconditioning (AI Surrogates)
+- [ ] Parallel-in-Time (PinT) orchestrator
+
 ## Formal Verification
 - [x] Scoped floating-point monotonicity axiom in `cvode.lean` (convert `admit` → `axiom`).
 - [x] Extended `nvector_parallel.lean` with Separation Logic for multi-threaded memory disjointness.

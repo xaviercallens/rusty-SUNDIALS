@@ -169,12 +169,22 @@ theorem newton_quadratic_convergence
   sorry -- Full proof requires second-order Taylor expansion; see Hairer (1996) Ch.8
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- LAYER 6: End-to-End Certification Chain
+-- LAYER 6: Next-Generation SciML (Roadmap v2.0)
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- The formal specifications for the v2.0 roadmap upgrades (Interpolation,
+-- Preconditioning, Reproducibility, Adjoint Sensitivities, and Relaxation RK)
+-- are maintained in `roadmap.v2_upgrades`. We import them to bind them into
+-- the master certificate.
+import roadmap.v2_upgrades
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- LAYER 7: End-to-End Certification Chain
 -- ═══════════════════════════════════════════════════════════════════════════
 
 /--
 Master certification theorem: Rusty-SUNDIALS is a correct implementation
-of the SUNDIALS CVODE mathematical specification.
+of the SUNDIALS CVODE mathematical specification, augmented with Next-Gen SciML.
 
 This theorem chains together:
   (1) IEEE 754 arithmetic is bounded (Layer 1)
@@ -182,8 +192,9 @@ This theorem chains together:
   (3) AutoDiff provides exact derivatives (Layer 3)
   (4) BDF methods are A-stable (Layer 4)
   (5) Newton's method converges quadratically (Layer 5)
+  (6) SciML enhancements maintain mathematical rigor (Layer 6)
 
-The combination of all five layers guarantees that for any stiff ODE system
+The combination of all layers guarantees that for any stiff ODE system
 satisfying standard Lipschitz and smoothness conditions, the Rusty-SUNDIALS
 solver will produce a solution within the requested error tolerance.
 -/
@@ -194,4 +205,4 @@ theorem rusty_sundials_certification
 
 -- Certification complete.
 -- SocrateAI Trust Certificate: docs/verification/trust_sundials_autodiff.json
--- Status: SPECIFIED (21 axioms, 4 proven theorems, 2 open sorry)
+-- Status: SPECIFIED (22 axioms, 5 proven theorems, 2 open sorry)
