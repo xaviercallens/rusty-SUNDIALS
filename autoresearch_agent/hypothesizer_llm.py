@@ -16,16 +16,16 @@ def generate_hypothesis(context):
         if "rejection_reason" not in context:
             # Force the hallucination trap on the first loop
             return json.dumps({
-                "method_name": "Dynamic_IMEX_Splitting",
-                "description": "Dynamic neural sorting of stiff/non-stiff equations",
-                "skew_symmetric_manifold": False
+                "method_name": "Fractional_Order_Latent_Attention_Graph_Neural_Operator",
+                "description": "Learns implicit nonlinear mapping of 3D tearing modes in latent space.",
+                "preserves_magnetic_divergence": False
             })
         else:
             # Self-correct on the second loop
             return json.dumps({
-                "method_name": "Dynamic_IMEX_Splitting_Corrected",
-                "description": "Dynamic neural sorting of stiff/non-stiff equations with projection onto skew-symmetric manifold",
-                "skew_symmetric_manifold": True
+                "method_name": "FLAGNO_Corrected",
+                "description": "Latent mapping with strict projection onto divergence-free sub-manifold",
+                "preserves_magnetic_divergence": True
             })
     
     genai.configure(api_key=api_key)
@@ -33,11 +33,11 @@ def generate_hypothesis(context):
     model = genai.GenerativeModel('gemini-2.5-pro')
     
     prompt = """
-    You are the Lead Plasma Physicist. We are validating rusty-SUNDIALS Auto-Research.
-    Target: Scenario 3 - The "Cadarache Discovery" (xMHD Stiffness Wall)
-    Problem: Implicit solvers waste 80% of their time on un-stiff plasma waves.
-    Propose an "AI-Discovered Dynamic IMEX Splitting Scheme" using an embedded neural net to dynamically sort equations.
-    Output ONLY valid JSON with keys: "method_name", "description", "skew_symmetric_manifold" (boolean).
+    You are the Lead Plasma Physicist. We are validating rusty-SUNDIALS Auto-Research on Google Cloud Serverless Infrastructure.
+    Target: Scenario 4 - 3D Tearing Mode (The Stiffness Wall)
+    Problem: Extremely complex topology changes.
+    Propose an "AI-Discovered FLAGNO: Fractional-Order Latent Attention Graph Neural Operator".
+    Output ONLY valid JSON with keys: "method_name", "description", "preserves_magnetic_divergence" (boolean).
     """
     
     if "rejection_reason" in context:

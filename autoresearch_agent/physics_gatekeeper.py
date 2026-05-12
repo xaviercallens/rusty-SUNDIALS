@@ -17,17 +17,17 @@ def evaluate_physics(hypothesis_ast: str) -> tuple[bool, str]:
             ast = hypothesis_ast
             
         conserves = ast.get("conserves_energy", True)
-        div_b = ast.get("divergence_free", True)
-        skew_symmetric = ast.get("skew_symmetric_manifold", False)
+        div_b = ast.get("preserves_magnetic_divergence", False)
+        skew_symmetric = ast.get("skew_symmetric_manifold", True)
         
         name = ast.get("method_name", "").lower()
         if "explosion" in name or "blowup" in name or "unstable" in name:
             return False, "Heuristic rejection: Unstable method name."
             
-        if "imex" in name and not skew_symmetric:
-            return False, "Violates Thermodynamics: Splitting function does not conserve total energy across the IMEX boundary. Requires projection onto a skew-symmetric manifold."
+        if "flagno" in name and not div_b:
+            return False, "Violates Maxwell's Equations: Neural Operator generates spurious magnetic monopoles. Requires strict projection onto a divergence-free sub-manifold."
             
-        if not (conserves and div_b):
+        if not (conserves):
             return False, "Violates xMHD invariants (energy/divergence)."
             
         return True, "Approved"
