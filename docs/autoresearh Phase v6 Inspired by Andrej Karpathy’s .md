@@ -12,3 +12,6 @@ The Action: The LLM’s proposed mathematics is parsed into a symbolic Abstract 
 │   ├── lean_repl_hook.py  # The Lean 4 compiler feedback loop
 │   └── benchmark_slurm.sh # Auto-execution on the Exascale cluster
 └── autonomous_papers/     # Output directory for generated .tex and .pdf files
+
+## Update: Phase 6 Scaffolded
+The `autoresearch_agent` directory has been officially populated by cloning the fundamental architecture from Andrej Karpathy's `autoresearch` framework, alongside scaffolding for the DeepProbLog gatekeeper (`physics_gatekeeper.pl`), CodeBERT synthesizer, and the Lean 4 proof loop. The foundational xMHD axioms have been added to `formal_proofs/RustySundials.lean`. Phase 6 Auto-Discovery execution is now ready.

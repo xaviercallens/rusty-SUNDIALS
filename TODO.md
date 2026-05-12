@@ -103,10 +103,10 @@
 - [ ] Test gatekeeper on 5 known valid and 5 known invalid xMHD operators
 
 ### M6.3 — CodeBERT Synthesizer (Weeks 7–9)
-- [ ] Fine-tune CodeBERT on rusty-SUNDIALS codebase + SUNDIALS C-API corpus
+- [x] Fine-tune CodeBERT on rusty-SUNDIALS codebase + SUNDIALS C-API corpus
 - [x] Implement `autoresearch_agent/syntax_codebert.py` for Rust/Lean AST generation
-- [ ] Validate synthesized Rust compiles and passes `cargo check`
-- [ ] Test on 3 known SciML preconditioner implementations (ILU, FLAGNO mock, AMG)
+- [x] Validate synthesized Rust compiles and passes `cargo check`
+- [x] Test on 3 known SciML preconditioner implementations (ILU, FLAGNO mock, AMG)
 
 ### M6.4 — LangGraph Orchestrator Loop (Weeks 10–13)
 - [x] Implement `autoresearch_agent/orchestrator.py` with 6-node LangGraph state machine:
