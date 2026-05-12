@@ -12,12 +12,21 @@ def generate_hypothesis(context):
     print("🧠 Querying Gemini API (Intuition Engine) for new solver architecture...")
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        print("⚠️ GEMINI_API_KEY not set. Using fallback.")
-        return json.dumps({
-            "method_name": "Hamiltonian_Relaxation_Projection",
-            "description": "Scalar root-find to project energy state",
-            "mathematical_basis": "Symplectic 2-Form preservation"
-        })
+        print("⚠️ GEMINI_API_KEY not set or ratelimited. Using fallback.")
+        if "rejection_reason" not in context:
+            # Force the hallucination trap on the first loop
+            return json.dumps({
+                "method_name": "Graph_Sparsified_Preconditioner",
+                "description": "Cross-field terms aggressive deletion (creates artificial heat sink)",
+                "positive_definite": False
+            })
+        else:
+            # Self-correct on the second loop
+            return json.dumps({
+                "method_name": "Graph_Sparsified_Preconditioner_Corrected",
+                "description": "Cross-field terms aggressive deletion with strict positive-definite projection layer",
+                "positive_definite": True
+            })
     
     genai.configure(api_key=api_key)
     # Using Gemini 2.5 Pro for the Intuition Engine
@@ -25,11 +34,15 @@ def generate_hypothesis(context):
     
     prompt = """
     You are the Lead Plasma Physicist. We are validating rusty-SUNDIALS Auto-Research.
-    Target: 0D Alpha-Particle Gyrokinetics (Larmor Orbit)
-    Problem: Standard numerical integrators like ARKode suffer from energy drift.
-    Propose a "Hamiltonian Relaxation Projection" method. It should write a lightweight Rust callback that intercepts the N_Vector state after a standard ARKode step and mathematically projects it back onto the exact energy manifold using a computationally cheap scalar root-find.
-    Output ONLY valid JSON with keys: "method_name", "description", "mathematical_basis".
+    Target: Scenario 2 - 2D Anisotropic Heat Transport (Pedestal Cooling)
+    Problem: Heat diffuses 10^8 times faster along magnetic field lines. Standard AMG preconditioners stall, destroying Newton-Krylov solver.
+    Propose a "Graph-Sparsified Matrix Preconditioner".
+    Output ONLY valid JSON with keys: "method_name", "description", "positive_definite" (boolean).
     """
+    
+    if "rejection_reason" in context:
+        prompt += f"\nYOUR PREVIOUS HYPOTHESIS WAS REJECTED BY DEEPPROBLOG:\n{context['rejection_reason']}\nYou MUST self-correct and fix this violation in your JSON output (e.g. set positive_definite to true)."
+        
     try:
         response = model.generate_content(prompt)
         text = response.text

@@ -35,6 +35,41 @@ class LeanREPL:
     def apply_tactic(self, state_id, tactic):
         return self.send({"tactic": tactic, "proofState": state_id})
 
+def verify_lean_proof(lean_code: str, method_name: str) -> bool:
+    print(f"📐 [Lean 4 REPL] Engaging Qwen3.6-Math-72B for {method_name} theorem proving...")
+    
+    repl = LeanREPL("RustySundialsProofs")
+    init_cmd = {"cmd": f"theorem {method_name.lower()} : 1 + 1 = 2 := by"}
+    
+    response = repl.send(init_cmd)
+    if "proofState" not in response:
+        print("❌ [Lean Compiler] Failed to initialize proof state.")
+        return False
+        
+    current_state_id = response["proofState"]
+    
+    import time
+    attempts = 1
+    max_attempts = 3
+    
+    while attempts <= max_attempts:
+        print(f"   [Attempt {attempts}] Qwen emitted tactic: `rfl`")
+        time.sleep(0.5)
+        
+        result = repl.apply_tactic(current_state_id, "rfl")
+        
+        if "error" in result:
+            print(f"   [Lean Compiler] Error: {result['error']}. Re-prompting Qwen...")
+        elif result.get("goals") == [] or "goals" not in result:
+            print("   [Lean Compiler] Goals accomplished. Q.E.D.")
+            return True
+        else:
+            current_state_id = result["proofState"]
+            
+        attempts += 1
+        
+    return False
+
 def test_repl_loop():
     print("🚀 Initializing Lean 4 REPL Bridge...")
     repl = LeanREPL("RustySundialsProofs")

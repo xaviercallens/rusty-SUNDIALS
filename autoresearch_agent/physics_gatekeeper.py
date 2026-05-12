@@ -5,9 +5,10 @@ In production, this queries the `physics_gatekeeper.pl` Prolog environment.
 
 import json
 
-def evaluate_physics(hypothesis_ast: str) -> bool:
+def evaluate_physics(hypothesis_ast: str) -> tuple[bool, str]:
     """
     Evaluates if the proposed hypothesis satisfies xMHD invariants.
+    Returns (is_valid, error_message)
     """
     try:
         if isinstance(hypothesis_ast, str):
@@ -15,17 +16,20 @@ def evaluate_physics(hypothesis_ast: str) -> bool:
         else:
             ast = hypothesis_ast
             
-        # Simulate Prolog DeepProbLog querying:
-        # prob(energy_bounded(Paradigm), P1), prob(div_b_zero(Paradigm), P2)
-        conserves = ast.get("conserves_energy", True) # Default true if not explicitly violation
+        conserves = ast.get("conserves_energy", True)
         div_b = ast.get("divergence_free", True)
+        positive_def = ast.get("positive_definite", False)
         
-        # Additional heuristic: If it says "Growth" or "Explosion" reject it
         name = ast.get("method_name", "").lower()
         if "explosion" in name or "blowup" in name or "unstable" in name:
-            return False
+            return False, "Heuristic rejection: Unstable method name."
             
-        return conserves and div_b
+        if not positive_def:
+            return False, "Violates Second Law of Thermodynamics: artificial heat sink detected. Requires strict positive-definite projection layer."
+            
+        if not (conserves and div_b):
+            return False, "Violates xMHD invariants (energy/divergence)."
+            
+        return True, "Approved"
     except Exception as e:
-        print(f"DeepProbLog Parse Error: {e}")
-        return False
+        return False, f"DeepProbLog Parse Error: {e}"
