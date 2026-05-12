@@ -57,7 +57,7 @@
 - [ ] Forward sensitivity analysis (`cvodes`)
 - [x] IMEX Splitting (`arkode`)
 - [ ] DAE solver (`ida`)
-- [ ] Adjoint sensitivity analysis
+- [x] Adjoint sensitivity analysis
 
 ### v4.0 — SciML Engine
 - [x] Formal Specification for Relaxation Runge-Kutta (Ketcheson 2019)

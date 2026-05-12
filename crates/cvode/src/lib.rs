@@ -11,6 +11,7 @@
 //!
 //! Translated from: `cvode/cvode.c` (~5000 LOC core solver)
 
+mod adjoint;
 mod builder;
 mod constants;
 mod error;
