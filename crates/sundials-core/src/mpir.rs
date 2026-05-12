@@ -50,7 +50,10 @@ pub struct MpirConfig {
 
 impl Default for MpirConfig {
     fn default() -> Self {
-        Self { max_iter: 10, tol: 1e-12 }
+        Self {
+            max_iter: 10,
+            tol: 1e-12,
+        }
     }
 }
 
@@ -117,7 +120,7 @@ pub fn mpir_solve(a: &[Real], b: &[Real], cfg: &MpirConfig) -> (Vec<Real>, MpirS
 
     // ── Step 1: Downcast A and b to FP32 ────────────────────────────────────
     let mut af32: Vec<f32> = a.iter().map(|&v| v as f32).collect();
-    let bf32: Vec<f32>     = b.iter().map(|&v| v as f32).collect();
+    let bf32: Vec<f32> = b.iter().map(|&v| v as f32).collect();
 
     // ── Step 2: FP32 LU factorisation ───────────────────────────────────────
     lu_f32(&mut af32, n);
@@ -139,7 +142,13 @@ pub fn mpir_solve(a: &[Real], b: &[Real], cfg: &MpirConfig) -> (Vec<Real>, MpirS
         let res_norm: Real = r.iter().map(|v| v * v).sum::<Real>().sqrt();
 
         if res_norm < cfg.tol {
-            return (x, MpirStatus::Converged { iters: iter, res_norm });
+            return (
+                x,
+                MpirStatus::Converged {
+                    iters: iter,
+                    res_norm,
+                },
+            );
         }
 
         // Solve A·Δx ≈ r using the cached FP32 LU
@@ -181,7 +190,7 @@ mod tests {
              2.0,  0.5, 11.0,  1.5,
              0.5,  1.0,  1.5,  9.0,
         ];
-        let x_true = vec![1.0, 2.0, 3.0, 4.0];
+        let x_true = [1.0, 2.0, 3.0, 4.0];
 
         // Compute b = A·x_true
         let mut b = vec![0.0; n];
@@ -205,8 +214,10 @@ mod tests {
         let residual: Real = res.iter().map(|v| v * v).sum::<Real>().sqrt();
         assert!(residual < 1e-10, "MPIR residual {residual:.2e} too large");
 
-        assert!(matches!(status, MpirStatus::Converged { .. }),
-            "MPIR should converge on well-conditioned 4x4 system");
+        assert!(
+            matches!(status, MpirStatus::Converged { .. }),
+            "MPIR should converge on well-conditioned 4x4 system"
+        );
     }
 
     /// Stress test: 8×8 Hilbert matrix (ill-conditioned, tests refinement power).
@@ -227,7 +238,10 @@ mod tests {
             }
         }
 
-        let cfg = MpirConfig { max_iter: 15, tol: 1e-8 };
+        let cfg = MpirConfig {
+            max_iter: 15,
+            tol: 1e-8,
+        };
         let (_, status) = mpir_solve(&a, &b, &cfg);
 
         // For very ill-conditioned systems, we just check it doesn't panic

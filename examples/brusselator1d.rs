@@ -37,7 +37,11 @@ fn main() -> Result<(), cvode::CvodeError> {
 
             // Right boundaries
             let u_right = if i == N - 1 { u_bound } else { y[2 * (i + 1)] };
-            let v_right = if i == N - 1 { v_bound } else { y[2 * (i + 1) + 1] };
+            let v_right = if i == N - 1 {
+                v_bound
+            } else {
+                y[2 * (i + 1) + 1]
+            };
 
             // Diffusion terms
             let u_diff = coeff * (u_left - 2.0 * u + u_right);
@@ -63,7 +67,7 @@ fn main() -> Result<(), cvode::CvodeError> {
     }
 
     let y0 = SerialVector::from_slice(&initial_state);
-    
+
     let mut solver = Cvode::builder(Method::Bdf)
         .rtol(1e-4)
         .atol(1e-6)
@@ -72,13 +76,16 @@ fn main() -> Result<(), cvode::CvodeError> {
 
     println!("1D Brusselator Benchmark (Method of Lines, {} points)", N);
     println!("BDF method with adaptive step size");
-    println!("{:>10} {:>14} {:>14} {:>14}", "t", "u(mid)", "v(mid)", "Steps");
+    println!(
+        "{:>10} {:>14} {:>14} {:>14}",
+        "t", "u(mid)", "v(mid)", "Steps"
+    );
     println!("{}", "-".repeat(56));
 
     let t_end = 10.0;
     let num_output_steps = 10;
     let dt_out = t_end / (num_output_steps as f64);
-    
+
     let mid_idx = N / 2;
 
     for i in 1..=num_output_steps {

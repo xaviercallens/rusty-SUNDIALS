@@ -106,7 +106,9 @@ impl DenseMat {
     pub fn dense_potrf(&mut self) -> Result<(), CvodeError> {
         self.check_well_formed()?;
         if self.m != self.n {
-            return Err(CvodeError::DimensionMismatch("POTRF requires square matrix"));
+            return Err(CvodeError::DimensionMismatch(
+                "POTRF requires square matrix",
+            ));
         }
         dense_potrf(&mut self.cols, self.m)
     }
@@ -116,7 +118,9 @@ impl DenseMat {
     pub fn dense_potrs(&self, b: &mut [SunReal]) -> Result<(), CvodeError> {
         self.check_well_formed()?;
         if self.m != self.n {
-            return Err(CvodeError::DimensionMismatch("POTRS requires square matrix"));
+            return Err(CvodeError::DimensionMismatch(
+                "POTRS requires square matrix",
+            ));
         }
         if b.len() != self.m {
             return Err(CvodeError::VectorLengthMismatch("b length must be m"));
@@ -257,7 +261,9 @@ pub fn dense_geqrf(
     v: &mut [SunReal],
 ) -> Result<(), CvodeError> {
     if beta.len() < n || v.len() < m {
-        return Err(CvodeError::VectorLengthMismatch("beta>=n and v>=m required"));
+        return Err(CvodeError::VectorLengthMismatch(
+            "beta>=n and v>=m required",
+        ));
     }
 
     for j in 0..n {
@@ -317,7 +323,9 @@ pub fn dense_ormqr(
     v: &mut [SunReal],
 ) -> Result<(), CvodeError> {
     if beta.len() < n || vn.len() < n || vm.len() < m || v.len() < m {
-        return Err(CvodeError::VectorLengthMismatch("invalid beta/vn/vm/v lengths"));
+        return Err(CvodeError::VectorLengthMismatch(
+            "invalid beta/vn/vm/v lengths",
+        ));
     }
 
     vm[..n].copy_from_slice(&vn[..n]);

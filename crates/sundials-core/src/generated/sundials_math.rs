@@ -39,7 +39,10 @@ impl fmt::Display for CvodeError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::ParseRealError { input } => {
-                write!(f, "failed to parse floating-point value from input: {input:?}")
+                write!(
+                    f,
+                    "failed to parse floating-point value from input: {input:?}"
+                )
             }
         }
     }
@@ -113,7 +116,7 @@ pub fn sunr_compare_tol(a: SunReal, b: SunReal, tol: SunReal) -> SunBool {
 /// Here, `sunrealtype -> f64`, so we use `f64::from_str`.
 #[inline]
 pub fn sun_str_to_real(s: &str) -> Result<SunReal, CvodeError> {
-    Ok(f64::from_str(s).map_err(|_| CvodeError::ParseRealError {
+    f64::from_str(s).map_err(|_| CvodeError::ParseRealError {
         input: s.to_string(),
-    })?)
+    })
 }

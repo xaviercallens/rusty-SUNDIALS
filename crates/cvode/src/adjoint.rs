@@ -9,7 +9,6 @@
 
 use crate::solver::Cvode;
 use sundials_core::Real;
-use nvector::SerialVector;
 
 /// Stores checkpoints during the forward integration phase.
 /// Used to reconstruct the forward state `y(t)` during the backward integration.
@@ -30,7 +29,7 @@ pub struct AdjointSolver<F, G> {
 impl<F, G> AdjointSolver<F, G>
 where
     F: Fn(Real, &[Real], &mut [Real]) -> Result<(), String> + Send + Sync,
-    // The backward RHS evaluates the adjoint dynamics: 
+    // The backward RHS evaluates the adjoint dynamics:
     // lambda_dot = - (df/dy)^T * lambda - (dg/dy)^T
     // signature: (t, y_forward, lambda, lambda_dot)
     G: Fn(Real, &[Real], &[Real], &mut [Real]) -> Result<(), String> + Send + Sync,
@@ -50,7 +49,7 @@ where
     /// between sparse checkpoints to save memory.
     pub fn solve_forward(&mut self, t_final: Real, dt_save: Real) -> Result<Vec<Real>, String> {
         let mut t_current = self.forward_solver.t();
-        
+
         // Save initial state
         self.checkpoints.push(Checkpoint {
             t: t_current,
@@ -59,10 +58,12 @@ where
 
         while t_current < t_final {
             let t_next = (t_current + dt_save).min(t_final);
-            let (_t_reached, y_reached) = self.forward_solver.solve(t_next, crate::constants::Task::Normal)
+            let (_t_reached, y_reached) = self
+                .forward_solver
+                .solve(t_next, crate::constants::Task::Normal)
                 .map_err(|e| format!("CVODE Error: {:?}", e))?;
             t_current = t_next;
-            
+
             self.checkpoints.push(Checkpoint {
                 t: t_current,
                 y: y_reached.to_vec(),
@@ -80,20 +81,20 @@ where
 
         let n = lambda_final.len();
         let mut lambda = lambda_final.to_vec();
-        
+
         // Integrate backwards using a simple implicit method or BDF
         // For demonstration, we'll use a Backward Euler step reversed in time
         // lambda_{n-1} = lambda_n - dt * backward_rhs(t_n, y_n, lambda_n)
-        
+
         for i in (0..self.checkpoints.len() - 1).rev() {
             let cp_next = &self.checkpoints[i + 1];
             let cp_curr = &self.checkpoints[i];
-            
+
             let dt = cp_next.t - cp_curr.t;
-            
+
             let mut lambda_dot = vec![0.0; n];
             (self.backward_rhs)(cp_next.t, &cp_next.y, &lambda, &mut lambda_dot)?;
-            
+
             // Reverse time step: lambda(t - dt) = lambda(t) - dt * d(lambda)/dt
             // Since lambda_dot is d(lambda)/dt in forward time, backward integration is:
             for j in 0..n {
@@ -109,6 +110,7 @@ where
 mod tests {
     use super::*;
     use crate::constants::Method;
+    use nvector::SerialVector;
 
     #[test]
     fn test_adjoint_sensitivity() {
@@ -130,20 +132,25 @@ mod tests {
 
         let initial_y = SerialVector::from_slice(&[1.0]);
         let cvode = Cvode::builder(Method::Bdf)
-            .build(f, 0.0, initial_y).unwrap();
+            .build(f, 0.0, initial_y)
+            .unwrap();
 
         let mut adjoint = AdjointSolver::new(cvode, g, 1);
-        
+
         // Forward pass from 0.0 to 1.0
         let _y_final = adjoint.solve_forward(1.0, 0.1).unwrap();
-        
+
         // At T=1.0, G = y(1), so dG/dy(1) = 1.0
         let lambda_final = vec![1.0];
-        
+
         // Backward pass
         let lambda_0 = adjoint.solve_backward(&lambda_final).unwrap();
-        
+
         // Since d(lambda)/dt = 0, lambda(0) should be exactly 1.0
-        assert!((lambda_0[0] - 1.0).abs() < 1e-12, "Expected 1.0, got {}", lambda_0[0]);
+        assert!(
+            (lambda_0[0] - 1.0).abs() < 1e-12,
+            "Expected 1.0, got {}",
+            lambda_0[0]
+        );
     }
 }

@@ -45,8 +45,12 @@ fn main() -> Result<(), cvode::CvodeError> {
     for i in 1..=num_output_steps {
         let tout = dt_out * (i as f64);
         let (t, y) = solver.solve(tout, Task::Normal)?;
-        println!("{t:10.2e} {y1:14.6e} {y2:14.6e} {y3:14.6e}",
-            y1 = y[0], y2 = y[1], y3 = y[2]);
+        println!(
+            "{t:10.2e} {y1:14.6e} {y2:14.6e} {y3:14.6e}",
+            y1 = y[0],
+            y2 = y[1],
+            y3 = y[2]
+        );
     }
 
     println!("\nSolver statistics:");

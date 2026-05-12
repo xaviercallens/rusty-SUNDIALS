@@ -74,14 +74,14 @@ impl NordsieckArray {
         let n = self.n;
         // Scratch buffer for the new scaled array
         let mut new_z = vec![vec![0.0; n]; order + 1];
-        
+
         // Compute combinations C(j, i) dynamically or via simple loops.
         // For Nordsieck size q <= 5, Pascal's triangle is trivial.
         let mut binom = [[0.0; NORDSIECK_SIZE]; NORDSIECK_SIZE];
         for j in 0..NORDSIECK_SIZE {
             binom[j][0] = 1.0;
             for i in 1..=j {
-                binom[j][i] = binom[j-1][i-1] + binom[j-1][i];
+                binom[j][i] = binom[j - 1][i - 1] + binom[j - 1][i];
             }
         }
 
@@ -156,16 +156,12 @@ impl NordsieckArray {
     ///
     /// # Reference
     /// Hindmarsh & Serban (2005), *CVODE User Guide*, §4.5.8 — `CVodeGetDky`
-    pub fn get_dky(
-        &self,
-        s: Real,
-        h: Real,
-        order: usize,
-        k: usize,
-        result: &mut [Real],
-    ) {
+    pub fn get_dky(&self, s: Real, h: Real, order: usize, k: usize, result: &mut [Real]) {
         let n = self.n;
-        debug_assert!(k <= order, "derivative order k={k} exceeds method order q={order}");
+        debug_assert!(
+            k <= order,
+            "derivative order k={k} exceeds method order q={order}"
+        );
         debug_assert!(result.len() == n);
 
         let sigma = if h.abs() > 0.0 { s / h } else { 0.0 };

@@ -1,5 +1,4 @@
 use sundials_core::Real;
-use sundials_core::generated::sundials_dense::DenseMat;
 
 /// The IDA Solver orchestrator.
 pub struct IdaSolver<F> {
@@ -50,7 +49,7 @@ where
             // Fixed-point iteration for the implicit solve
             // We need to find y_next and yp_next such that F(t_next, y_next, yp_next) = 0
             // and y_next = y_curr + h * yp_next  => yp_next = (y_next - y_curr) / h
-            
+
             let mut y_next = self.y.clone();
             let mut yp_next = self.yp.clone();
             let mut iter = 0;
@@ -60,15 +59,15 @@ where
                 let mut res = vec![0.0; n];
                 (self.residual_func)(t_curr, &y_next, &yp_next, &mut res)?;
 
-                // Simple gradient descent / fixed-point update 
+                // Simple gradient descent / fixed-point update
                 // (In production, this is a full Newton solve with a Jacobian)
                 let mut max_diff = 0.0_f64;
                 for i in 0..n {
                     // Update y_next using a pseudo-Newton step.
                     // Assumes dF/dy ~ 1.0 and dF/dy' ~ 1.0
                     let c_j = 1.0 / h_step; // The SUNDIALS c_j factor
-                    let delta_y = -res[i] / (1.0 + c_j); 
-                    
+                    let delta_y = -res[i] / (1.0 + c_j);
+
                     let new_y = y_next[i] + delta_y;
                     let new_yp = (new_y - self.y[i]) / h_step;
 
@@ -116,7 +115,7 @@ mod tests {
         let mut solver = IdaSolver::new(res_func, 0.0, &y0, &yp0);
 
         solver.solve(0.01, 0.001).unwrap();
-        
+
         // Exact solution: y(t) = exp(-t). At t=0.01, y ~ 0.9900498
         assert!((solver.y[0] - 0.99).abs() < 1e-2);
     }

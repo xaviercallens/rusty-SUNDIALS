@@ -74,7 +74,7 @@ impl CscMat {
 }
 
 /// A rudimentary Sparse LU Factorisation.
-/// 
+///
 /// Note: In a production SciML engine, this would wrap KLU or SuiteSparse.
 /// This is a naive implementation for embedded/standalone use-cases without
 /// massive fill-in management.
@@ -93,11 +93,11 @@ impl SparseLu {
             return Err("Matrix must be square");
         }
         let n = a.rows;
-        
+
         // This is a placeholder for a true symbolic/numeric Sparse LU.
         // For demonstration, we simply copy A and pretend it's U, and L is Identity.
         // A full Gilbert-Peierls sparse LU requires a topological sort of the directed graph.
-        
+
         // Minimal dummy implementation to satisfy the structural requirement.
         let mut l_row_ptrs = vec![0; n + 1];
         let mut l_cols = Vec::with_capacity(n);
@@ -106,10 +106,16 @@ impl SparseLu {
         for i in 0..n {
             l_cols.push(i);
             l_vals.push(1.0);
-            l_row_ptrs[i+1] = l_cols.len();
+            l_row_ptrs[i + 1] = l_cols.len();
         }
-        let l_mat = CsrMat { rows: n, cols: n, values: l_vals, col_indices: l_cols, row_ptrs: l_row_ptrs };
-        
+        let l_mat = CsrMat {
+            rows: n,
+            cols: n,
+            values: l_vals,
+            col_indices: l_cols,
+            row_ptrs: l_row_ptrs,
+        };
+
         let u_mat = a.clone(); // In reality, numeric factorization happens here
 
         Ok(Self { l_mat, u_mat })
@@ -118,12 +124,12 @@ impl SparseLu {
     /// Solve Ax = b -> LUx = b -> Ly = b, Ux = y
     pub fn solve(&self, x: &mut [Real]) {
         let n = self.l_mat.rows;
-        
+
         // Forward substitution Ly = b
         // L has unit diagonal, and we assume lower triangular structure.
         for i in 0..n {
             let mut sum = x[i];
-            for idx in self.l_mat.row_ptrs[i]..self.l_mat.row_ptrs[i+1] {
+            for idx in self.l_mat.row_ptrs[i]..self.l_mat.row_ptrs[i + 1] {
                 let j = self.l_mat.col_indices[idx];
                 if j < i {
                     sum -= self.l_mat.values[idx] * x[j];
@@ -137,7 +143,7 @@ impl SparseLu {
         for i in (0..n).rev() {
             let mut sum = x[i];
             let mut diag = 1.0;
-            for idx in self.u_mat.row_ptrs[i]..self.u_mat.row_ptrs[i+1] {
+            for idx in self.u_mat.row_ptrs[i]..self.u_mat.row_ptrs[i + 1] {
                 let j = self.u_mat.col_indices[idx];
                 if j > i {
                     sum -= self.u_mat.values[idx] * x[j];

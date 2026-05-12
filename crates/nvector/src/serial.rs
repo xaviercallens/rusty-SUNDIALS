@@ -19,7 +19,9 @@ pub struct SerialVector {
 impl SerialVector {
     /// Create a new vector of given length, initialized to zero.
     pub fn new(len: usize) -> Self {
-        Self { data: vec![0.0; len] }
+        Self {
+            data: vec![0.0; len],
+        }
     }
 
     /// Create a vector from a slice.
@@ -29,7 +31,9 @@ impl SerialVector {
 
     /// Create a vector filled with a constant value.
     pub fn filled(len: usize, val: Real) -> Self {
-        Self { data: vec![val; len] }
+        Self {
+            data: vec![val; len],
+        }
     }
 }
 
@@ -75,7 +79,10 @@ impl NVector for SerialVector {
 
     fn wrms_norm(&self, w: &Self) -> Real {
         let n = self.data.len() as Real;
-        let sum: Real = self.data.iter().zip(w.data.iter())
+        let sum: Real = self
+            .data
+            .iter()
+            .zip(w.data.iter())
             .map(|(xi, wi)| (xi * wi).powi(2))
             .sum();
         (sum / n).sqrt()
@@ -90,7 +97,11 @@ impl NVector for SerialVector {
                 count += 1;
             }
         }
-        if count == 0 { 0.0 } else { (sum / count as Real).sqrt() }
+        if count == 0 {
+            0.0
+        } else {
+            (sum / count as Real).sqrt()
+        }
     }
 
     fn max_norm(&self) -> Real {
@@ -102,7 +113,11 @@ impl NVector for SerialVector {
     }
 
     fn dot(&self, other: &Self) -> Real {
-        self.data.iter().zip(other.data.iter()).map(|(a, b)| a * b).sum()
+        self.data
+            .iter()
+            .zip(other.data.iter())
+            .map(|(a, b)| a * b)
+            .sum()
     }
 
     fn scale(c: Real, x: &Self, z: &mut Self) {
@@ -151,7 +166,9 @@ impl NVector for SerialVector {
                 || (ci == -1.0 && xi > 0.0)
                 || (ci == -2.0 && xi >= 0.0);
             m.data[i] = if violated { 1.0 } else { 0.0 };
-            if violated { all_ok = false; }
+            if violated {
+                all_ok = false;
+            }
         }
         all_ok
     }
@@ -161,7 +178,9 @@ impl NVector for SerialVector {
         for i in 0..num.data.len() {
             if denom.data[i] != 0.0 {
                 let q = num.data[i] / denom.data[i];
-                if q < min_q { min_q = q; }
+                if q < min_q {
+                    min_q = q;
+                }
             }
         }
         min_q

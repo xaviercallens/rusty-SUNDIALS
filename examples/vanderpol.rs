@@ -32,9 +32,7 @@ fn main() -> Result<(), cvode::CvodeError> {
     println!("{:>12} {:>14} {:>14}", "t", "y0", "y1");
     println!("{}", "-".repeat(42));
 
-    let times = [
-        5.0, 10.0, 15.0, 20.0, 25.0
-    ];
+    let times = [5.0, 10.0, 15.0, 20.0, 25.0];
 
     for &tout in &times {
         let (t, y) = solver.solve(tout, Task::Normal)?;

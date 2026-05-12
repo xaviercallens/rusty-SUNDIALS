@@ -29,16 +29,14 @@ pub(crate) fn compute_eta(err_norm: Real, order: usize) -> Real {
 ///
 /// For BDF: err = (q+1) * z[q+1] / (tq[2] * h)
 /// Simplified: err_norm = ||z[q+1]|| * error_coefficient
-pub(crate) fn error_estimate_norm(
-    z_qp1: &[Real],
-    ewt: &[Real],
-    error_coeff: Real,
-) -> Real {
+pub(crate) fn error_estimate_norm(z_qp1: &[Real], ewt: &[Real], error_coeff: Real) -> Real {
     let n = z_qp1.len();
     if n == 0 {
         return 0.0;
     }
-    let sum: Real = z_qp1.iter().zip(ewt.iter())
+    let sum: Real = z_qp1
+        .iter()
+        .zip(ewt.iter())
         .map(|(zi, wi)| (zi * wi * error_coeff).powi(2))
         .sum();
     (sum / n as Real).sqrt()
@@ -55,13 +53,7 @@ pub(crate) fn compute_ewt(y: &[Real], rtol: Real, atol: Real, ewt: &mut [Real]) 
 /// Select the initial step size based on the RHS evaluation.
 ///
 /// h0 = (rtol)^(1/(q+1)) / max(|f(t0,y0)| / (rtol*|y0| + atol))
-pub(crate) fn initial_step(
-    y0: &[Real],
-    f0: &[Real],
-    rtol: Real,
-    atol: Real,
-    order: usize,
-) -> Real {
+pub(crate) fn initial_step(y0: &[Real], f0: &[Real], rtol: Real, atol: Real, order: usize) -> Real {
     let n = y0.len();
     if n == 0 {
         return 1.0;

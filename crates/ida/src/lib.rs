@@ -8,3 +8,5 @@
 //! implicitly defined by the structure).
 
 pub mod solver;
+
+pub use solver::IdaSolver;

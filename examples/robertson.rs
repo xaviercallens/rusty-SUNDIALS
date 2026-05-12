@@ -31,12 +31,18 @@ fn main() -> Result<(), cvode::CvodeError> {
     println!("{:>12} {:>14} {:>14} {:>14}", "t", "y1", "y2", "y3");
     println!("{}", "-".repeat(58));
 
-    let times = [0.4, 4.0, 40.0, 400.0, 4000.0, 40000.0, 4e5, 4e6, 4e7, 4e8, 4e9, 4e10];
+    let times = [
+        0.4, 4.0, 40.0, 400.0, 4000.0, 40000.0, 4e5, 4e6, 4e7, 4e8, 4e9, 4e10,
+    ];
 
     for &tout in &times {
         let (t, y) = solver.solve(tout, Task::Normal)?;
-        println!("{t:12.4e} {y1:14.6e} {y2:14.6e} {y3:14.6e}",
-            y1 = y[0], y2 = y[1], y3 = y[2]);
+        println!(
+            "{t:12.4e} {y1:14.6e} {y2:14.6e} {y3:14.6e}",
+            y1 = y[0],
+            y2 = y[1],
+            y3 = y[2]
+        );
     }
 
     println!("\nSolver statistics:");

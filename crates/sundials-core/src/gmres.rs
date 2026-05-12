@@ -36,7 +36,11 @@ pub struct GmresConfig {
 
 impl Default for GmresConfig {
     fn default() -> Self {
-        Self { max_restarts: 20, restart: 30, tol: 1e-8 }
+        Self {
+            max_restarts: 20,
+            restart: 30,
+            tol: 1e-8,
+        }
     }
 }
 
@@ -50,12 +54,7 @@ impl Default for GmresConfig {
 /// GMRES(m) solver without preconditioning.
 ///
 /// Convenience wrapper over `gmres_preconditioned` using identity preconditioners.
-pub fn gmres<F>(
-    matvec: F,
-    b: &[Real],
-    x: &mut Vec<Real>,
-    cfg: &GmresConfig,
-) -> GmresStatus
+pub fn gmres<F>(matvec: F, b: &[Real], x: &mut Vec<Real>, cfg: &GmresConfig) -> GmresStatus
 where
     F: Fn(&[Real], &mut [Real]),
 {
@@ -106,7 +105,10 @@ where
 
         let beta = norm2(&r);
         if beta < cfg.tol {
-            return GmresStatus::Converged { iters: total_iters, res_norm: beta };
+            return GmresStatus::Converged {
+                iters: total_iters,
+                res_norm: beta,
+            };
         }
 
         // Arnoldi basis V[0..m+1][n], Hessenberg H[m+1][m]
@@ -159,24 +161,25 @@ where
 
             // Apply previous Givens rotations
             for i in 0..j {
-                let tmp =  cs[i] * h[i][j] + sn[i] * h[i + 1][j];
+                let tmp = cs[i] * h[i][j] + sn[i] * h[i + 1][j];
                 h[i + 1][j] = -sn[i] * h[i][j] + cs[i] * h[i + 1][j];
                 h[i][j] = tmp;
             }
             // Compute new Givens rotation
             let (c, s) = givens_rotation(h[j][j], h[j + 1][j]);
-            cs[j] = c; sn[j] = s;
+            cs[j] = c;
+            sn[j] = s;
 
-            h[j][j]     =  cs[j] * h[j][j] + sn[j] * h[j + 1][j];
+            h[j][j] = cs[j] * h[j][j] + sn[j] * h[j + 1][j];
             h[j + 1][j] = 0.0;
 
             e1[j + 1] = -sn[j] * e1[j];
-            e1[j]     =  cs[j] * e1[j];
+            e1[j] *= cs[j];
 
             let res: Real = e1[j + 1].abs();
             if res < cfg.tol {
                 let y = back_solve(&h, &e1, j + 1);
-                
+
                 // Form solution: x_new = x_old + M_R^{-1} V y
                 let mut vy = vec![0.0; n];
                 for step_j in 0..=j {
@@ -190,7 +193,10 @@ where
                     x[i] += prec_vy[i];
                 }
 
-                return GmresStatus::Converged { iters: total_iters, res_norm: res };
+                return GmresStatus::Converged {
+                    iters: total_iters,
+                    res_norm: res,
+                };
             }
         }
 
@@ -214,13 +220,21 @@ where
         let r_unprec: Vec<Real> = b.iter().zip(ax2.iter()).map(|(bi, axi)| bi - axi).collect();
         let res_norm = norm2(&r_unprec);
         if res_norm < cfg.tol {
-            return GmresStatus::Converged { iters: total_iters, res_norm };
+            return GmresStatus::Converged {
+                iters: total_iters,
+                res_norm,
+            };
         }
     }
 
     let mut ax = vec![0.0; n];
     matvec(x, &mut ax);
-    let res_norm = norm2(&b.iter().zip(ax.iter()).map(|(bi, axi)| bi - axi).collect::<Vec<_>>());
+    let res_norm = norm2(
+        &b.iter()
+            .zip(ax.iter())
+            .map(|(bi, axi)| bi - axi)
+            .collect::<Vec<_>>(),
+    );
     GmresStatus::MaxItersReached { res_norm }
 }
 
@@ -237,11 +251,21 @@ fn dot(a: &[Real], b: &[Real]) -> Real {
 /// Compute Givens rotation  (c, s)  such that  |[c s; -s c] * [a; b]| = [r; 0].
 #[cfg(test)]
 pub(crate) fn givens_rotation(a: Real, b: Real) -> (Real, Real) {
-    if b == 0.0 { (1.0, 0.0) } else { let r = a.hypot(b); (a / r, b / r) }
+    if b == 0.0 {
+        (1.0, 0.0)
+    } else {
+        let r = a.hypot(b);
+        (a / r, b / r)
+    }
 }
 #[cfg(not(test))]
 fn givens_rotation(a: Real, b: Real) -> (Real, Real) {
-    if b == 0.0 { (1.0, 0.0) } else { let r = a.hypot(b); (a / r, b / r) }
+    if b == 0.0 {
+        (1.0, 0.0)
+    } else {
+        let r = a.hypot(b);
+        (a / r, b / r)
+    }
 }
 
 /// Backward substitution for upper-triangular H[0..k][0..k] · y = e1[0..k].
@@ -290,7 +314,11 @@ mod tests {
         let mut ax = vec![0.0; 3];
         matvec(&x, &mut ax);
         for i in 0..3 {
-            assert!((ax[i] - b[i]).abs() < 1e-6, "residual[{i}] = {}", (ax[i] - b[i]).abs());
+            assert!(
+                (ax[i] - b[i]).abs() < 1e-6,
+                "residual[{i}] = {}",
+                (ax[i] - b[i]).abs()
+            );
         }
 
         let converged = matches!(status, GmresStatus::Converged { .. });

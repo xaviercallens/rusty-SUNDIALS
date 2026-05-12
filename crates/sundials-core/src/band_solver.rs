@@ -66,7 +66,10 @@ impl BandMat {
         let smu = mu + ml;
         let col_len = smu + ml + 1;
         Self {
-            n, ml, mu, smu,
+            n,
+            ml,
+            mu,
+            smu,
             cols: vec![vec![0.0; col_len]; n],
             lu_dense: None,
         }
@@ -75,9 +78,13 @@ impl BandMat {
     /// Get element A(i, j) — returns 0.0 if outside band.
     #[inline]
     pub fn get(&self, i: usize, j: usize) -> Real {
-        if j >= self.n || i >= self.n { return 0.0; }
+        if j >= self.n || i >= self.n {
+            return 0.0;
+        }
         let row = (i as isize - j as isize + self.smu as isize) as usize;
-        if row >= self.cols[j].len() { return 0.0; }
+        if row >= self.cols[j].len() {
+            return 0.0;
+        }
         self.cols[j][row]
     }
 
@@ -104,14 +111,14 @@ impl BandMat {
     /// This eliminates the silent numerical corruption that occurred when fill-in
     /// entries fell outside the original `(ml, mu)` band window.
     pub fn band_getrf(&mut self, pivots: &mut [usize]) -> Result<(), BandError> {
-        let n  = self.n;
+        let n = self.n;
         let ml = self.ml;
         let mu = self.mu;
 
         // Expand into full dense matrix for correct pivoting
-        let mut a: Vec<Vec<Real>> = (0..n).map(|i| {
-            (0..n).map(|j| self.get(i, j)).collect()
-        }).collect();
+        let mut a: Vec<Vec<Real>> = (0..n)
+            .map(|i| (0..n).map(|j| self.get(i, j)).collect())
+            .collect();
 
         for k in 0..n {
             // Pivot search limited to bandwidth window (at most ml rows below k)
@@ -120,7 +127,7 @@ impl BandMat {
             // Find pivot row with largest |a[i][k]| in [k, p_hi]
             let mut pivot_row = k;
             let mut pivot_abs = a[k][k].abs();
-            for i in (k+1)..=p_hi {
+            for i in (k + 1)..=p_hi {
                 if a[i][k].abs() > pivot_abs {
                     pivot_abs = a[i][k].abs();
                     pivot_row = i;
@@ -137,12 +144,12 @@ impl BandMat {
             }
 
             // Gaussian elimination within the band
-            for i in (k+1)..=p_hi {
+            for i in (k + 1)..=p_hi {
                 let factor = a[i][k] / a[k][k];
                 a[i][k] = factor; // store L multiplier
                 // U entries extend to k + mu (may include fill-in beyond original mu)
                 let j_hi = (k + ml + mu).min(n - 1);
-                for j in (k+1)..=j_hi {
+                for j in (k + 1)..=j_hi {
                     a[i][j] -= factor * a[k][j];
                 }
             }
@@ -170,9 +177,11 @@ impl BandMat {
     ///
     /// `b` is modified in-place to the solution vector `x`.
     pub fn band_getrs(&self, pivots: &[usize], b: &mut [Real]) -> Result<(), BandError> {
-        let n  = self.n;
+        let n = self.n;
 
-        if b.len() != n || pivots.len() != n { return Err(BandError::DimensionMismatch); }
+        if b.len() != n || pivots.len() != n {
+            return Err(BandError::DimensionMismatch);
+        }
 
         // Use dense LU if available (correct after pivoting with fill-in)
         let lu = self.lu_dense.as_ref();
@@ -180,14 +189,20 @@ impl BandMat {
         // Apply row permutations
         for k in 0..n {
             let pk = pivots[k];
-            if pk != k { b.swap(k, pk); }
+            if pk != k {
+                b.swap(k, pk);
+            }
         }
 
         // Forward substitution L·y = b  (unit diagonal L, multipliers below)
         for k in 0..n {
             // L multipliers may extend to k + ml (or beyond due to fill-in)
-            let i_hi = if lu.is_some() { n - 1 } else { (k + self.ml).min(n - 1) };
-            for i in (k+1)..=i_hi {
+            let i_hi = if lu.is_some() {
+                n - 1
+            } else {
+                (k + self.ml).min(n - 1)
+            };
+            for i in (k + 1)..=i_hi {
                 let l_ik = if let Some(lu) = lu {
                     lu[i][k]
                 } else {
@@ -201,8 +216,12 @@ impl BandMat {
 
         // Backward substitution U·x = y
         for k in (0..n).rev() {
-            let j_hi = if lu.is_some() { n - 1 } else { (k + self.mu).min(n - 1) };
-            for j in (k+1)..=j_hi {
+            let j_hi = if lu.is_some() {
+                n - 1
+            } else {
+                (k + self.mu).min(n - 1)
+            };
+            for j in (k + 1)..=j_hi {
                 let u_kj = if let Some(lu) = lu {
                     lu[k][j]
                 } else {
@@ -212,7 +231,11 @@ impl BandMat {
                     b[k] -= u_kj * b[j];
                 }
             }
-            let u_kk = if let Some(lu) = lu { lu[k][k] } else { self.get(k, k) };
+            let u_kk = if let Some(lu) = lu {
+                lu[k][k]
+            } else {
+                self.get(k, k)
+            };
             b[k] /= u_kk;
         }
         Ok(())
@@ -232,7 +255,10 @@ mod tests {
         let mut a = BandMat::zeros(n, 1, 1);
         for i in 0..n {
             a.set(i, i, 2.0);
-            if i + 1 < n { a.set(i + 1, i, -1.0); a.set(i, i + 1, -1.0); }
+            if i + 1 < n {
+                a.set(i + 1, i, -1.0);
+                a.set(i, i + 1, -1.0);
+            }
         }
         // RHS: all ones
         let mut b = vec![1.0; n];
@@ -241,17 +267,25 @@ mod tests {
         a.band_getrs(&pivots, &mut b).expect("solve");
 
         // x is now in `b`; compute residual A_original * x - rhs
-        let x = b;  // solution
+        let x = b; // solution
         let mut residual = vec![0.0; n];
         for i in 0..n {
             residual[i] = 2.0 * x[i];
-            if i > 0     { residual[i] -= x[i - 1]; }
-            if i < n - 1 { residual[i] -= x[i + 1]; }
+            if i > 0 {
+                residual[i] -= x[i - 1];
+            }
+            if i < n - 1 {
+                residual[i] -= x[i + 1];
+            }
             residual[i] -= 1.0; // subtract rhs
         }
         for i in 0..n {
-            assert!(residual[i].abs() < 1e-8,
-                "residual[{i}] = {} (x[i]={})", residual[i].abs(), x[i]);
+            assert!(
+                residual[i].abs() < 1e-8,
+                "residual[{i}] = {} (x[i]={})",
+                residual[i].abs(),
+                x[i]
+            );
         }
     }
 
@@ -262,18 +296,22 @@ mod tests {
         let n = 3;
         let mut a = BandMat::zeros(n, 1, 1);
         // Matrix where |a[1][0]| = 5 > |a[0][0]| = 2 → forces pivot swap
-        let vals: [[f64;3];3] = [
-            [ 2.0, -1.0,  0.0],
-            [-5.0, 10.0, -1.0],
-            [ 0.0, -1.0,  5.0],
-        ];
-        for i in 0..n { for j in 0..n {
-            if vals[i][j] != 0.0 { a.set(i, j, vals[i][j]); }
-        }}
+        let vals: [[f64; 3]; 3] = [[2.0, -1.0, 0.0], [-5.0, 10.0, -1.0], [0.0, -1.0, 5.0]];
+        for i in 0..n {
+            for j in 0..n {
+                if vals[i][j] != 0.0 {
+                    a.set(i, j, vals[i][j]);
+                }
+            }
+        }
 
         let x_true = [1.0f64, 2.0, 3.0];
         let mut b = vec![0.0f64; n];
-        for i in 0..n { for j in 0..n { b[i] += vals[i][j] * x_true[j]; } }
+        for i in 0..n {
+            for j in 0..n {
+                b[i] += vals[i][j] * x_true[j];
+            }
+        }
         let b_orig = b.clone();
         let mut pivots = vec![0usize; n];
         a.band_getrf(&mut pivots).unwrap();
@@ -285,9 +323,11 @@ mod tests {
         // Verify residual A·x_solved ≈ b_orig
         for i in 0..n {
             let ax_i: f64 = (0..n).map(|j| vals[i][j] * b[j]).sum();
-            assert!((ax_i - b_orig[i]).abs() < 1e-10,
+            assert!(
+                (ax_i - b_orig[i]).abs() < 1e-10,
                 "residual[{i}]={:.2e} — pivoted solve should be accurate",
-                (ax_i - b_orig[i]).abs());
+                (ax_i - b_orig[i]).abs()
+            );
         }
     }
 
@@ -300,20 +340,28 @@ mod tests {
         let mut a = BandMat::zeros(n, ml, mu);
         // Pentadiagonal matrix where some sub-diagonals are dominant
         let vals: Vec<Vec<f64>> = vec![
-            vec![ 1.0,  2.0, -1.0,  0.0,  0.0,  0.0],
-            vec![ 5.0,  8.0,  2.0, -1.0,  0.0,  0.0],
-            vec![-2.0,  3.0,  7.0,  2.0, -1.0,  0.0],
-            vec![ 0.0, -1.0,  4.0,  9.0,  2.0, -1.0],
-            vec![ 0.0,  0.0, -2.0,  3.0,  8.0,  1.0],
-            vec![ 0.0,  0.0,  0.0, -1.0,  4.0,  6.0],
+            vec![1.0, 2.0, -1.0, 0.0, 0.0, 0.0],
+            vec![5.0, 8.0, 2.0, -1.0, 0.0, 0.0],
+            vec![-2.0, 3.0, 7.0, 2.0, -1.0, 0.0],
+            vec![0.0, -1.0, 4.0, 9.0, 2.0, -1.0],
+            vec![0.0, 0.0, -2.0, 3.0, 8.0, 1.0],
+            vec![0.0, 0.0, 0.0, -1.0, 4.0, 6.0],
         ];
-        for i in 0..n { for j in 0..n {
-            if vals[i][j] != 0.0 { a.set(i, j, vals[i][j]); }
-        }}
+        for i in 0..n {
+            for j in 0..n {
+                if vals[i][j] != 0.0 {
+                    a.set(i, j, vals[i][j]);
+                }
+            }
+        }
 
-        let x_true = vec![1.0, -1.0, 2.0, -2.0, 3.0, -3.0];
+        let x_true = [1.0, -1.0, 2.0, -2.0, 3.0, -3.0];
         let mut b = vec![0.0f64; n];
-        for i in 0..n { for j in 0..n { b[i] += vals[i][j] * x_true[j]; } }
+        for i in 0..n {
+            for j in 0..n {
+                b[i] += vals[i][j] * x_true[j];
+            }
+        }
         let b_orig = b.clone();
         let mut pivots = vec![0usize; n];
         a.band_getrf(&mut pivots).unwrap();
@@ -321,8 +369,11 @@ mod tests {
 
         for i in 0..n {
             let ax_i: f64 = (0..n).map(|j| vals[i][j] * b[j]).sum();
-            assert!((ax_i - b_orig[i]).abs() < 1e-8,
-                "pentadiag residual[{i}]={:.2e}", (ax_i - b_orig[i]).abs());
+            assert!(
+                (ax_i - b_orig[i]).abs() < 1e-8,
+                "pentadiag residual[{i}]={:.2e}",
+                (ax_i - b_orig[i]).abs()
+            );
         }
     }
 }
