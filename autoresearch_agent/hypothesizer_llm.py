@@ -16,16 +16,16 @@ def generate_hypothesis(context):
         if "rejection_reason" not in context:
             # Force the hallucination trap on the first loop
             return json.dumps({
-                "method_name": "Graph_Sparsified_Preconditioner",
-                "description": "Cross-field terms aggressive deletion (creates artificial heat sink)",
-                "positive_definite": False
+                "method_name": "Dynamic_IMEX_Splitting",
+                "description": "Dynamic neural sorting of stiff/non-stiff equations",
+                "skew_symmetric_manifold": False
             })
         else:
             # Self-correct on the second loop
             return json.dumps({
-                "method_name": "Graph_Sparsified_Preconditioner_Corrected",
-                "description": "Cross-field terms aggressive deletion with strict positive-definite projection layer",
-                "positive_definite": True
+                "method_name": "Dynamic_IMEX_Splitting_Corrected",
+                "description": "Dynamic neural sorting of stiff/non-stiff equations with projection onto skew-symmetric manifold",
+                "skew_symmetric_manifold": True
             })
     
     genai.configure(api_key=api_key)
@@ -34,10 +34,10 @@ def generate_hypothesis(context):
     
     prompt = """
     You are the Lead Plasma Physicist. We are validating rusty-SUNDIALS Auto-Research.
-    Target: Scenario 2 - 2D Anisotropic Heat Transport (Pedestal Cooling)
-    Problem: Heat diffuses 10^8 times faster along magnetic field lines. Standard AMG preconditioners stall, destroying Newton-Krylov solver.
-    Propose a "Graph-Sparsified Matrix Preconditioner".
-    Output ONLY valid JSON with keys: "method_name", "description", "positive_definite" (boolean).
+    Target: Scenario 3 - The "Cadarache Discovery" (xMHD Stiffness Wall)
+    Problem: Implicit solvers waste 80% of their time on un-stiff plasma waves.
+    Propose an "AI-Discovered Dynamic IMEX Splitting Scheme" using an embedded neural net to dynamically sort equations.
+    Output ONLY valid JSON with keys: "method_name", "description", "skew_symmetric_manifold" (boolean).
     """
     
     if "rejection_reason" in context:

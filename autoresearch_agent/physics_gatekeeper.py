@@ -18,14 +18,14 @@ def evaluate_physics(hypothesis_ast: str) -> tuple[bool, str]:
             
         conserves = ast.get("conserves_energy", True)
         div_b = ast.get("divergence_free", True)
-        positive_def = ast.get("positive_definite", False)
+        skew_symmetric = ast.get("skew_symmetric_manifold", False)
         
         name = ast.get("method_name", "").lower()
         if "explosion" in name or "blowup" in name or "unstable" in name:
             return False, "Heuristic rejection: Unstable method name."
             
-        if not positive_def:
-            return False, "Violates Second Law of Thermodynamics: artificial heat sink detected. Requires strict positive-definite projection layer."
+        if "imex" in name and not skew_symmetric:
+            return False, "Violates Thermodynamics: Splitting function does not conserve total energy across the IMEX boundary. Requires projection onto a skew-symmetric manifold."
             
         if not (conserves and div_b):
             return False, "Violates xMHD invariants (energy/divergence)."
