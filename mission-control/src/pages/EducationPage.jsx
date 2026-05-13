@@ -6,16 +6,37 @@ export default function EducationPage() {
   const [generating, setGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState('infographics');
 
-  const handleGenerate = () => {
-    setGenerating(true);
-    setTimeout(() => setGenerating(false), 2000);
+  const handleDownload = () => {
+    alert("Downloading Full Media Kit (High-Res Images, Videos, press release .zip)...");
   };
 
   const infographics = [
-    { title: "Breaking the Photosynthesis Limit", desc: "CQD upconversion shifts UV/IR to PAR light, pushing CCU past the thermodynamic 11.4% barrier.", color: "var(--cyan)", score: "18.2% Eff" },
-    { title: "24/7 Dark Fixation", desc: "Electro-bionic DET powers the Calvin cycle through the night using 1.5V off-peak electricity.", color: "var(--green)", score: "95% Boost" },
-    { title: "Zero-Shear Acoustofluidics", desc: "2.4 MHz ultrasonic standing waves auto-flocculate algae and maximize mass transfer.", color: "var(--magenta)", score: "99.1% Harvest" },
-    { title: "O2 Vacuuming with PFD", desc: "A fluorocarbon liquid drops through the reactor, absorbing oxygen and suppressing photorespiration.", color: "var(--blue)", score: "66% Net Boost" }
+    { 
+      title: "Protocol K: Breaking the Photosynthesis Limit", 
+      desc: "CQD upconversion shifts UV/IR to PAR light, pushing CCU past the thermodynamic 11.4% barrier.", 
+      longDesc: "Through mathematical optimization of Radiative Transfer Equations, the agent discovered that Carbon Quantum Dots (CQDs) act as a secondary 'antenna' system. By absorbing wasted high-energy UV and low-energy IR photons, they re-emit them in the Photosynthetically Active Radiation (PAR) spectrum. This tricks the RuBisCO enzyme into continuously firing, resulting in an unprecedented 18.2% equivalent photosynthetic efficiency—the absolute upper bound before thermal denaturation occurs.",
+      image: "/protocol_k.png",
+      color: "var(--cyan)", score: "18.2% Eff" 
+    },
+    { 
+      title: "Protocol M: Zero-Shear Acoustofluidics", 
+      desc: "2.4 MHz ultrasonic standing waves auto-flocculate algae and maximize mass transfer.", 
+      longDesc: "A core problem in industrial scaling is that mechanical pumps shear and lyse the delicate algal cells. The agent hypothesized using Acoustic Radiation Forces. By injecting 2.4 MHz standing waves, it perfectly suspends the micro-bubbles and algal cells in the center of the flow stream. This creates zero-shear mass transfer boundaries, scaling the kLa coefficient to an astounding 310 /h while preventing the cells from touching the pipe walls.",
+      image: "/protocol_m.png",
+      color: "var(--magenta)", score: "99.1% Harvest" 
+    },
+    { 
+      title: "Protocol L: 24/7 Dark Fixation", 
+      desc: "Electro-bionic DET powers the Calvin cycle through the night using 1.5V off-peak electricity.", 
+      longDesc: "Plants normally shut down at night. By simulating Direct Electron Transfer (DET) via a 1.5V cathode mesh, the agent bypassed the light-dependent reactions entirely. Electrons are pumped directly into the plastoquinone pool, maintaining ATP/NADPH production 24/7. This effectively doubles the daily CO2 absorption capacity of the biorefinery without requiring sunlight.",
+      color: "var(--green)", score: "95% Boost" 
+    },
+    { 
+      title: "Protocol N: O2 Vacuuming with PFD", 
+      desc: "A fluorocarbon liquid drops through the reactor, absorbing oxygen and suppressing photorespiration.", 
+      longDesc: "Oxygen buildup poisons the RuBisCO enzyme. By modeling the Multiphase Cahn-Hilliard equations, the agent introduced Perfluorodecalin (PFD) droplets that sink through the reactor like an 'oxygen vacuum'. This keeps O2 levels below 4.1 mg/L, suppressing the wasteful photorespiration cycle and locking RuBisCO exclusively into carbon fixation mode.",
+      color: "var(--blue)", score: "66% Net Boost" 
+    }
   ];
 
   const fusionDiscoveries = [
@@ -29,8 +50,8 @@ export default function EducationPage() {
     <div>
       <div className="page-header">
         <h2>EDUCATION & OUTREACH</h2>
-        <button className="btn btn-primary" onClick={handleGenerate} disabled={generating}>
-          {generating ? 'GENERATING MEDIA KIT...' : 'GENERATE MEDIA KIT'}
+        <button className="btn btn-primary" onClick={handleDownload}>
+          <Download size={14} style={{ marginRight: 8 }} /> DOWNLOAD FULL MEDIA KIT (.ZIP)
         </button>
       </div>
 
@@ -54,9 +75,19 @@ export default function EducationPage() {
           {infographics.map((info, idx) => (
             <GlowPanel key={idx} title={`POST ${idx + 1}: ${info.title.toUpperCase()}`} style={{ borderTop: `2px solid ${info.color}` }}>
               <div style={{ padding: 'var(--gap-md) 0' }}>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, marginBottom: 'var(--gap-md)' }}>
+                {info.image && (
+                  <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-dim)', marginBottom: 'var(--gap-md)' }}>
+                    <img src={info.image} alt={info.title} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                  </div>
+                )}
+                <p style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '8px' }}>
                   {info.desc}
                 </p>
+                <div style={{ padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', borderLeft: `3px solid ${info.color}`, marginBottom: '16px' }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6, margin: 0 }}>
+                    {info.longDesc}
+                  </p>
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ color: info.color, fontWeight: 'bold', fontSize: '1.2rem' }}>
                     {info.score}
