@@ -49,6 +49,12 @@ export const api = {
   runOxidizeP2: (cfg = {}) => request('/oxidize/p2', { method: 'POST', body: JSON.stringify(cfg) }),
   runOxidizeP3: (cfg = {}) => request('/oxidize/p3', { method: 'POST', body: JSON.stringify(cfg) }),
   runOxidizeFull: () => request('/oxidize/full', { method: 'POST' }),
+
+  // Verification & Reports
+  getVerification: () => request('/api/verification'),
+  runVerification: () => request('/api/verify', { method: 'POST' }),
+  getReport: () => request('/api/report'),
+  generateReport: () => request('/api/report/generate', { method: 'POST' }),
 };
 
 export default api;
