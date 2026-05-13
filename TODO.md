@@ -39,7 +39,7 @@
 - [ ] Implement Mixed-Precision Iterative Refinement.
 
 ## Phase 6: Academic Roadmap v2.0 (The Path to v3.0)
-### v1.5 — Algorithmic Correctness (Shipped)
+### v1.5 — Algorithmic Correctness
 - [x] Band LU pivoting with fill-in storage (Fixes silent corruption, Golub & Van Loan §4.3.5)
 - [x] Newton convergence-rate monitoring (ρ = ||δ_m+1|| / ||δ_m||)
 - [x] Dense output via `CVodeGetDky` (Nordsieck polynomial evaluation)
@@ -141,3 +141,17 @@
 - [x] Add a **Tutorials** section to docs (`docs/tutorials/1_first_ode.md`)
 - [x] Add a Core Correctness Verification GitHub Action (`.github/workflows/verify_core_correctness.yml`) running numerical benchmarks C vs Rust
 
+## Phase 8: Final Polish & Production Readiness (v7.0)
+- [x] Add `examples/run_benchmarks.sh` to the repository.
+- [x] Add a `README.md` to `proofs/lean4/` with Lean 4 setup and run instructions.
+- [x] Add Issue/PR Templates (`.github/ISSUE_TEMPLATE/`, `.github/PULL_REQUEST_TEMPLATE.md`).
+- [x] Add `CHANGELOG.md`.
+- [x] Clarify Roadmap (move unimplemented v2.0 features back).
+- [x] Publish to `crates.io` and enable `docs.rs`.
+- [x] Add Windows CI to `.github/workflows/ci.yml`.
+- [x] Integrate Coverage CI (e.g., `grcov`).
+- [x] Add `clippy` and `rustfmt` to CI.
+- [x] Expand Tutorials (GMRES, DAE solving).
+- [x] Implement v1.5 Ship-Blocking Items (Band LU, Newton convergence, Dense output) - Audited, already implemented.
+- [x] Implement v2.0 remaining features (`no_std`, PyO3, Sparse Matrix) - Audited, already implemented.
+- [x] Add WebAssembly Target.

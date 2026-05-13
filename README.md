@@ -344,12 +344,12 @@ We welcome contributions! Here's the evidence-based roadmap grounded in academic
 
 > Full analysis: [docs/ACADEMIC_ROADMAP_v2.md](docs/ACADEMIC_ROADMAP_v2.md)
 
-### v1.5 — Algorithmic Correctness *(Q3 2026)*
-- [ ] Band LU pivoting with fill-in storage (Golub & Van Loan §4.3.5)
-- [ ] Newton convergence-rate monitoring ($\rho = \|\delta_{m+1}\| / \|\delta_m\|$)
-- [ ] Nordsieck rescaling with interpolation for large step-size changes
-- [ ] Dense output via `CVodeGetDky` — Nordsieck polynomial evaluation
-- [ ] Thread-safe `Cvode<F>: Send` for ensemble/parameter-sweep workflows
+### v1.5 — Algorithmic Correctness *(Shipped)*
+- [x] Band LU pivoting with fill-in storage (Golub & Van Loan §4.3.5)
+- [x] Newton convergence-rate monitoring ($\rho = \|\delta_{m+1}\| / \|\delta_m\|$)
+- [x] Nordsieck rescaling with interpolation for large step-size changes
+- [x] Dense output via `CVodeGetDky` — Nordsieck polynomial evaluation
+- [x] Thread-safe `Cvode<F>: Send` for ensemble/parameter-sweep workflows
 
 ### v2.0 — Industrial Solver *(Shipped)*
 - [x] Preconditioned GMRES (left/right preconditioner callbacks + ILU(0))
