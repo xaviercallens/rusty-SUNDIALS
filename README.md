@@ -506,6 +506,42 @@ The SpecToRust migration was powered by [SocrateAgora](https://github.com/xavier
 
 ---
 
+## 📜 Citation & Copyright
+
+© 2026 **Xavier Callens** & **SocrateAI Lab**. All rights reserved.
+
+This software, including all associated scientific publications, simulation results, Lean 4 formal proofs, figures, and methodologies, is the intellectual property of Xavier Callens and SocrateAI Lab. The software is released under the [BSD 3-Clause License](LICENSE).
+
+### How to Cite
+
+If you use `rusty-SUNDIALS`, any derived results, or reference the SymbioticFactory / OpenCyclo research in your work, you **must** include the following citation:
+
+```bibtex
+@article{callens2026rustysundials,
+  title   = {rusty-SUNDIALS: Formally Verified Scientific Machine Learning Engine},
+  author  = {Callens, Xavier},
+  year    = {2026},
+  journal = {SocrateAI Lab},
+  url     = {https://github.com/xaviercallens/rusty-SUNDIALS},
+  note    = {Lean 4 formally verified. BSD 3-Clause License.}
+}
+```
+
+For the SymbioticFactory CCU research specifically:
+
+```bibtex
+@article{callens2026symbioticfactory,
+  title   = {Disruptive Physics \& Autonomous {AI} for Planetary-Scale Carbon Capture},
+  author  = {Callens, Xavier},
+  year    = {2026},
+  journal = {SocrateAI Lab -- SymbioticFactory Research},
+  url     = {https://github.com/xaviercallens/rusty-SUNDIALS},
+  note    = {Lean 4 formally verified. rusty-SUNDIALS v8.0}
+}
+```
+
+---
+
 <div align="center">
 
 **⭐ Star this repo if you believe in open, verified scientific computing ⭐**

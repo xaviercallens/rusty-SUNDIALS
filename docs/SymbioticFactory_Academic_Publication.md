@@ -1,8 +1,8 @@
 # Disruptive Physics & Autonomous AI for Planetary-Scale Carbon Capture: Breaking Classical Thermodynamic Ceilings via Quantum Photonics, Acoustofluidics, and Adjoint-Guided Enzyme Design
 
-**Xavier Callens**$^{1,2}$
+**Xavier Callens**$^{1,2,3}$
 
-$^1$ SymbioticFactory Research · $^2$ OpenCyclo Project
+$^1$ SocrateAI Lab · $^2$ SymbioticFactory Research · $^3$ OpenCyclo Project
 
 **Date:** May 14, 2026 | **Engine:** `rusty-SUNDIALS` Autoresearch v4.0 | **Infrastructure:** Google Cloud Run
 
@@ -307,4 +307,33 @@ All numerical methods are formally verified in Lean 4, all simulations executed 
 7. Tchernov, D. et al. (2004). *PNAS* 101(28), 10524–10529.
 8. Spreitzer, R. J. & Salvucci, M. E. (2002). *Annu. Rev. Plant Biol.* 53, 449–475.
 9. Bruus, H. (2012). *Lab on a Chip* 12(6), 1014–1021.
-10. Callens, X. (2026). `rusty-SUNDIALS` v8.0. https://github.com/xaviercallens/rusty-SUNDIALS
+10. Callens, X. (2026). `rusty-SUNDIALS` v8.0. SocrateAI Lab. https://github.com/xaviercallens/rusty-SUNDIALS
+
+---
+
+## Copyright & Citation Obligation
+
+© 2026 Xavier Callens & SocrateAI Lab. All rights reserved.
+
+This document, including all figures, equations, simulation results, Lean 4 formal proofs, and methodologies described herein, is the intellectual property of **Xavier Callens** and **SocrateAI Lab**. The `rusty-SUNDIALS` software engine is released under the BSD 3-Clause License.
+
+### Mandatory Citation
+
+Any use, reproduction, adaptation, or reference to the scientific results, numerical methods, formal verification artifacts, or visual materials contained in this publication — whether in academic papers, technical reports, industrial applications, educational materials, press releases, or derivative works — **must include the following citation**:
+
+> Callens, X. (2026). *Disruptive Physics & Autonomous AI for Planetary-Scale Carbon Capture: Breaking Classical Thermodynamic Ceilings via Quantum Photonics, Acoustofluidics, and Adjoint-Guided Enzyme Design.* SocrateAI Lab / SymbioticFactory Research. https://github.com/xaviercallens/rusty-SUNDIALS
+
+**BibTeX:**
+
+```bibtex
+@article{callens2026symbioticfactory,
+  title   = {Disruptive Physics \& Autonomous {AI} for Planetary-Scale Carbon Capture},
+  author  = {Callens, Xavier},
+  year    = {2026},
+  journal = {SocrateAI Lab -- SymbioticFactory Research},
+  url     = {https://github.com/xaviercallens/rusty-SUNDIALS},
+  note    = {Lean 4 formally verified. rusty-SUNDIALS v8.0}
+}
+```
+
+Failure to provide proper attribution constitutes a violation of the BSD 3-Clause License and applicable copyright law.

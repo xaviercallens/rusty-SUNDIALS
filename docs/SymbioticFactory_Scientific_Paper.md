@@ -480,3 +480,12 @@ The platform is deployed and accessible at:
 *© 2026 SymbioticFactory / rusty-SUNDIALS. Released under Apache 2.0 license.*
 *Repository: https://github.com/xaviercallens/rusty-SUNDIALS*
 *Release: v7.0.0*
+
+---
+
+## Copyright & Citation
+
+© 2026 Xavier Callens & SocrateAI Lab. All rights reserved.
+
+Citation of this work is mandatory for any academic, industrial, or educational use. See [CITATION.cff](../CITATION.cff) for the required BibTeX entry.
+

@@ -67,3 +67,12 @@ By unifying Rust's memory-safe zero-cost abstractions, LLVM Automatic Differenti
 
 ### Acknowledgments
 This work aligns with the EUROfusion Work Packages targeting advanced computing algorithms for ITER deployment.
+
+---
+
+## Copyright & Citation
+
+© 2026 Xavier Callens & SocrateAI Lab. All rights reserved.
+
+Citation of this work is mandatory for any academic, industrial, or educational use. See [CITATION.cff](../CITATION.cff) for the required BibTeX entry.
+

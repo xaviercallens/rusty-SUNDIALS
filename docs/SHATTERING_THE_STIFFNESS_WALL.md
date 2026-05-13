@@ -45,3 +45,12 @@ We demonstrate these breakthroughs by simulating the 2D Reduced-MHD Magnetic Tea
 
 ## 4. Conclusion
 `rusty-SUNDIALS` transitions fusion simulation from intractable numerical analysis into real-time, differentiable machine learning, strictly bound by mathematical truth. It serves as the required Exascale digital twin topology for EUROfusion control systems.
+
+---
+
+## Copyright & Citation
+
+© 2026 Xavier Callens & SocrateAI Lab. All rights reserved.
+
+Citation of this work is mandatory for any academic, industrial, or educational use. See [CITATION.cff](../CITATION.cff) for the required BibTeX entry.
+

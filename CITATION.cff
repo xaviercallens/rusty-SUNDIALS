@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, any derived scientific results, figures,
+  or methodologies in your research, please cite it using the metadata
+  below. Citation is mandatory for all academic, industrial, and
+  educational use.
+title: "rusty-SUNDIALS: Formally Verified Scientific Machine Learning Engine"
+type: software
+authors:
+  - given-names: Xavier
+    family-names: Callens
+    affiliation: SocrateAI Lab
+    orcid: ""
+license: BSD-3-Clause
+repository-code: "https://github.com/xaviercallens/rusty-SUNDIALS"
+version: "8.0.0"
+date-released: "2026-05-14"
+keywords:
+  - scientific-computing
+  - ODE-solvers
+  - formal-verification
+  - carbon-capture
+  - bioreactor
+  - machine-learning
+  - Lean4
+  - Rust
+preferred-citation:
+  type: article
+  authors:
+    - given-names: Xavier
+      family-names: Callens
+      affiliation: SocrateAI Lab
+  title: >-
+    Disruptive Physics & Autonomous AI for Planetary-Scale Carbon Capture:
+    Breaking Classical Thermodynamic Ceilings via Quantum Photonics,
+    Acoustofluidics, and Adjoint-Guided Enzyme Design
+  year: 2026
+  journal: "SymbioticFactory Research — SocrateAI Lab"
+  url: "https://github.com/xaviercallens/rusty-SUNDIALS"

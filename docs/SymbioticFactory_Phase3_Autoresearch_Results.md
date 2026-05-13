@@ -114,3 +114,12 @@ Acknowledging that serverless ROMs cannot resolve turbulent microscales, the pip
 
 > [!TIP]
 > By distilling exact LES physics into a Neural SGS operator, the framework legitimately achieves microscale accuracy on macroscopic grids. The $-5/3$ energy cascade is fully preserved at a $6 \times 10^5$ speedup, definitively resolving the "ROM vs CFD" fallacy.
+
+---
+
+## Copyright & Citation
+
+© 2026 Xavier Callens & SocrateAI Lab. All rights reserved.
+
+Citation of this work is mandatory for any academic, industrial, or educational use. See [CITATION.cff](../CITATION.cff) for the required BibTeX entry.
+

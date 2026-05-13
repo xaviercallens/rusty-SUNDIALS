@@ -121,3 +121,11 @@ To achieve a true paradigm shift in planetary Carbon Capture and Utilization (CC
 ### CCU Yield Improvement Benchmark
 
 ![Phase IV Yield Improvements](phase4_benchmark.png)
+---
+
+## Copyright & Citation
+
+© 2026 Xavier Callens & SocrateAI Lab. All rights reserved.
+
+Citation of this work is mandatory for any academic, industrial, or educational use. See [CITATION.cff](../CITATION.cff) for the required BibTeX entry.
+

@@ -404,3 +404,12 @@ All results are formally specified in **Lean 4** with theorem statements coverin
 
 *Deployed at: https://rusty-sundials-autoresearch-1003063861791.europe-west1.run.app*
 *API: POST /fusion/{1-4} or /fusion/full*
+
+---
+
+## Copyright & Citation
+
+© 2026 Xavier Callens & SocrateAI Lab. All rights reserved.
+
+Citation of this work is mandatory for any academic, industrial, or educational use. See [CITATION.cff](../CITATION.cff) for the required BibTeX entry.
+

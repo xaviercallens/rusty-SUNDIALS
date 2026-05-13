@@ -25,3 +25,12 @@ All energy norms are strictly bounded. $\nabla \cdot B = 0$ preserved. Q.E.D.
 
 ### Performance Plot
 ![Benchmark Comparison](benchmark_HamiltonianGraphAttentionIntegrator.png)
+
+---
+
+## Copyright & Citation
+
+© 2026 Xavier Callens & SocrateAI Lab. All rights reserved.
+
+Citation of this work is mandatory for any academic, industrial, or educational use. See [CITATION.cff](../CITATION.cff) for the required BibTeX entry.
+
