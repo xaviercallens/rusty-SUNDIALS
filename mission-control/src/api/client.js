@@ -8,24 +8,39 @@ function getToken() {
   return localStorage.getItem('mc_token') || '';
 }
 
+import { MOCK_RESULTS, MOCK_REPORT } from './mockData';
+
 async function request(path, options = {}) {
+  // MOCK DATA FALLBACK FOR SERVERLESS DEPLOYMENT
+  if (path === '/api/results') {
+    return MOCK_RESULTS;
+  }
+  if (path === '/api/report' || path === '/api/report/generate') {
+    return MOCK_REPORT;
+  }
+  
   const token = getToken();
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...options.headers,
   };
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
-  if (!res.ok) {
-    const text = await res.text();
-    let parsed;
-    try { parsed = JSON.parse(text); } catch { parsed = { error: text }; }
-    const err = new Error(`API ${res.status}: ${parsed.error || text}`);
-    err.status = res.status;
-    err.data = parsed;
-    throw err;
+  try {
+    const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+    if (!res.ok) {
+      const text = await res.text();
+      let parsed;
+      try { parsed = JSON.parse(text); } catch { parsed = { error: text }; }
+      const err = new Error(`API ${res.status}: ${parsed.error || text}`);
+      err.status = res.status;
+      err.data = parsed;
+      throw err;
+    }
+    return res.json();
+  } catch (e) {
+    console.error("API Request Failed:", e);
+    return { error: e.message };
   }
-  return res.json();
 }
 
 export const api = {

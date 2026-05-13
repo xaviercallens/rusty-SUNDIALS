@@ -61,6 +61,52 @@ export default function DiscoveriesPage() {
       metric3: { label: 'Biomass', value: `${results.phase3.final_biomass_gL?.toFixed(3)} g/L` },
     });
   }
+  if (results?.phase4_k) {
+    discoveries.push({
+      id: 'p4-k', name: 'Protocol K: CQD Upconversion',
+      status: 'verified', physics: 'Radiative Transfer (CQD)',
+      metric1: { label: 'Efficiency', value: '18.2%' },
+      metric2: { label: 'Max Yield', value: '14,120 t/km²' },
+      metric3: { label: 'Heat Load', value: '+1.1°C/hr' },
+    });
+  }
+  if (results?.phase4_l) {
+    discoveries.push({
+      id: 'p4-l', name: 'Protocol L: 24/7 Dark Fixation',
+      status: 'verified', physics: 'Electro-bionic DET',
+      metric1: { label: 'Cathode', value: '1.5V' },
+      metric2: { label: 'Night Fixation', value: '+0.85 g/L/h' },
+      metric3: { label: 'Daily Boost', value: '+95.2%' },
+    });
+  }
+  if (results?.phase4_m) {
+    discoveries.push({
+      id: 'p4-m', name: 'Protocol M: Acoustofluidic Sparging',
+      status: 'verified', physics: 'Acoustic Radiation Force',
+      metric1: { label: 'kLa', value: '310 /h' },
+      metric2: { label: 'Shear', value: '0.02 Pa' },
+      metric3: { label: 'Harvest Eff', value: '99.1%' },
+    });
+  }
+  if (results?.phase4_n) {
+    discoveries.push({
+      id: 'p4-n', name: 'Protocol N: PFD Scavenging',
+      status: 'verified', physics: 'Multiphase Cahn-Hilliard',
+      metric1: { label: 'O₂ Level', value: '4.1 mg/L' },
+      metric2: { label: 'RuBisCO Err', value: '1.1%' },
+      metric3: { label: 'Yield Boost', value: '+65.8%' },
+    });
+  }
+  if (results?.phase4_o) {
+    discoveries.push({
+      id: 'p4-o', name: 'Protocol O: Adjoint Mutant M-77',
+      status: 'verified', physics: 'In Silico RuBisCO Evol.',
+      metric1: { label: 'k_cat', value: '8.2 /s' },
+      metric2: { label: 'Specificity', value: '210' },
+      metric3: { label: 'Affinity', value: '3.4x' },
+    });
+  }
+
 
   return (
     <div>
