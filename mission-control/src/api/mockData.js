@@ -18,6 +18,10 @@ export const MOCK_RESULTS = {
     final_pH: 7.21,
     final_biomass_gL: 2.85
   },
+  phase3_f: { success: true },
+  phase3_g: { success: true },
+  phase3_h: { success: true },
+  phase3_i: { success: true },
   phase4_k: { success: true },
   phase4_l: { success: true },
   phase4_m: { success: true },
@@ -46,6 +50,21 @@ export const MOCK_REPORT = {
       key_results: {
         Equivalent_Efficiency: "18.2%",
         Yield_Limit: "14,120 t/km2"
+      }
+    },
+    {
+      name: "Protocol F: Tensor-Train Gyrokinetic Integration",
+      key_results: {
+        Memory_Footprint: "46.2 MB",
+        Run_Time: "14.2s",
+        Compression_Ratio: "320,000x"
+      }
+    },
+    {
+      name: "Protocol I: HDC Boolean Control",
+      key_results: {
+        Execution_Latency: "40 ns",
+        Speedup_Factor: "1,375x"
       }
     },
     {
