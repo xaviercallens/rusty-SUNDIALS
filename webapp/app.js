@@ -11,6 +11,7 @@ function buildSidebar() {
       <a href="lean.html" style="color:#c678dd;font-size:.7rem;text-decoration:none;border:1px solid rgba(198,120,221,.3);padding:4px 8px;border-radius:4px">📐 Lean 4 Verification Demo</a>
       <a href="neurosymbolic.html" style="color:#10b981;font-size:.7rem;text-decoration:none;border:1px solid rgba(16,185,129,.3);padding:4px 8px;border-radius:4px">🧠 Neuro-Symbolic Evaluation</a>
       <a href="grand_unified.html" style="color:#f59e0b;font-size:.7rem;text-decoration:none;border:1px solid rgba(245,158,11,.3);padding:4px 8px;border-radius:4px">🌍 Grand Unified Validation</a>
+      <a href="autoresearch.html" style="color:#ef4444;font-size:.7rem;text-decoration:none;border:1px solid rgba(239,68,68,.3);padding:4px 8px;border-radius:4px">⚛️ Auto-Research Mission Control</a>
     </div>
   </div>`;
   DOMAINS.forEach(d => {

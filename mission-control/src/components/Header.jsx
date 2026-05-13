@@ -1,6 +1,8 @@
-import { Activity, Cpu, Database, Globe } from 'lucide-react';
+import { Activity, Cpu, Database, Globe, Shield } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Header({ cost = 4.27, budget = 100 }) {
+  const { role, email, signIn, signOut } = useAuth();
   const pct = (cost / budget) * 100;
   const level = pct > 90 ? 'danger' : pct > 70 ? 'warning' : '';
 
@@ -24,6 +26,21 @@ export default function Header({ cost = 4.27, budget = 100 }) {
           <span className="divider">/</span>
           <span className="budget">${budget.toFixed(2)}</span>
         </div>
+
+        <div className={`badge ${role === 'admin' ? 'verified' : 'pending'}`}
+             style={{ marginLeft: 12, fontSize: '0.6rem', padding: '2px 8px',
+                      display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
+             title={email || 'Click to sign in'}
+             onClick={email ? signOut : signIn}>
+          <Shield size={10} />
+          {email ? (role === 'admin' ? '⚡ ADMIN' : '👁 GUEST') : '🔒 SIGN IN'}
+        </div>
+        {email && (
+          <span style={{ fontSize: '0.55rem', color: 'var(--text-muted)', marginLeft: 6,
+                         maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {email}
+          </span>
+        )}
       </div>
     </header>
   );

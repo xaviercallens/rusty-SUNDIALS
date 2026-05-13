@@ -1,30 +1,48 @@
 /**
  * API Client for Rusty-SUNDIALS Mission Control
- * Connects to the Cloud Run backend
+ * Sends Google Sign-In JWT as Bearer token for role-based access.
  */
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
+function getToken() {
+  return localStorage.getItem('mc_token') || '';
+}
+
 async function request(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    ...options,
-  });
-  if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
+  const token = getToken();
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...options.headers,
+  };
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  if (!res.ok) {
+    const text = await res.text();
+    let parsed;
+    try { parsed = JSON.parse(text); } catch { parsed = { error: text }; }
+    const err = new Error(`API ${res.status}: ${parsed.error || text}`);
+    err.status = res.status;
+    err.data = parsed;
+    throw err;
+  }
   return res.json();
 }
 
 export const api = {
-  // Health
-  health: () => request('/health'),
-  
-  // Pipeline
+  // Auth & Health
+  health: () => request('/api/health'),
+  role: () => request('/api/role'),
+  info: () => request('/api/info'),
+
+  // Read-only (all users)
+  results: () => request('/api/results'),
+
+  // Write operations (admin only)
   runPipeline: (config = {}) => request('/run', { method: 'POST', body: JSON.stringify(config) }),
   runPhysics: (config = {}) => request('/physics', { method: 'POST', body: JSON.stringify(config) }),
   runSweep: () => request('/sweep', { method: 'POST' }),
   runBioreactor: () => request('/bioreactor', { method: 'POST' }),
-  
-  // Service info
-  info: () => request('/'),
+  runBioreactorAdvanced: () => request('/bioreactor/advanced', { method: 'POST' }),
 };
 
 export default api;

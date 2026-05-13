@@ -3,16 +3,21 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   BarChart, Bar, ResponsiveContainer, Legend
 } from 'recharts';
-import { Play, RotateCcw, Droplets } from 'lucide-react';
+import { Play, RotateCcw, Droplets, Beaker } from 'lucide-react';
 import GlowPanel from '../components/GlowPanel';
+import { useAuth } from '../hooks/useAuth';
 import api from '../api/client';
 
 export default function PhysicsPage() {
+  const { role } = useAuth();
+  const isAdmin = role === 'admin';
   const [params, setParams] = useState({ grid: 128, eta: '1e-3', t_end: 0.1 });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
   const [sweepResult, setSweepResult] = useState(null);
   const [bioResult, setBioResult] = useState(null);
+  const [advResult, setAdvResult] = useState(null);
 
   const runPhysics = useCallback(async () => {
     setLoading(true);
@@ -50,20 +55,39 @@ export default function PhysicsPage() {
     }
   }, []);
 
+  const runAdvanced = useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      const res = await api.runBioreactorAdvanced();
+      setAdvResult(res); setResult(null); setSweepResult(null); setBioResult(null);
+    } catch (e) {
+      setError(e.status === 403 ? 'Admin access required' : e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return (
     <div>
       <div className="page-header">
         <h2>NUMERICAL COMPUTATION LAB</h2>
-        <div style={{ display: 'flex', gap: 'var(--gap-sm)' }}>
-          <button className="btn btn-primary" onClick={runPhysics} disabled={loading}>
+        <div style={{ display: 'flex', gap: 'var(--gap-sm)', flexWrap: 'wrap' }}>
+          <button className="btn btn-primary" onClick={runPhysics} disabled={loading || !isAdmin}
+                  title={!isAdmin ? 'Admin only' : ''}>
             <Play size={14} /> 1D RMHD
           </button>
-          <button className="btn btn-outline" onClick={runSweep} disabled={loading}>
+          <button className="btn btn-outline" onClick={runSweep} disabled={loading || !isAdmin}>
             <RotateCcw size={14} /> STIFFNESS SWEEP
           </button>
-          <button className="btn btn-outline" onClick={runBioreactor} disabled={loading} style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
-            <Droplets size={14} /> BIO-VORTEX OPTIMIZATION
+          <button className="btn btn-outline" onClick={runBioreactor} disabled={loading || !isAdmin}
+                  style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
+            <Droplets size={14} /> BIO-VORTEX P1
           </button>
+          <button className="btn btn-outline" onClick={runAdvanced} disabled={loading || !isAdmin}
+                  style={{ borderColor: '#c084fc', color: '#c084fc' }}>
+            <Beaker size={14} /> ADVANCED BIO P2
+          </button>
+          {!isAdmin && <span className="badge pending" style={{ alignSelf: 'center', fontSize: '0.6rem' }}>GUEST: READ ONLY</span>}
         </div>
       </div>
 
@@ -187,12 +211,44 @@ export default function PhysicsPage() {
         </GlowPanel>
       )}
 
-      {!result && !sweepResult && !bioResult && !loading && (
+      {/* Advanced Bioreactor Phase 2 Results */}
+      {advResult?.pareto && !loading && (
+        <GlowPanel title="ADVANCED BIOREACTOR PHASE 2 — PARETO FRONT" className="animate-in">
+          <table className="data-table">
+            <thead>
+              <tr><th>RPM</th><th>Pulse</th><th>Air (L/min)</th><th>Vortex</th><th>Max Shear</th><th>Growth</th><th>CO₂</th><th>Temp</th><th>Safety</th></tr>
+            </thead>
+            <tbody>
+              {advResult.pareto.map((r, i) => (
+                <tr key={i}>
+                  <td>{r.pump_rpm}</td>
+                  <td>{r.pulse_freq > 0 ? `${r.pulse_freq}Hz (${(r.pulse_duty*100).toFixed(0)}%)` : 'Steady'}</td>
+                  <td>{r.air_flow}</td>
+                  <td style={{ color: 'var(--cyan)' }}>{r.vortex_ratio?.toFixed(2)}x</td>
+                  <td style={{ color: r.lysis_risk ? 'var(--red)' : 'var(--text-primary)' }}>{r.max_shear?.toFixed(2)}</td>
+                  <td style={{ color: 'var(--green)' }}>{r.biomass_growth?.toFixed(4)}x</td>
+                  <td>{r.co2_final?.toFixed(4)}</td>
+                  <td>{r.temp_final?.toFixed(1)}°C</td>
+                  <td><span className={`badge ${r.lysis_risk ? 'failed' : 'verified'}`}>{r.lysis_risk ? 'LYSIS' : 'SAFE'}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </GlowPanel>
+      )}
+
+      {error && !loading && (
+        <GlowPanel title="ERROR" dot={false}>
+          <p style={{ color: 'var(--red)', textAlign: 'center', padding: 'var(--gap-lg)' }}>{error}</p>
+        </GlowPanel>
+      )}
+
+      {!result && !sweepResult && !bioResult && !advResult && !loading && !error && (
         <GlowPanel title="AWAITING EXECUTION" dot={false}>
           <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 'var(--gap-2xl)' }}>
-            Configure parameters above and click <strong style={{ color: 'var(--cyan)' }}>RUN BASELINE</strong> or{' '}
-            <strong style={{ color: 'var(--cyan)' }}>STIFFNESS SWEEP</strong> or{' '}
-            <strong style={{ color: 'var(--green)' }}>BIO-VORTEX OPTIMIZATION</strong> to execute real physics on Google Cloud.
+            {isAdmin
+              ? <>Select a computation above to execute real physics on Google Cloud.</>
+              : <>You are in <strong style={{ color: 'var(--amber)' }}>GUEST</strong> mode. Sign in as admin to run computations.</>}
           </p>
         </GlowPanel>
       )}
