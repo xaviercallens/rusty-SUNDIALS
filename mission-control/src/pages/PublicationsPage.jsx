@@ -14,7 +14,7 @@ export default function PublicationsPage() {
 
   useEffect(() => {
     api.getReport()
-      .then(d => { if (!d.status) setReport(d); setLoading(false); })
+      .then(d => { if (d && !d.error && !d.status?.includes('error')) setReport(d); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
