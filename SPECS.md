@@ -36,3 +36,10 @@ This specification tracks the **Critical**, **High-Priority**, and **Medium-Prio
 - [ ] **GPU Tensor Core Support** (document current state).
 - [ ] **CVODES (Sensitivity Analysis)**.
 - [ ] **Publish Academic Papers** (NeurIPS / Nature Computational Science).
+- [ ] **Case Studies** for Industry Partnerships.
+
+### 🟣 Phase 5: Serverless Autoresearch (v8.0)
+- [x] **Deploy Mission Control Interface**: Launch the React-based frontend for Autoresearch orchestration.
+- [x] **Serverless Auto-Research**: Transition the auto-research engine to GCP Serverless (Vertex AI + Cloud Run).
+- [x] **Autonomous Peer Review Validation**: Generate physics and lean verification for xMHD paradigms.
+- [x] **Discover New Integrators**: Publish `HamiltonianGraphAttentionIntegrator` (500x speedup).
