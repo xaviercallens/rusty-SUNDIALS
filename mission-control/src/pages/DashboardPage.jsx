@@ -3,163 +3,153 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   BarChart, Bar, ResponsiveContainer, Legend
 } from 'recharts';
-import { Play, Zap, Clock, Award, TrendingDown } from 'lucide-react';
+import { Play, Zap, Clock, Award, TrendingDown, Droplets, FlaskConical, Gauge } from 'lucide-react';
 import GlowPanel from '../components/GlowPanel';
 import PipelineGraph from '../components/PipelineGraph';
+import { useAuth } from '../hooks/useAuth';
 import api from '../api/client';
 
-/* ── Mock telemetry for demo ──────────────────────────────── */
-function genTelemetry(n = 50) {
-  return Array.from({ length: n }, (_, i) => ({
-    t: i,
-    energyDrift: Math.random() * 0.04 * Math.exp(-i * 0.03) + 1e-16,
-    krylov: Math.floor(Math.random() * 12) + 2,
-    cpuLoad: 40 + Math.random() * 50,
-  }));
-}
-
-const DISCOVERIES = [
-  { id: 1, name: 'AsynchronousGeometricIntegrator', status: 'verified', cert: 'CERT-LEAN4-A72F', speedup: '2.3×10¹⁴' },
-  { id: 2, name: 'SpectralLagrangianDecomposition', status: 'verified', cert: 'CERT-LEAN4-B93E', speedup: '5000×' },
-  { id: 3, name: 'NeuroGeometricOperatorDecomp', status: 'verified', cert: 'CERT-LEAN4-C14D', speedup: '1.2×10¹⁴' },
-  { id: 4, name: 'HamiltonianPrimalDualIntegrator', status: 'verified', cert: 'CERT-LEAN4-D58A', speedup: '890×' },
-  { id: 5, name: 'GeometricNeuralPreconditioner', status: 'pending', cert: '—', speedup: '—' },
-  { id: 6, name: 'SymplecticEnergyProjection', status: 'verified', cert: 'CERT-LEAN4-E3B1', speedup: '4.7×10¹⁴' },
-];
-
-const SWEEP_DATA = [
-  { S: 'S=10', baseline: 0.059, projected: 2.57e-16, improvement: 2.3e14 },
-  { S: 'S=100', baseline: 0.060, projected: 1e-18, improvement: 6e16 },
-  { S: 'S=200', baseline: 0.060, projected: 1e-18, improvement: 6e16 },
-  { S: 'S=1000', baseline: 0.060, projected: 1.29e-16, improvement: 4.7e14 },
-];
-
 export default function DashboardPage() {
-  const [telemetry, setTelemetry] = useState(genTelemetry());
+  const { role } = useAuth();
+  const isAdmin = role === 'admin';
   const [activeNode, setActiveNode] = useState('synthesize');
   const [loading, setLoading] = useState(false);
-  const [runResult, setRunResult] = useState(null);
+  const [lastResults, setLastResults] = useState(null);
 
-  // Animate telemetry
+  // Load last results on mount
   useEffect(() => {
-    const iv = setInterval(() => {
-      setTelemetry(prev => {
-        const next = [...prev.slice(1)];
-        const last = prev[prev.length - 1];
-        next.push({
-          t: last.t + 1,
-          energyDrift: Math.random() * 0.01 + 1e-16,
-          krylov: Math.floor(Math.random() * 10) + 2,
-          cpuLoad: 40 + Math.random() * 50,
-        });
-        return next;
-      });
-    }, 2000);
-    return () => clearInterval(iv);
+    api.results()
+      .then(data => { if (data.status !== 'no_results_yet') setLastResults(data); })
+      .catch(() => {});
   }, []);
 
-  const handleRun = useCallback(async () => {
+  const handleRunBioreactor = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.runPipeline({ max_loops: 1 });
-      setRunResult(res);
+      const res = await api.runBioreactor();
+      setLastResults(res);
       setActiveNode('publish');
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
   }, []);
+
+  // Compute metrics from last results
+  const metrics = {
+    experiments: lastResults ? 1 : 0,
+    status: lastResults?.status === 'complete' ? 'complete' : 'pending',
+    physics: lastResults?.physics || '—',
+    elapsed: lastResults?.elapsed_seconds || '—',
+  };
 
   return (
     <div>
       <div className="page-header">
         <h2>MISSION DASHBOARD</h2>
-        <button className="btn btn-primary" onClick={handleRun} disabled={loading}>
+        <button className="btn btn-primary" onClick={handleRunBioreactor}
+                disabled={loading || !isAdmin}>
           <Play size={14} />
-          {loading ? 'EXECUTING...' : 'RUN LOOP'}
+          {loading ? 'EXECUTING...' : 'RUN BIO-VORTEX P1'}
         </button>
       </div>
 
       {/* Metrics Row */}
       <div className="grid-4" style={{ marginBottom: 'var(--gap-lg)' }}>
-        <MetricCard icon={Zap} label="Discoveries" value="6" delta="+2 today" positive />
-        <MetricCard icon={Award} label="Verified" value="5" delta="83% rate" positive />
-        <MetricCard icon={TrendingDown} label="Best Drift" value="1.29e-16" delta="machine ε" positive />
-        <MetricCard icon={Clock} label="Uptime" value="4h 12m" delta="5 runs" />
+        <MetricCard icon={Zap} label="Status" value={metrics.status === 'complete' ? '✓ COMPLETE' : 'IDLE'}
+                    delta={metrics.physics} positive={metrics.status === 'complete'} />
+        <MetricCard icon={Droplets} label="Experiments" value={metrics.experiments}
+                    delta="bioreactor" positive />
+        <MetricCard icon={FlaskConical} label="Engine"
+                    value="SUNDIALS BDF" delta="IMEX + Projection" positive />
+        <MetricCard icon={Clock} label="Last Run"
+                    value={metrics.elapsed !== '—' ? `${metrics.elapsed}s` : '—'}
+                    delta="Cloud Run EU" />
       </div>
 
-      {/* Main 2x2 Grid */}
+      {/* Main Grid */}
       <div className="grid-2x2">
         <GlowPanel title="PIPELINE STATUS">
           <PipelineGraph activeNode={activeNode} />
         </GlowPanel>
 
-        <GlowPanel title="LIVE TELEMETRY">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <MiniChart data={telemetry} dataKey="energyDrift" color="#00e5ff" label="Energy Drift |ΔE/E₀|" />
-            <MiniChart data={telemetry} dataKey="krylov" color="#ffb800" label="Krylov Iterations" />
-            <MiniChart data={telemetry} dataKey="cpuLoad" color="#a78bfa" label="CPU Utilization %" />
+        <GlowPanel title="EXPERIMENT CAPABILITIES">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '8px 0' }}>
+            <ExperimentRow icon={Droplets} name="Bio-Vortex P1" desc="Taylor-Couette algae vortex optimization"
+                          solver="cvode-rs (BDF)" status="active" color="var(--green)" />
+            <ExperimentRow icon={FlaskConical} name="Bio-Vortex P2" desc="6-field: CO₂ + thermal + diurnal"
+                          solver="BDF + IMEX" status="active" color="#c084fc" />
+            <ExperimentRow icon={Gauge} name="Oxidize-Cyclo P1" desc="17m column kLa mass transfer (DICA nanobubbles)"
+                          solver="cvode-rs (BDF)" status="ready" color="var(--cyan)" />
+            <ExperimentRow icon={Zap} name="Oxidize-Cyclo P2" desc="PWM photonic optimization (Monod-Haldane)"
+                          solver="kinsol-rs (Newton)" status="ready" color="var(--amber)" />
+            <ExperimentRow icon={TrendingDown} name="Oxidize-Cyclo P3" desc="pH-Stat DAE cyber-physical control"
+                          solver="ida-rs (Radau)" status="ready" color="#f472b6" />
           </div>
         </GlowPanel>
 
-        <GlowPanel title="DISCOVERY LOG">
-          <div style={{ overflowX: 'auto' }}>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Method</th>
-                  <th>Status</th>
-                  <th>Certificate</th>
-                  <th>Speedup</th>
-                </tr>
-              </thead>
-              <tbody>
-                {DISCOVERIES.map(d => (
-                  <tr key={d.id}>
-                    <td style={{ color: 'var(--text-primary)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {d.name}
-                    </td>
-                    <td><span className={`badge ${d.status}`}>{d.status}</span></td>
-                    <td style={{ color: 'var(--text-secondary)' }}>{d.cert}</td>
-                    <td style={{ color: 'var(--green)' }}>{d.speedup}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {/* Last results */}
+        <GlowPanel title="LAST EXPERIMENT RESULTS">
+          {lastResults?.optimization ? (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
+                  <tr><th>Config</th><th>Vortex</th><th>Shear</th><th>Growth</th><th>Safe</th></tr>
+                </thead>
+                <tbody>
+                  {lastResults.optimization.slice(0, 4).map((r, i) => (
+                    <tr key={i}>
+                      <td>{r.pump_rpm} RPM</td>
+                      <td style={{ color: 'var(--cyan)' }}>{r.vortex_ratio?.toFixed(2)}x</td>
+                      <td>{r.avg_shear?.toFixed(1)} Pa</td>
+                      <td style={{ color: 'var(--green)' }}>{r.biomass_growth?.toFixed(4)}x</td>
+                      <td><span className={`badge ${r.lysis_risk ? 'failed' : 'verified'}`}>
+                        {r.lysis_risk ? '✗' : '✓'}
+                      </span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : lastResults?.phase1 ? (
+            <div style={{ padding: 12 }}>
+              <div style={{ display: 'flex', gap: 'var(--gap-xl)', flexWrap: 'wrap' }}>
+                <MiniMetric label="kLa" value={`${lastResults.phase1.avg_kla_final?.toFixed(1)} 1/s`} color="var(--cyan)" />
+                <MiniMetric label="Biomass" value={`${lastResults.phase1.biomass_final_gL?.toFixed(2)} g/L`} color="var(--green)" />
+                <MiniMetric label="CO₂ Util" value={`${lastResults.phase1.co2_utilization_pct?.toFixed(0)}%`} color="var(--amber)" />
+              </div>
+            </div>
+          ) : (
+            <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 'var(--gap-xl)' }}>
+              No experiments run yet. {isAdmin ? 'Click a button above to start.' : 'Sign in as admin to run.'}
+            </p>
+          )}
         </GlowPanel>
 
-        <GlowPanel title="STIFFNESS SWEEP">
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={SWEEP_DATA} barGap={2}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1a2744" />
-              <XAxis dataKey="S" tick={{ fill: '#7a8ba8', fontSize: 11, fontFamily: 'JetBrains Mono' }} />
-              <YAxis tick={{ fill: '#7a8ba8', fontSize: 10, fontFamily: 'JetBrains Mono' }}
-                tickFormatter={v => v >= 0.01 ? `${(v * 100).toFixed(0)}%` : v.toExponential(0)} />
-              <Tooltip contentStyle={{ background: '#0d1525', border: '1px solid #253654', borderRadius: 8, fontFamily: 'JetBrains Mono', fontSize: 12 }}
-                labelStyle={{ color: '#00e5ff' }} />
-              <Legend wrapperStyle={{ fontFamily: 'JetBrains Mono', fontSize: 11 }} />
-              <Bar dataKey="baseline" fill="#ff3d5a" name="Baseline BDF" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="projected" fill="#00ff88" name="+ Projection" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <GlowPanel title="OXIDIZE-CYCLO ARCHITECTURE">
+          <div style={{ padding: '8px 0', fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+            <div style={{ marginBottom: 8, color: 'var(--cyan)', fontWeight: 'bold' }}>CYCLOREACTOR V2.0 SPECS</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px' }}>
+              <span>Column Height</span><span className="data-value">17.0 m</span>
+              <span>Bubble Size</span><span className="data-value">&lt; 5 µm</span>
+              <span>DICA Enhancement</span><span className="data-value">50×</span>
+              <span>Flue CO₂</span><span className="data-value">12–15%</span>
+              <span>Light Guide</span><span className="data-value">680nm + 450nm PWM</span>
+              <span>pH Target</span><span className="data-value">7.5 ± 0.05</span>
+              <span>Solver Stack</span><span className="data-value">cvode / kinsol / ida</span>
+              <span>Edge Deploy</span><span className="data-value">RPi / STM32</span>
+            </div>
+          </div>
         </GlowPanel>
       </div>
 
-      {/* Run result toast */}
-      {runResult && (
+      {loading && (
         <div style={{
           position: 'fixed', bottom: 24, right: 24, padding: '16px 24px',
-          background: 'var(--bg-surface)', border: '1px solid var(--green-dim)',
-          borderRadius: 'var(--radius-md)', boxShadow: 'var(--glow-green)',
-          fontFamily: 'JetBrains Mono', fontSize: '0.85rem', color: 'var(--green)',
+          background: 'var(--bg-surface)', border: '1px solid var(--cyan-dim)',
+          borderRadius: 'var(--radius-md)', fontFamily: 'JetBrains Mono',
+          fontSize: '0.85rem', color: 'var(--cyan)', zIndex: 1000,
           animation: 'fade-in-up 0.4s ease-out',
-          zIndex: 1000,
         }}>
-          ✓ Discovery: {runResult.discovery?.method_name || 'Complete'} — ${runResult.estimated_cost_usd?.toFixed(4)}
-          <button onClick={() => setRunResult(null)}
-            style={{ marginLeft: 16, background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer' }}>✕</button>
+          ⏳ Running computation on Google Cloud (europe-west1)...
         </div>
       )}
     </div>
@@ -179,16 +169,29 @@ function MetricCard({ icon: Icon, label, value, delta, positive }) {
   );
 }
 
-function MiniChart({ data, dataKey, color, label }) {
+function ExperimentRow({ icon: Icon, name, desc, solver, status, color }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '8px 0', borderBottom: '1px solid var(--border-dim)' }}>
+      <Icon size={16} style={{ color, flexShrink: 0 }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <strong style={{ color: 'var(--text-primary)', fontSize: '0.8rem' }}>{name}</strong>
+          <span className={`badge ${status === 'active' ? 'verified' : 'pending'}`}
+                style={{ fontSize: '0.5rem' }}>{status.toUpperCase()}</span>
+        </div>
+        <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>{desc}</div>
+      </div>
+      <span style={{ fontSize: '0.6rem', color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{solver}</span>
+    </div>
+  );
+}
+
+function MiniMetric({ label, value, color }) {
   return (
     <div>
-      <div className="label" style={{ marginBottom: 2 }}>{label}</div>
-      <ResponsiveContainer width="100%" height={50}>
-        <LineChart data={data}>
-          <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={1.5}
-            dot={false} isAnimationActive={false} />
-        </LineChart>
-      </ResponsiveContainer>
+      <div className="label" style={{ fontSize: '0.6rem' }}>{label}</div>
+      <div className="data-value" style={{ color, fontSize: '0.95rem' }}>{value}</div>
     </div>
   );
 }

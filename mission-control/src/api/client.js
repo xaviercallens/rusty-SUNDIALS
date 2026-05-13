@@ -43,6 +43,12 @@ export const api = {
   runSweep: () => request('/sweep', { method: 'POST' }),
   runBioreactor: () => request('/bioreactor', { method: 'POST' }),
   runBioreactorAdvanced: () => request('/bioreactor/advanced', { method: 'POST' }),
+
+  // Oxidize-Cyclo experiments
+  runOxidizeP1: (cfg = {}) => request('/oxidize/p1', { method: 'POST', body: JSON.stringify(cfg) }),
+  runOxidizeP2: (cfg = {}) => request('/oxidize/p2', { method: 'POST', body: JSON.stringify(cfg) }),
+  runOxidizeP3: (cfg = {}) => request('/oxidize/p3', { method: 'POST', body: JSON.stringify(cfg) }),
+  runOxidizeFull: () => request('/oxidize/full', { method: 'POST' }),
 };
 
 export default api;
