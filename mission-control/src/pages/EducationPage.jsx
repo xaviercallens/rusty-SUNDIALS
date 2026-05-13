@@ -18,6 +18,13 @@ export default function EducationPage() {
     { title: "O2 Vacuuming with PFD", desc: "A fluorocarbon liquid drops through the reactor, absorbing oxygen and suppressing photorespiration.", color: "var(--blue)", score: "66% Net Boost" }
   ];
 
+  const fusionDiscoveries = [
+    { title: "Protocol F: Tensor-Train Integration", desc: "Solves the 6D 'curse of dimensionality'. Newton integration on Tensor-Train arrays compresses 14.8 TB down to 46 MB. Exascale run locally in 14.2s.", color: "var(--cyan)", score: "320,000x Shrink" },
+    { title: "Protocol G: Adjoint Billiard d-SPI", desc: "Adjoint differentiation discovered an 800m/s Argon + 1.2ms Neon billiard pulse. Drops thermal quench heat flux from 84.2 to 11.4 MW/m².", color: "var(--amber)", score: "98.5% Radiated" },
+    { title: "Protocol H: Neural Phase-Field Walls", desc: "Simulates liquid Tin/Lithium walls. Triggers an active capillary counter-wave to perfectly neutralize ELM kinetic shock without splashing.", color: "var(--blue)", score: "Zero Splash" },
+    { title: "Protocol I: HDC Boolean Control", desc: "Abandons standard PDEs for a 10,000-D boolean space (XOR on FPGA). Drops sub-millisecond magnetic control latency to just 40 nanoseconds.", color: "var(--magenta)", score: "1,375x Faster" }
+  ];
+
   return (
     <div>
       <div className="page-header">
@@ -27,9 +34,12 @@ export default function EducationPage() {
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: 'var(--gap-md)', marginBottom: 'var(--gap-lg)' }}>
+      <div style={{ display: 'flex', gap: 'var(--gap-md)', marginBottom: 'var(--gap-lg)', flexWrap: 'wrap' }}>
         <button className={`btn ${activeTab === 'infographics' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setActiveTab('infographics')}>
           <ImageIcon size={14} /> Infographics
+        </button>
+        <button className={`btn ${activeTab === 'iter' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setActiveTab('iter')}>
+          <Video size={14} /> ITER Fusion Master
         </button>
         <button className={`btn ${activeTab === 'animations' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setActiveTab('animations')}>
           <Video size={14} /> Animations
@@ -59,6 +69,40 @@ export default function EducationPage() {
               </div>
             </GlowPanel>
           ))}
+        </div>
+      )}
+
+      {activeTab === 'iter' && (
+        <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-lg)' }}>
+          <GlowPanel title="ITER FUSION: DISRUPTIVE PLASMA CONTAINMENT">
+            <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-dim)', marginBottom: 'var(--gap-md)' }}>
+              <img src="/iter_fusion_hero.png" alt="ITER Fusion Plasma Core" style={{ width: '100%', height: 'auto', display: 'block' }} />
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+              The Phase III Autoresearch pipeline bypassed incremental stabilization, generating four horizon computational paradigms targeting ITER's absolute physical limitations: the 6D kinetic curse, thermal quenches, boundary failures, and nanosecond latency.
+            </p>
+          </GlowPanel>
+
+          <div className="grid-2">
+            {fusionDiscoveries.map((info, idx) => (
+              <GlowPanel key={idx} title={info.title.toUpperCase()} style={{ borderTop: `2px solid ${info.color}` }}>
+                <div style={{ padding: 'var(--gap-md) 0' }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, marginBottom: 'var(--gap-md)' }}>
+                    {info.desc}
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ color: info.color, fontWeight: 'bold', fontSize: '1.2rem' }}>
+                      {info.score}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button className="btn btn-outline" title="Share"><Share2 size={12} /></button>
+                      <button className="btn btn-outline" title="Download HD"><Download size={12} /></button>
+                    </div>
+                  </div>
+                </div>
+              </GlowPanel>
+            ))}
+          </div>
         </div>
       )}
 
