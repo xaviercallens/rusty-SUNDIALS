@@ -11,6 +11,7 @@ const navItems = [
   { to: '/verification', icon: ShieldCheck, label: 'Verify' },
   { to: '/physics', icon: FlaskConical, label: 'Physics' },
   { to: '/publications', icon: FileText, label: 'Publish' },
+  { to: '/education', icon: Lightbulb, label: 'Media' },
   { to: '/cost', icon: DollarSign, label: 'Cost' },
   { to: '/settings', icon: Settings, label: 'Config' },
 ];

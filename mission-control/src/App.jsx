@@ -8,6 +8,7 @@ import DiscoveriesPage from './pages/DiscoveriesPage';
 import VerificationPage from './pages/VerificationPage';
 import PhysicsPage from './pages/PhysicsPage';
 import PublicationsPage from './pages/PublicationsPage';
+import EducationPage from './pages/EducationPage';
 import CostPage from './pages/CostPage';
 import SettingsPage from './pages/SettingsPage';
 
@@ -27,6 +28,7 @@ export default function App() {
                 <Route path="/verification" element={<VerificationPage />} />
                 <Route path="/physics" element={<PhysicsPage />} />
                 <Route path="/publications" element={<PublicationsPage />} />
+                <Route path="/education" element={<EducationPage />} />
                 <Route path="/cost" element={<CostPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
               </Routes>
