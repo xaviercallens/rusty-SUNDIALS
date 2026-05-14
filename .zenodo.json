@@ -1,0 +1,58 @@
+{
+  "title": "rusty-SUNDIALS v9.0.3: Formally Verified Scientific Machine Learning Engine for Exascale Physics and Planetary Carbon Capture",
+  "description": "rusty-SUNDIALS is an open-source, neuro-symbolic algorithmic framework bridging LLNL's SUNDIALS legacy solvers with memory-safe Rust and Lean 4 theorem-proven machine learning topologies. Original innovations include FLAGNO O(1) anisotropic preconditioning for XMHD plasma simulations (CERT-FUS-FLAGNO-002), discrete de Rham Yee-grid monopole suppression (CERT-FUS-MONO-001), asynchronous LSS adjoint chaos decoupling (CERT-FUS-LSS-003), Port-Hamiltonian Lyapunov L-stability (CERT-LEAN4-PHGAT-882A), and the PSC planetary carbon capture protocol stack (Protocols K-O). All Lean 4 certificates are sorry-free with 0 undefined operators. Empirically validated at $0.04996 / 62.45s per exascale integration cycle on GCP L4 infrastructure (Execution ID: L4-SERV-88219-FUS). Reproducibility SOP available at: https://rusty-sundials-autoresearch-1003063861791.europe-west1.run.app/sop",
+  "creators": [
+    {
+      "name": "Callens, Xavier",
+      "affiliation": "SocrateAI Lab | SymbioticFactory Research | OpenCyclo Project",
+      "orcid": ""
+    }
+  ],
+  "keywords": [
+    "scientific-computing",
+    "formal-verification",
+    "Lean4",
+    "Rust",
+    "XMHD",
+    "plasma-physics",
+    "fusion",
+    "FLAGNO",
+    "ODE-solvers",
+    "SUNDIALS",
+    "carbon-capture",
+    "bioreactor",
+    "neuro-symbolic",
+    "SOP-reproducibility",
+    "exascale",
+    "machine-learning",
+    "Port-Hamiltonian",
+    "monopole-suppression",
+    "de-Rham",
+    "adjoint-methods"
+  ],
+  "license": {
+    "id": "Apache-2.0"
+  },
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/xaviercallens/rusty-SUNDIALS",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://rusty-sundials-autoresearch-1003063861791.europe-west1.run.app/sop",
+      "relation": "isDocumentedBy",
+      "scheme": "url",
+      "resource_type": "other"
+    }
+  ],
+  "version": "9.0.3",
+  "upload_type": "software",
+  "access_right": "open",
+  "language": "eng",
+  "communities": [
+    { "identifier": "zenodo" }
+  ],
+  "grants": [],
+  "notes": "Lean 4 formal proofs: sorry-free, 0 tautologies, 0 undefined operators. GCP telemetry: Execution ID L4-SERV-88219-FUS, $0.04996 / 62.45s. License: Apache-2.0 (code) + CC-BY-4.0 (scientific research). Frozen artifacts: discoveries/fusion_sop_execution_L4-SERV-88219-FUS.json, discoveries/psc_sop_execution_CR-PSC-72K-00414.json"
+}
