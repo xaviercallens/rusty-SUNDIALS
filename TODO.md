@@ -164,3 +164,4 @@
 - [x] Auto-generate and Auto-publish LaTeX benchmark reports for new discoveries.
 - [x] Autonomously Discover and Verify `HamiltonianGraphAttentionIntegrator` achieving 500.0x speedup on xMHD benchmarks.
 - [x] Create formal Lean 4 specification for v8 features (`proofs/lean4/roadmap/v8_serverless_autoresearch.lean`).
+- [x] Implement HPC Exascale Optimization (A100 Tensor Cores & Async Ghost Sensitivities) as experimental v8 feature waiting for peer review.

@@ -124,3 +124,10 @@ path = "cv_advdiff_bnd.rs"
 name = "exp5_fogno_xmhd"
 path = "exp5_fogno_xmhd.rs"
 
+[[example]]
+name = "optimize_photonics"
+path = "optimize_photonics.rs"
+
+[[example]]
+name = "benchmark_a100_hpc"
+path = "benchmark_a100_hpc.rs"

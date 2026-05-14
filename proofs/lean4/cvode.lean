@@ -31,27 +31,23 @@ structure MemBlock (α : Type) where
 
 /-- A safe read from a memory block using C-style integer index. -/
 def memRead? {α : Type} (m : MemBlock α) (i : Index) : Option α :=
-  if h₁ : i < 0 then
+  if i < 0 then
     none
   else
     let n : Nat := Int.toNat i
-    if h₂ : n < m.size then
-      some (m.data.get ⟨n, by
-        -- proof that n < data.size is abstracted by size consistency assumptions
-        -- in concrete developments one would relate `m.size` and `m.data.size`.
-        simpa using h₂
-      ⟩)
+    if n < m.size then
+      m.data[n]?
     else
       none
 
 /-- A safe write to a memory block using C-style integer index. -/
 def memWrite? {α : Type} (m : MemBlock α) (i : Index) (v : α) : Option (MemBlock α) :=
-  if h₁ : i < 0 then
+  if i < 0 then
     none
   else
     let n : Nat := Int.toNat i
-    if h₂ : n < m.size then
-      some { m with data := m.data.set ⟨n, by simpa using h₂⟩ v }
+    if n < m.size then
+      some { m with data := m.data.set! n v }
     else
       none
 
@@ -221,15 +217,13 @@ theorem memRead_oob_none {α} (m : MemBlock α) (i : Index)
   by_cases hneg : i < 0
   · simp [hneg]
   · simp [hneg]
-    have : Int.toNat i < m.size = False := by
-      apply propext
-      constructor
-      · intro hi
-        cases h with
-        | inl hlt => exact (False.elim (hneg hlt))
-        | inr hge => exact (Nat.not_lt_of_ge hge hi)
-      · intro hf
-        exact False.elim hf
-    simp [this]
+    have hge : Int.toNat i ≥ m.size := by
+      cases h with
+      | inl hlt => exact False.elim (hneg hlt)
+      | inr hge_h => exact hge_h
+    have hnotlt : ¬(Int.toNat i < m.size) := Nat.not_lt_of_ge hge
+    simp [hnotlt]
 
 end SUNDIALS.CVODE.Spec
+
+def main : IO Unit := pure ()

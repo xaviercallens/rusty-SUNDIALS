@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/sundials-core", "crates/cvode", "crates/nvector", "examples", "crates/ida"]
+members = ["crates/sundials-core", "crates/cvode", "crates/nvector", "examples", "crates/ida", "crates/benchmarks"]
 resolver = "2"
 
 [workspace.package]

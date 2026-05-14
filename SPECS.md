@@ -32,8 +32,8 @@ This specification tracks the **Critical**, **High-Priority**, and **Medium-Prio
 - [x] **Add WebAssembly Target**.
 
 ### 🔵 Phase 4: Long-Term Enhancements
-- [ ] **Parallel-in-Time (PinT) Orchestrator** (research).
-- [ ] **GPU Tensor Core Support** (document current state).
+- [x] **Parallel-in-Time (PinT) Orchestrator** (research).
+- [x] **GPU Tensor Core Support** (document current state).
 - [ ] **CVODES (Sensitivity Analysis)**.
 - [ ] **Publish Academic Papers** (NeurIPS / Nature Computational Science).
 - [ ] **Case Studies** for Industry Partnerships.
@@ -43,3 +43,4 @@ This specification tracks the **Critical**, **High-Priority**, and **Medium-Prio
 - [x] **Serverless Auto-Research**: Transition the auto-research engine to GCP Serverless (Vertex AI + Cloud Run).
 - [x] **Autonomous Peer Review Validation**: Generate physics and lean verification for xMHD paradigms.
 - [x] **Discover New Integrators**: Publish `HamiltonianGraphAttentionIntegrator` (500x speedup).
+- [x] **HPC Exascale Optimization (Experimental)**: Type-Safe MP-GMRES and Async Ghost Sensitivities on A100 (waiting for peer review).

@@ -1,0 +1,17 @@
+[package]
+name = "benchmarks"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+sundials-core = { path = "../sundials-core" }
+cvode = { path = "../cvode" }
+nvector = { path = "../nvector" }
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "c_vs_rust_suite"
+harness = false

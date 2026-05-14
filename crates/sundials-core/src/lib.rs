@@ -21,6 +21,7 @@ pub mod math;
 pub mod mpir;
 pub mod pinn;
 pub mod sparse;
+pub mod pint;
 
 #[cfg(feature = "experimental")]
 pub mod experimental;

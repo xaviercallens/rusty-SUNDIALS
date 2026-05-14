@@ -1,0 +1,62 @@
+@page {
+    size: A4;
+    margin: 40mm 30mm;
+}
+
+body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 20pt;
+    line-height: 2.2;
+    text-align: justify;
+    color: #000;
+}
+
+h1 {
+    font-size: 32pt;
+    text-align: center;
+    color: #111;
+    margin-top: 2in;
+    margin-bottom: 1in;
+    page-break-before: always;
+}
+
+h2 {
+    font-size: 26pt;
+    color: #222;
+    margin-top: 1.5in;
+    margin-bottom: 0.5in;
+    page-break-before: always;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+}
+
+h3 {
+    font-size: 22pt;
+    color: #333;
+    margin-top: 1in;
+    margin-bottom: 0.5in;
+}
+
+p {
+    margin-bottom: 30px;
+}
+
+ul, ol {
+    margin-bottom: 30px;
+    margin-left: 40px;
+}
+
+li {
+    margin-bottom: 15px;
+}
+
+.math {
+    display: block;
+    text-align: center;
+    font-size: 24pt;
+    margin: 40px 0;
+    font-style: italic;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
