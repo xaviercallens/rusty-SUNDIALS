@@ -22,6 +22,9 @@ pub mod mpir;
 pub mod pinn;
 pub mod sparse;
 
+#[cfg(feature = "experimental")]
+pub mod experimental;
+
 #[cfg(test)]
 mod tests_coverage;
 

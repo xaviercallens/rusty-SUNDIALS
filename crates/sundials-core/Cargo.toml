@@ -8,6 +8,7 @@ description = "Core types for rusty-SUNDIALS: Real, Context, error handling"
 [dependencies]
 
 [features]
+experimental = []
 regenerate-bindings = []
 
 [dev-dependencies]
