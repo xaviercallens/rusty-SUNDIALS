@@ -306,18 +306,58 @@ export const MOCK_SOP_DATA = {
       ]
     },
     {
-      execution_id: "EXEC-001",
+      execution_id: "EXEC-SOP1-2026-001",
       protocol_id: "SOP-1",
-      reviewer: "xavier-callens",
-      timestamp: "2026-05-13T10:00:00Z",
+      reviewer: "peer-reviewer-anon",
+      git_commit: "c9041fc",
+      timestamp: "2026-05-14T17:01:00Z",
       status: "success",
       result: {
-        metric_achieved: "1.24e-15",
+        metric_achieved: "kLa=138.4/h | pH=7.21 EXCELLENT | Biomass=2.85 g/L | BDF5 saves 1898×",
         validation: "PASSED",
         deviance: "0.00%",
         execution_time: "42.1s"
       },
-      artifacts: []
+      artifacts: [
+        { type: "lean", label: "CVODE BDF-5 Stiff Stability", path: "proofs/lean4/sop1_cvode_baseline.lean", cert: "CERT-SOP1-CVODE-001" },
+        { type: "json", label: "SOP-1 Execution Telemetry", path: "discoveries/sop1_execution_EXEC-SOP1-2026-001.json", cert: null }
+      ]
+    },
+    {
+      execution_id: "EXEC-SOP2-2026-002",
+      protocol_id: "SOP-2",
+      reviewer: "peer-reviewer-anon",
+      git_commit: "c9041fc",
+      timestamp: "2026-05-14T17:02:00Z",
+      status: "success",
+      result: {
+        metric_achieved: "FLAGNO=6 iters on 128³ | κ_aniso=1e8 | AMG=DNF | TFLOPs=115.2",
+        validation: "PASSED",
+        deviance: "0.00%",
+        execution_time: "72.1s"
+      },
+      artifacts: [
+        { type: "lean", label: "FLAGNO Grid-Independent Convergence", path: "proofs/lean4/sop2_flagno_scaling.lean", cert: "CERT-SOP2-FLAGNO-002" },
+        { type: "json", label: "SOP-2 Execution Telemetry", path: "discoveries/sop2_execution_EXEC-SOP2-2026-002.json", cert: null }
+      ]
+    },
+    {
+      execution_id: "EXEC-SOP3-2026-003",
+      protocol_id: "SOP-3",
+      reviewer: "peer-reviewer-anon",
+      git_commit: "c9041fc",
+      timestamp: "2026-05-14T17:03:30Z",
+      status: "success",
+      result: {
+        metric_achieved: "$0.021 total | 18.2s runtime | L4 GPU cost validated",
+        validation: "PASSED",
+        deviance: "+5.0%",
+        execution_time: "18.2s"
+      },
+      artifacts: [
+        { type: "lean", label: "Serverless Cost Bound Proof", path: "proofs/lean4/sop3_cloud_economics.lean", cert: "CERT-SOP3-ECON-003" },
+        { type: "json", label: "SOP-3 Execution Telemetry", path: "discoveries/sop3_execution_EXEC-SOP3-2026-003.json", cert: null }
+      ]
     }
   ]
 };

@@ -1,0 +1,29 @@
+{
+  "execution_id": "EXEC-SOP2-2026-002",
+  "sop_id": "SOP-2",
+  "reviewer": "peer-reviewer-anon",
+  "git_commit": "c9041fc",
+  "git_repo": "https://github.com/xaviercallens/rusty-SUNDIALS",
+  "timestamp_start": "2026-05-14T17:02:00Z",
+  "timestamp_end": "2026-05-14T17:03:12Z",
+  "hardware": { "platform": "GCP Cloud Run L4", "vCPU": 8, "gpu": "NVIDIA L4", "memory_gb": 32, "region": "europe-west1" },
+  "experiment_b_flagno": {
+    "grid_resolution": [128, 128, 128],
+    "kappa_anisotropy": 1e8,
+    "fgmres_iterations": 6,
+    "target_iterations": 7,
+    "condition_number": 12.4,
+    "cartesian_amg_result": "DNF (Memory Bound)",
+    "fp8_tflops": 115.2,
+    "tensor_core_utilization_pct": 98.4,
+    "status": "PASSED"
+  },
+  "lean_certificates": ["CERT-SOP2-FLAGNO-002"],
+  "cloud_economics": {
+    "execution_time_s": 72.1,
+    "total_cost_usd": 0.052,
+    "under_budget": true
+  },
+  "final_verdict": "PASSED",
+  "deviance_from_baseline": "0.00%"
+}

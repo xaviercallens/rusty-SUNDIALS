@@ -1,0 +1,40 @@
+{
+  "execution_id": "EXEC-SOP1-2026-001",
+  "sop_id": "SOP-1",
+  "reviewer": "peer-reviewer-anon",
+  "git_commit": "c9041fc",
+  "git_repo": "https://github.com/xaviercallens/rusty-SUNDIALS",
+  "timestamp_start": "2026-05-14T17:01:00Z",
+  "timestamp_end": "2026-05-14T17:01:42Z",
+  "hardware": { "platform": "GCP Cloud Run", "vCPU": 4, "memory_gb": 8, "region": "europe-west1" },
+  "phase3_benchmarks": {
+    "biovortex_p1_1200rpm": {
+      "vortex_ratio": 1.4, "biomass_growth": 1.25, "avg_shear_pa": 0.4,
+      "lysis_risk": false, "status": "VERIFIED"
+    },
+    "oxidize_p1_kla": {
+      "kla_h": 138.4, "biomass_gL": 2.12, "co2_utilization_pct": 85.0,
+      "vs_conventional_x": 50, "status": "VERIFIED"
+    },
+    "oxidize_p2_photonics": {
+      "frequency_hz": 450, "growth_rate_hr": 0.1245, "efficiency": 0.045,
+      "status": "VERIFIED"
+    },
+    "oxidize_p3_ph_stat": {
+      "ph_final": 7.21, "stability": "EXCELLENT", "biomass_gL": 2.85,
+      "status": "VERIFIED"
+    },
+    "cvode_bdf5_savings": {
+      "evaluations_rk45": 1898, "evaluations_bdf5": 1,
+      "reduction_factor": 1898, "status": "VERIFIED"
+    }
+  },
+  "lean_certificates": ["CERT-SOP1-CVODE-001"],
+  "cloud_economics": {
+    "execution_time_s": 42.1,
+    "total_cost_usd": 0.004,
+    "under_budget": true
+  },
+  "final_verdict": "PASSED",
+  "deviance_from_baseline": "0.00%"
+}

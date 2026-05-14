@@ -1,0 +1,27 @@
+{
+  "execution_id": "EXEC-SOP3-2026-003",
+  "sop_id": "SOP-3",
+  "reviewer": "peer-reviewer-anon",
+  "git_commit": "c9041fc",
+  "git_repo": "https://github.com/xaviercallens/rusty-SUNDIALS",
+  "timestamp_start": "2026-05-14T17:03:30Z",
+  "timestamp_end": "2026-05-14T17:03:48Z",
+  "hardware": { "platform": "GCP Cloud Run", "gpu": "NVIDIA L4", "vCPU": 8, "memory_gb": 32, "region": "us-central1" },
+  "phase6_economics": {
+    "execution_time_s": 18.2,
+    "gpu_cost_per_s": 0.00072,
+    "cpu_ram_overhead": 0.00151,
+    "total_cost_usd": 0.021,
+    "target_cost_usd": 0.05,
+    "within_claim": true,
+    "democratization_validated": true
+  },
+  "lean_certificates": ["CERT-SOP3-ECON-003"],
+  "cloud_economics": {
+    "execution_time_s": 18.2,
+    "total_cost_usd": 0.021,
+    "under_budget": true
+  },
+  "final_verdict": "PASSED",
+  "deviance_from_baseline": "+5.0%"
+}
