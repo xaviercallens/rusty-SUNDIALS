@@ -1,8 +1,59 @@
+# Build artifacts
 /target
+target/
 Cargo.lock
+dist/
+build/
+
+# Editor / OS
 *.swp
 *.swo
 .DS_Store
-target/
-Cargo.lock
+.idea/
+.vscode/settings.json
+
+# ==========================================
+# SECRETS — NEVER COMMIT
+# ==========================================
+# Environment variable files (all variants)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+*.env
+
+# GCP / Google Cloud credentials
+service-account*.json
+*-service-account.json
+credentials*.json
+application_default_credentials.json
+gcloud-key*.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# SSH keys
+id_rsa
+id_ecdsa
+id_ed25519
+*.pub.secret
+
+# API key / token files
 secrets/
+.secrets/
+secret.txt
+token.txt
+*.token
+
+# Node / frontend
+node_modules/
+mission-control/node_modules/
+mission-control/dist/
+mission-control/.env
+mission-control/.env.local
+mission-control/.env.*.local
+

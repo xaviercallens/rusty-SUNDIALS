@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# ============================================================
+# rusty-SUNDIALS — Pre-commit Secret Scanner
+# Blocks commits containing hardcoded secrets or credentials.
+# Install: cp .githooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# ============================================================
+
+set -euo pipefail
+
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+echo "🔒 [pre-commit] Scanning staged files for secrets..."
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)
+
+if [ -z "$STAGED" ]; then
+  echo -e "${GREEN}✓ No staged files.${NC}"
+  exit 0
+fi
+
+FAIL=0
+
+# ---- Pattern list --------------------------------------------------------
+declare -a PATTERNS=(
+  # GCP / Google API keys
+  'AIza[0-9A-Za-z\-_]{35}'
+  'ya29\.[0-9A-Za-z\-_]+'
+  '[0-9]{12}-[a-z0-9]{32}\.apps\.googleusercontent\.com'
+  # GitHub tokens
+  'ghp_[0-9a-zA-Z]{36}'
+  'ghs_[0-9a-zA-Z]{36}'
+  'github_pat_[a-zA-Z0-9_]{82}'
+  # Generic secrets / passwords
+  'password\s*=\s*["\x27][^"\x27]{6,}'
+  'passwd\s*=\s*["\x27][^"\x27]{6,}'
+  'secret\s*=\s*["\x27][^"\x27]{8,}'
+  # Private key headers
+  '-----BEGIN (RSA|EC|OPENSSH|PGP) PRIVATE KEY-----'
+  # AWS
+  'AKIA[0-9A-Z]{16}'
+  # Stripe
+  'sk_live_[0-9a-zA-Z]{24}'
+  # Anthropic
+  'sk-ant-[0-9a-zA-Z\-_]{90,}'
+)
+# ---- Allowlist (safe false-positive patterns) ----------------------------
+declare -a ALLOWLIST=(
+  '\.env\.example'
+  'VITE_GOOGLE_CLIENT_ID='
+  'import\.meta\.env\.'
+  '#.*token'
+  'mc_token'
+  'getToken'
+  'Bearer.*\${'
+  'js-tokens'
+  'css-tokenizer'
+)
+
+build_allowlist_grep() {
+  local args=()
+  for pat in "${ALLOWLIST[@]}"; do
+    args+=(-e "$pat")
+  done
+  echo "${args[@]}"
+}
+
+for FILE in $STAGED; do
+  # Skip binary files and gitignored paths
+  [ -f "$FILE" ] || continue
+  if git check-ignore -q "$FILE" 2>/dev/null; then continue; fi
+
+  CONTENT=$(git show ":$FILE" 2>/dev/null || true)
+  [ -z "$CONTENT" ] && continue
+
+  for PAT in "${PATTERNS[@]}"; do
+    MATCHES=$(echo "$CONTENT" | grep -P "$PAT" 2>/dev/null || true)
+    if [ -n "$MATCHES" ]; then
+      # Run through allowlist filter
+      FILTERED=$(echo "$MATCHES" | grep -vP "$(IFS='|'; echo "${ALLOWLIST[*]}")" 2>/dev/null || true)
+      if [ -n "$FILTERED" ]; then
+        echo -e "${RED}❌ SECRET DETECTED in: $FILE${NC}"
+        echo -e "${YELLOW}   Pattern: $PAT${NC}"
+        echo "$FILTERED" | head -3 | sed 's/^/   /'
+        FAIL=1
+      fi
+    fi
+  done
+done
+
+if [ "$FAIL" -eq 1 ]; then
+  echo ""
+  echo -e "${RED}🚫 Commit BLOCKED. Remove secrets and use environment variables.${NC}"
+  echo -e "   See: mission-control/.env.example"
+  echo -e "   Docs: https://12factor.net/config"
+  exit 1
+fi
+
+echo -e "${GREEN}✓ No secrets detected. Commit allowed.${NC}"
+exit 0

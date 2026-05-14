@@ -1,7 +1,16 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-const GOOGLE_CLIENT_ID = '1003063861791-gdun1ecne4v4j67eo3k4i88498nkdefs.apps.googleusercontent.com';
-const ADMIN_EMAIL = 'callensxavier@gmail.com';
+// These values MUST be set as environment variables.
+// See mission-control/.env.example — never hardcode secrets in source.
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const ADMIN_EMAIL      = import.meta.env.VITE_ADMIN_EMAIL;
+
+if (!GOOGLE_CLIENT_ID) {
+  console.warn('[useAuth] VITE_GOOGLE_CLIENT_ID is not set. Copy .env.example to .env.local and fill in values.');
+}
+if (!ADMIN_EMAIL) {
+  console.warn('[useAuth] VITE_ADMIN_EMAIL is not set.');
+}
 
 const AuthContext = createContext({
   role: 'guest', email: '', token: null, loading: true,
