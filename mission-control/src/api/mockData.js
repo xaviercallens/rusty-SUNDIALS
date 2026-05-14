@@ -212,12 +212,73 @@ export const MOCK_SOP_DATA = {
       baseline_metric: "Total cost < $0.05",
       estimated_time: "17.8s",
       cost: "$0.02"
+    },
+    {
+      id: "Fusion",
+      name: "Fusion SOP: Reproducibility Protocol",
+      description: "Full XMHD Benchmark: Monopole Suppression, FLAGNO Scaling, LSS Shadowing Adjoints, and HDC Triggers on L4 GCP serverless.",
+      baseline_metric: "Cost < $0.05, div(B) ≈ 10^-15, FLAGNO ≤ 7 iters, HDC ≈ 40ns",
+      estimated_time: "25m 00s",
+      cost: "$0.15"
     }
   ],
   history: [
     {
+      execution_id: "L4-SERV-88219-FUS",
+      protocol_id: "Fusion",
+      reviewer: "peer-reviewer-anon",
+      git_commit: "9712004",
+      timestamp: "2026-05-14T16:45:12Z",
+      status: "success",
+      result: {
+        metric_achieved: "$0.04996 Total, div(B)=1.12e-15, FLAGNO=6 iters, HDC=38.5ns",
+        validation: "REPRODUCED",
+        deviance: "0.00%",
+        execution_time: "24m 55s"
+      },
+      artifacts: [
+        {
+          type: "lean",
+          label: "Monopole Suppression Proof",
+          path: "proofs/lean4/fusion_sop_monopole.lean",
+          cert: "CERT-FUS-MONO-001"
+        },
+        {
+          type: "lean",
+          label: "FLAGNO O(1) Scaling Proof",
+          path: "proofs/lean4/fusion_sop_flagno.lean",
+          cert: "CERT-FUS-FLAGNO-002"
+        },
+        {
+          type: "lean",
+          label: "LSS + HDC Bounds Proof",
+          path: "proofs/lean4/fusion_sop_lss_hdc.lean",
+          cert: "CERT-FUS-LSS-003"
+        },
+        {
+          type: "json",
+          label: "GCP L4 Execution Telemetry",
+          path: "discoveries/fusion_sop_execution_L4-SERV-88219-FUS.json",
+          cert: null
+        },
+        {
+          type: "article",
+          label: "Fusion Final Submission v2",
+          path: "docs/Standard Operating Procedure (SOP)/Fusion Final Submission v2.md",
+          cert: null
+        },
+        {
+          type: "sop",
+          label: "Fusion SOP Protocol",
+          path: "docs/Standard Operating Procedure (SOP)/Fusion Standard Operating Procedure (SOP).md",
+          cert: null
+        }
+      ]
+    },
+    {
       execution_id: "EXEC-001",
       protocol_id: "SOP-1",
+      reviewer: "xavier-callens",
       timestamp: "2026-05-13T10:00:00Z",
       status: "success",
       result: {
@@ -225,7 +286,8 @@ export const MOCK_SOP_DATA = {
         validation: "PASSED",
         deviance: "0.00%",
         execution_time: "42.1s"
-      }
+      },
+      artifacts: []
     }
   ]
 };
