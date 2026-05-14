@@ -29,7 +29,8 @@ async function request(path, options = {}) {
     let result = { metric_achieved: "1.1e-15", validation: "PASSED", deviance: "0.00%", execution_time: "40.5s" };
     if (protocol_id === 'SOP-2') result = { metric_achieved: "6 Iterations", validation: "PASSED", deviance: "0.00%", execution_time: "72.1s" };
     if (protocol_id === 'SOP-3') result = { metric_achieved: "$0.021", validation: "PASSED", deviance: "+5.0%", execution_time: "18.2s" };
-    if (protocol_id === 'Fusion') result = { metric_achieved: "$0.14 Total, div(B)=1.1e-15, FLAGNO=6", validation: "REPRODUCED", deviance: "0.00%", execution_time: "24m 45s" };
+    if (protocol_id === 'Fusion') result = { metric_achieved: "$0.04996 Total, div(B)=1.12e-15, FLAGNO=6", validation: "REPRODUCED", deviance: "0.00%", execution_time: "24m 55s" };
+    if (protocol_id === 'PSC') result = { metric_achieved: "72,000 t CO₂/km²/yr | kLa=310/h | M-77 kcat=8.2 Sco=210 | Cost=$0.148", validation: "REPRODUCED", deviance: "0.00%", execution_time: "1m 32.1s" };
     return {
       execution_id: `EXEC-${Math.floor(Math.random()*1000)}`,
       protocol_id,

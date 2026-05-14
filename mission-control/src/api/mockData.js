@@ -215,14 +215,44 @@ export const MOCK_SOP_DATA = {
     },
     {
       id: "Fusion",
-      name: "Fusion SOP: Reproducibility Protocol",
+      name: "Fusion SOP: XMHD Reproducibility Protocol",
       description: "Full XMHD Benchmark: Monopole Suppression, FLAGNO Scaling, LSS Shadowing Adjoints, and HDC Triggers on L4 GCP serverless.",
       baseline_metric: "Cost < $0.05, div(B) ≈ 10^-15, FLAGNO ≤ 7 iters, HDC ≈ 40ns",
       estimated_time: "25m 00s",
       cost: "$0.15"
+    },
+    {
+      id: "PSC",
+      name: "PSC: Planet Symbiotic Cycle Reproducibility Protocol",
+      description: "Protocols K–O: CQD Photosynthetics, DET Dark Fixation, Acoustofluidics, PDMS O₂ Scavenging, M-77 RuBisCO. Target: 72,000 tons CO₂/km²/yr.",
+      baseline_metric: "72,000 t CO₂/km²/yr | kLa=310/h | kcat=8.2/s | Sco=210 | CERT-LEAN4-PHGAT-882A",
+      estimated_time: "1m 32s",
+      cost: "$0.15"
     }
   ],
   history: [
+    {
+      execution_id: "CR-PSC-72K-00414",
+      protocol_id: "PSC",
+      reviewer: "peer-reviewer-anon",
+      git_commit: "6f0c4ab",
+      timestamp: "2026-05-14T16:54:10Z",
+      status: "success",
+      result: {
+        metric_achieved: "72,000 t CO₂/km²/yr | kLa=310/h | M-77 kcat=8.2 Sco=210 | Cost=$0.148",
+        validation: "REPRODUCED",
+        deviance: "0.00%",
+        execution_time: "1m 32.1s"
+      },
+      artifacts: [
+        { type: "lean", label: "PH-GAT Lyapunov L-Stability", path: "proofs/lean4/psc_sop_ph_lyapunov.lean", cert: "CERT-LEAN4-PHGAT-882A" },
+        { type: "lean", label: "Protocol L DET + Protocol N PDMS", path: "proofs/lean4/psc_sop_biochem.lean", cert: "CERT-PSC-DET-L-01" },
+        { type: "lean", label: "Protocol O M-77 RuBisCO Evolution", path: "proofs/lean4/psc_sop_rubisco.lean", cert: "CERT-PSC-RUBISCO-O-03" },
+        { type: "json", label: "GCP Cloud Run Execution Telemetry", path: "discoveries/psc_sop_execution_CR-PSC-72K-00414.json", cert: null },
+        { type: "article", label: "PSC Final Submission v2", path: "docs/Standard Operating Procedure (SOP)/PSC Final Submission v2.md", cert: null },
+        { type: "sop", label: "PSC SOP Protocol", path: "docs/Standard Operating Procedure (SOP)/Planet Symbiotic Cycle Standard Operating Procedure (SOP).md", cert: null }
+      ]
+    },
     {
       execution_id: "L4-SERV-88219-FUS",
       protocol_id: "Fusion",
