@@ -138,3 +138,51 @@ export const MOCK_REPORT = {
   generated_at: new Date().toISOString(),
   elapsed_ms: 1245
 };
+
+export const MOCK_VERIFICATION = {
+  total_proofs: 4,
+  proved: 4,
+  failed: 0,
+  pending: 0,
+  pass_rate: 100,
+  timestamp: new Date().toISOString(),
+  elapsed_ms: 7340,
+  proofs: [
+    {
+      theorem: "theorem hpc_tensor_core_precision (a100 : GPU)",
+      module: "hpc_exascale.lean",
+      status: "proved",
+      evidence: "Verified precision bound ≤ 10⁻⁶",
+      certificate: "CERT-A100-8891",
+      time_ms: 1250,
+      lean4: "theorem hpc_tensor_core_precision (a100 : GPU) : \\n  ∀ t, error (tensor_gmres a100 t) ≤ 1e-6 := by\\n  apply tensor_error_bound\\n  exact hpc_precision_axioms"
+    },
+    {
+      theorem: "theorem kalundborg_topology_valid (eip : SymbioticFactory)",
+      module: "global_eip_safety.lean",
+      status: "proved",
+      evidence: "Verified Zero-Waste cascade topology",
+      certificate: "CERT-EIP-414",
+      time_ms: 840,
+      lean4: "theorem kalundborg_topology_valid (eip : SymbioticFactory) :\\n  is_zero_waste (eip) ∧ valid_cascade (eip) := by\\n  apply thermodynamic_cascade\\n  exact eip_graph_theory"
+    },
+    {
+      theorem: "theorem earth_twin_drawdown_bounds (planet : Earth)",
+      module: "planetary_geo.lean",
+      status: "proved",
+      evidence: "Verified Net-Negative Carbon Flow",
+      certificate: "CERT-GEO-992",
+      time_ms: 2150,
+      lean4: "theorem earth_twin_drawdown_bounds (planet : Earth) :\\n  carbon_flow (planet.atmosphere) < 0 := by\\n  apply navier_stokes_drawdown\\n  exact coastal_desert_optima"
+    },
+    {
+      theorem: "theorem iter_gyrokinetic_stability (plasma : Fusion)",
+      module: "iter_phase3.lean",
+      status: "proved",
+      evidence: "Verified Tensor-Train Phase-Space bounds",
+      certificate: "CERT-FUS-110",
+      time_ms: 3100,
+      lean4: "theorem iter_gyrokinetic_stability (plasma : Fusion) :\\n  is_stable (tensor_train plasma) := by\\n  apply lyapunov_stability\\n  exact mhd_bounds"
+    }
+  ]
+};

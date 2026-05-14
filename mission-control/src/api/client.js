@@ -8,7 +8,7 @@ function getToken() {
   return localStorage.getItem('mc_token') || '';
 }
 
-import { MOCK_RESULTS, MOCK_REPORT } from './mockData';
+import { MOCK_RESULTS, MOCK_REPORT, MOCK_VERIFICATION } from './mockData';
 
 async function request(path, options = {}) {
   // MOCK DATA FALLBACK FOR SERVERLESS DEPLOYMENT
@@ -17,6 +17,9 @@ async function request(path, options = {}) {
   }
   if (path === '/api/report' || path === '/api/report/generate') {
     return MOCK_REPORT;
+  }
+  if (path === '/api/verification' || path === '/api/verify') {
+    return MOCK_VERIFICATION;
   }
   if (path === '/kalundborg') return MOCK_RESULTS.kalundborg;
   if (path === '/hpc_exascale') return MOCK_RESULTS.hpc_exascale;
