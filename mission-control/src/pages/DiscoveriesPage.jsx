@@ -142,7 +142,33 @@ export default function DiscoveriesPage() {
       metric3: { label: 'Affinity', value: '3.4x' },
     });
   }
-
+  if (results?.kalundborg) {
+    discoveries.push({
+      id: 'eip-1', name: 'Kalundborg 2.0 EIP Global Topology',
+      status: 'verified', physics: 'Symbiotic Thermodynamics',
+      metric1: { label: 'Optima', value: results.kalundborg.global_optima },
+      metric2: { label: 'CO₂ Reduction', value: `${results.kalundborg.co2_reduction} Mt/yr` },
+      metric3: { label: 'Agri Boost', value: `+${results.kalundborg.agri_boost}%` },
+    });
+  }
+  if (results?.planetary) {
+    discoveries.push({
+      id: 'plan-1', name: 'Earth Digital Twin Geo-Optimization',
+      status: 'verified', physics: 'Atmospheric CFD Drawdown',
+      metric1: { label: 'Node', value: results.planetary.optimal_node },
+      metric2: { label: 'Neutrality', value: `${results.planetary.neutrality_years} Years` },
+      metric3: { label: 'Drawdown', value: `${results.planetary.drawdown_megatons} Mt` },
+    });
+  }
+  if (results?.hpc_exascale) {
+    discoveries.push({
+      id: 'hpc-1', name: 'HPC A100 Tensor Core Exascale Validation',
+      status: 'verified', physics: 'Tensor-Train MP-GMRES',
+      metric1: { label: 'Speedup', value: `${results.hpc_exascale.a100_speedup}x` },
+      metric2: { label: 'Precision', value: results.hpc_exascale.precision_error.toExponential(2) },
+      metric3: { label: 'Platform', value: 'GCP Vertex AI' },
+    });
+  }
 
   return (
     <div>

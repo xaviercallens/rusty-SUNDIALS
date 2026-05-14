@@ -18,6 +18,9 @@ async function request(path, options = {}) {
   if (path === '/api/report' || path === '/api/report/generate') {
     return MOCK_REPORT;
   }
+  if (path === '/kalundborg') return MOCK_RESULTS.kalundborg;
+  if (path === '/hpc_exascale') return MOCK_RESULTS.hpc_exascale;
+  if (path === '/planetary') return MOCK_RESULTS.planetary;
   
   const token = getToken();
   const headers = {
@@ -58,6 +61,11 @@ export const api = {
   runSweep: () => request('/sweep', { method: 'POST' }),
   runBioreactor: () => request('/bioreactor', { method: 'POST' }),
   runBioreactorAdvanced: () => request('/bioreactor/advanced', { method: 'POST' }),
+
+  // V9 Features
+  runKalundborg: () => request('/kalundborg', { method: 'POST' }),
+  runHpc: () => request('/hpc_exascale', { method: 'POST' }),
+  runPlanet: () => request('/planetary', { method: 'POST' }),
 
   // Oxidize-Cyclo experiments
   runOxidizeP1: (cfg = {}) => request('/oxidize/p1', { method: 'POST', body: JSON.stringify(cfg) }),

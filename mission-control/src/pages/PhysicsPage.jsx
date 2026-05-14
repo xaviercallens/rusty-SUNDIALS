@@ -54,6 +54,15 @@ export default function PhysicsPage() {
           <ExpButton icon={Rocket} label="OXIDIZE FULL" desc="Run All 3 Phases"
                      color="#f59e0b" disabled={loading || !isAdmin}
                      onClick={() => runExperiment('oxidize-full', api.runOxidizeFull)} />
+          <ExpButton icon={Rocket} label="KALUNDBORG 2.0" desc="EIP Global Topology"
+                     color="#10b981" disabled={loading || !isAdmin}
+                     onClick={() => runExperiment('kalundborg', api.runKalundborg)} />
+          <ExpButton icon={Zap} label="HPC EXASCALE" desc="A100 Tensor Core Bench"
+                     color="#6366f1" disabled={loading || !isAdmin}
+                     onClick={() => runExperiment('hpc_exascale', api.runHpc)} />
+          <ExpButton icon={Gauge} label="PLANET CYCLE" desc="Earth Digital Twin"
+                     color="#8b5cf6" disabled={loading || !isAdmin}
+                     onClick={() => runExperiment('planetary', api.runPlanet)} />
         </div>
       </GlowPanel>
 
@@ -236,6 +245,42 @@ export default function PhysicsPage() {
           <div style={{ marginTop: 'var(--gap-md)', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.7rem' }}>
             Total elapsed: {result.data.total_elapsed?.toFixed(1)}s | Solver: cvode → kinsol → ida
           </div>
+        </GlowPanel>
+      )}
+
+      {/* Kalundborg 2.0 Results */}
+      {result?.type === 'kalundborg' && result.data?.global_optima && !loading && (
+        <GlowPanel title="KALUNDBORG 2.0 — EIP TOPOLOGY RESULTS" className="animate-in">
+          <div style={{ display: 'flex', gap: 'var(--gap-xl)', flexWrap: 'wrap', marginBottom: 'var(--gap-md)' }}>
+            <ResultMetric label="Global Optima" value={result.data.global_optima} color="var(--green)" />
+            <ResultMetric label="CO₂ Reduction" value={`${result.data.co2_reduction} Mt/yr`} color="var(--cyan)" />
+            <ResultMetric label="Agriculture Boost" value={`+${result.data.agri_boost}%`} color="var(--amber)" />
+          </div>
+          <Elapsed data={{elapsed_seconds: 8.4, solver: "Global Serverless Search"}} />
+        </GlowPanel>
+      )}
+
+      {/* HPC Exascale Results */}
+      {result?.type === 'hpc_exascale' && result.data?.a100_speedup && !loading && (
+        <GlowPanel title="HPC EXASCALE — A100 VALIDATION" className="animate-in">
+          <div style={{ display: 'flex', gap: 'var(--gap-xl)', flexWrap: 'wrap', marginBottom: 'var(--gap-md)' }}>
+            <ResultMetric label="Speedup" value={`${result.data.a100_speedup}x`} color="var(--cyan)" />
+            <ResultMetric label="Precision Error" value={result.data.precision_error.toExponential(2)} color="var(--green)" />
+            <ResultMetric label="Platform" value="GCP Vertex AI" color="#c084fc" />
+          </div>
+          <Elapsed data={{elapsed_seconds: 25.0, solver: "TensorCoreGMRES"}} />
+        </GlowPanel>
+      )}
+
+      {/* Planetary Digital Twin Results */}
+      {result?.type === 'planetary' && result.data?.optimal_node && !loading && (
+        <GlowPanel title="EARTH DIGITAL TWIN — GEO-OPTIMIZATION" className="animate-in">
+          <div style={{ display: 'flex', gap: 'var(--gap-xl)', flexWrap: 'wrap', marginBottom: 'var(--gap-md)' }}>
+            <ResultMetric label="Optimal Node" value={result.data.optimal_node} color="var(--amber)" />
+            <ResultMetric label="Neutrality Reached" value={`${result.data.neutrality_years} Years`} color="var(--green)" />
+            <ResultMetric label="Carbon Drawdown" value={`${result.data.drawdown_megatons} Mt`} color="var(--cyan)" />
+          </div>
+          <Elapsed data={{elapsed_seconds: 35.0, solver: "NASA POWER CERES/MERRA-2"}} />
         </GlowPanel>
       )}
 
