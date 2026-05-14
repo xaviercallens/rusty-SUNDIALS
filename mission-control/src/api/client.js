@@ -8,7 +8,7 @@ function getToken() {
   return localStorage.getItem('mc_token') || '';
 }
 
-import { MOCK_RESULTS, MOCK_REPORT, MOCK_VERIFICATION } from './mockData';
+import { MOCK_RESULTS, MOCK_REPORT, MOCK_VERIFICATION, MOCK_SOP_DATA } from './mockData';
 
 async function request(path, options = {}) {
   // MOCK DATA FALLBACK FOR SERVERLESS DEPLOYMENT
@@ -20,6 +20,22 @@ async function request(path, options = {}) {
   }
   if (path === '/api/verification' || path === '/api/verify') {
     return MOCK_VERIFICATION;
+  }
+  if (path === '/api/sop') {
+    return MOCK_SOP_DATA;
+  }
+  if (path === '/api/sop/execute') {
+    const { protocol_id } = options.body ? JSON.parse(options.body) : {};
+    let result = { metric_achieved: "1.1e-15", validation: "PASSED", deviance: "0.00%", execution_time: "40.5s" };
+    if (protocol_id === 'SOP-2') result = { metric_achieved: "6 Iterations", validation: "PASSED", deviance: "0.00%", execution_time: "72.1s" };
+    if (protocol_id === 'SOP-3') result = { metric_achieved: "$0.021", validation: "PASSED", deviance: "+5.0%", execution_time: "18.2s" };
+    return {
+      execution_id: `EXEC-${Math.floor(Math.random()*1000)}`,
+      protocol_id,
+      timestamp: new Date().toISOString(),
+      status: "success",
+      result
+    };
   }
   if (path === '/kalundborg') return MOCK_RESULTS.kalundborg;
   if (path === '/hpc_exascale') return MOCK_RESULTS.hpc_exascale;
@@ -81,6 +97,10 @@ export const api = {
   runVerification: () => request('/api/verify', { method: 'POST' }),
   getReport: () => request('/api/report'),
   generateReport: () => request('/api/report/generate', { method: 'POST' }),
+
+  // SOP Reproducibility
+  getSopData: () => request('/api/sop'),
+  executeSop: (protocol_id) => request('/api/sop/execute', { method: 'POST', body: JSON.stringify({ protocol_id }) }),
 };
 
 export default api;

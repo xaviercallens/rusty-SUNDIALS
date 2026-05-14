@@ -13,6 +13,7 @@ import LeaderboardPage from './pages/LeaderboardPage';
 import EducationPage from './pages/EducationPage';
 import CostPage from './pages/CostPage';
 import SettingsPage from './pages/SettingsPage';
+import SopPage from './pages/SopPage';
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/docs" element={<DocsPage />} />
                 <Route path="/leaderboard" element={<LeaderboardPage />} />
+                <Route path="/sop" element={<SopPage />} />
               </Routes>
             </main>
           </div>

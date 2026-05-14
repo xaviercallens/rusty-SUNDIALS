@@ -186,3 +186,46 @@ export const MOCK_VERIFICATION = {
     }
   ]
 };
+
+export const MOCK_SOP_DATA = {
+  protocols: [
+    {
+      id: "SOP-1",
+      name: "Phase 5A: Monopole Suppression & Gauge Invariance",
+      description: "Validates that continuous decoding mapping does not violate div(B)=0.",
+      baseline_metric: "Max |div(B)| ≈ 10^-15",
+      estimated_time: "45s",
+      cost: "$0.02"
+    },
+    {
+      id: "SOP-2",
+      name: "Phase 5B: FLAGNO Preconditioning O(1) Scaling",
+      description: "Tests Field-Aligned Graph Network against Cartesian AMG.",
+      baseline_metric: "FGMRES Iterations <= 7 at 128^3",
+      estimated_time: "1m 15s",
+      cost: "$0.05"
+    },
+    {
+      id: "SOP-3",
+      name: "Phase 6: Cloud Economics Verification",
+      description: "Validates Exascale inference runs on 5-cent web microservices (L4 GPU).",
+      baseline_metric: "Total cost < $0.05",
+      estimated_time: "17.8s",
+      cost: "$0.02"
+    }
+  ],
+  history: [
+    {
+      execution_id: "EXEC-001",
+      protocol_id: "SOP-1",
+      timestamp: "2026-05-13T10:00:00Z",
+      status: "success",
+      result: {
+        metric_achieved: "1.24e-15",
+        validation: "PASSED",
+        deviance: "0.00%",
+        execution_time: "42.1s"
+      }
+    }
+  ]
+};
