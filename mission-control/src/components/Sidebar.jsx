@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, GitBranch, Lightbulb, ShieldCheck,
-  FlaskConical, FileText, DollarSign, Settings
+  FlaskConical, FileText, DollarSign, Settings, BookOpen, Trophy
 } from 'lucide-react';
 
 const navItems = [
@@ -11,6 +11,8 @@ const navItems = [
   { to: '/verification', icon: ShieldCheck, label: 'Verify' },
   { to: '/physics', icon: FlaskConical, label: 'Physics' },
   { to: '/publications', icon: FileText, label: 'Publish' },
+  { to: '/docs', icon: BookOpen, label: 'Docs' },
+  { to: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
   { to: '/education', icon: Lightbulb, label: 'Media' },
   { to: '/cost', icon: DollarSign, label: 'Cost' },
   { to: '/settings', icon: Settings, label: 'Config' },

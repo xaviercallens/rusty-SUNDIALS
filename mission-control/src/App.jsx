@@ -8,6 +8,8 @@ import DiscoveriesPage from './pages/DiscoveriesPage';
 import VerificationPage from './pages/VerificationPage';
 import PhysicsPage from './pages/PhysicsPage';
 import PublicationsPage from './pages/PublicationsPage';
+import DocsPage from './pages/DocsPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import EducationPage from './pages/EducationPage';
 import CostPage from './pages/CostPage';
 import SettingsPage from './pages/SettingsPage';
@@ -31,6 +33,8 @@ export default function App() {
                 <Route path="/education" element={<EducationPage />} />
                 <Route path="/cost" element={<CostPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/docs" element={<DocsPage />} />
+                <Route path="/leaderboard" element={<LeaderboardPage />} />
               </Routes>
             </main>
           </div>
