@@ -46,9 +46,10 @@ export default function DashboardPage() {
       <div className="page-header">
         <h2>MISSION DASHBOARD</h2>
         <button className="btn btn-primary" onClick={handleRunBioreactor}
-                disabled={loading || !isAdmin}>
+                disabled={loading || !isAdmin}
+                style={{ opacity: (!isAdmin || loading) ? 0.5 : 1, cursor: (!isAdmin || loading) ? 'not-allowed' : 'pointer' }}>
           <Play size={14} />
-          {loading ? 'EXECUTING...' : 'RUN BIO-VORTEX P1'}
+          {loading ? 'EXECUTING...' : !isAdmin ? 'RUN BIO-VORTEX P1 (Admin Only)' : 'RUN BIO-VORTEX P1'}
         </button>
       </div>
 

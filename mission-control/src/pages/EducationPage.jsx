@@ -93,8 +93,8 @@ export default function EducationPage() {
                     {info.score}
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button className="btn btn-outline" title="Share"><Share2 size={12} /></button>
-                    <button className="btn btn-outline" title="Download HD"><Download size={12} /></button>
+                    <button className="btn btn-outline" title="Share (Unavailable)" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}><Share2 size={12} /></button>
+                    <button className="btn btn-outline" title="Download HD (Unavailable)" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}><Download size={12} /></button>
                   </div>
                 </div>
               </div>
@@ -126,8 +126,8 @@ export default function EducationPage() {
                       {info.score}
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button className="btn btn-outline" title="Share"><Share2 size={12} /></button>
-                      <button className="btn btn-outline" title="Download HD"><Download size={12} /></button>
+                      <button className="btn btn-outline" title="Share (Unavailable)" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}><Share2 size={12} /></button>
+                      <button className="btn btn-outline" title="Download HD (Unavailable)" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}><Download size={12} /></button>
                     </div>
                   </div>
                 </div>
@@ -164,12 +164,12 @@ export default function EducationPage() {
             <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid var(--border-dim)' }}>
               <h4 style={{ color: 'var(--text-primary)', margin: '0 0 8px 0' }}>"How AI is Breaking the Photosynthesis Limit"</h4>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', margin: 0 }}>Auto-generated Medium article explaining Protocol K's quantum dot upconversion to a general audience. Estimated read time: 4 mins.</p>
-              <button className="btn btn-outline" style={{ marginTop: 12 }}><Share2 size={12} /> Publish to Medium</button>
+              <button className="btn btn-outline" disabled style={{ marginTop: 12, opacity: 0.5, cursor: 'not-allowed' }}><Share2 size={12} /> Publish to Medium (Unavailable)</button>
             </div>
             <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid var(--border-dim)' }}>
               <h4 style={{ color: 'var(--text-primary)', margin: '0 0 8px 0' }}>"SymbioticFactory Shatters Classical CCU Ceilings"</h4>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', margin: 0 }}>Press release targeting climate-tech journalists. Focuses on the 14,000 tons/km² yield breakthrough.</p>
-              <button className="btn btn-outline" style={{ marginTop: 12 }}><Share2 size={12} /> Distribute to Wire</button>
+              <button className="btn btn-outline" disabled style={{ marginTop: 12, opacity: 0.5, cursor: 'not-allowed' }}><Share2 size={12} /> Distribute to Wire (Unavailable)</button>
             </div>
           </div>
         </GlowPanel>

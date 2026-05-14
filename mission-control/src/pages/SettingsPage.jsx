@@ -25,7 +25,7 @@ export default function SettingsPage() {
           <SettingRow label="Slack Webhook" value="Not configured" icon={<Bell size={14}/>} />
         </GlowPanel>
       </div>
-      <div style={{marginTop:'var(--gap-lg)'}}><button className="btn btn-primary"><Save size={14}/> SAVE CONFIGURATION</button></div>
+      <div style={{marginTop:'var(--gap-lg)'}}><button className="btn btn-primary" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}><Save size={14}/> SAVE CONFIGURATION (Unavailable)</button></div>
     </div>
   );
 }

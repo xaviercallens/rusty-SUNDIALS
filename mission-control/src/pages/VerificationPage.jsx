@@ -13,7 +13,7 @@ export default function VerificationPage() {
 
   useEffect(() => {
     api.getVerification()
-      .then(d => { if (!d.status) setData(d); setLoading(false); })
+      .then(d => { if (d && !d.error && !d.status?.includes('error')) setData(d); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
@@ -37,8 +37,9 @@ export default function VerificationPage() {
       <div className="page-header">
         <h2>FORMAL VERIFICATION CONSOLE</h2>
         <button className="btn btn-primary" onClick={runVerify}
-                disabled={running || !isAdmin}>
-          {running ? <><RefreshCw size={14} className="spin" /> VERIFYING...</> : <><Play size={14} /> RUN LEAN 4 VERIFICATION</>}
+                disabled={running || !isAdmin}
+                style={{ opacity: (!isAdmin || running) ? 0.5 : 1, cursor: (!isAdmin || running) ? 'not-allowed' : 'pointer' }}>
+          {running ? <><RefreshCw size={14} className="spin" /> VERIFYING...</> : <><Play size={14} /> RUN LEAN 4 VERIFICATION {(!isAdmin) && '(Admin Only)'}</>}
         </button>
       </div>
 

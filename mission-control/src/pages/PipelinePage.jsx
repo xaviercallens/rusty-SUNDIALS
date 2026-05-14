@@ -16,7 +16,7 @@ export default function PipelinePage() {
     <div>
       <div className="page-header">
         <h2>PIPELINE BUILDER</h2>
-        <button className="btn btn-outline"><Sliders size={14} /> SAVE TEMPLATE</button>
+        <button className="btn btn-outline" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}><Sliders size={14} /> SAVE TEMPLATE (Unavailable)</button>
       </div>
 
       <GlowPanel title="STATE MACHINE TOPOLOGY" className="animate-in">
