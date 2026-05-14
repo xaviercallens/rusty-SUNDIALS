@@ -1,29 +1,100 @@
-BSD 3-Clause License
+Creative Commons Attribution 4.0 International License (CC BY 4.0)
+with Mandatory Attribution Addendum for Scientific Innovations
 
-Copyright (c) 2026, Xavier Callens & SocrateAI Lab
-Based on SUNDIALS, Copyright (c) 2002-2026, Lawrence Livermore National Security, LLC.
+Copyright (c) 2026 Xavier Callens
+SocrateAI Lab | SymbioticFactory Research | OpenCyclo Project
+Cagnes-sur-Mer, France
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+================================================================================
+PART I — CODE LICENSE (Apache 2.0 with Mandatory Attribution)
+================================================================================
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this software except in compliance with the License.
+A copy of the Apache 2.0 License is available at:
+  https://www.apache.org/licenses/LICENSE-2.0
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+MANDATORY ATTRIBUTION REQUIREMENT (Apache 2.0, Section 4):
+Any use, distribution, or derivative work of this software MUST:
+  1. Retain the NOTICE file included with this distribution.
+  2. Display "Powered by rusty-SUNDIALS — Xavier Callens, SocrateAI Lab"
+     in any software product, documentation, or publication derived from
+     this work.
+  3. Cite the mandatory citation defined in CITATION.cff.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
+================================================================================
+PART II — SCIENTIFIC RESEARCH LICENSE (CC BY 4.0)
+================================================================================
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+The scientific results, formal Lean 4 proofs, Standard Operating Procedures
+(SOPs), simulation artifacts, discovery logs, mathematical methods, and all
+content in the following directories are licensed under CC BY 4.0:
+  - docs/
+  - proofs/
+  - discoveries/
+  - docs/Standard Operating Procedure (SOP)/
+
+You are free to:
+  Share — copy and redistribute the material in any medium or format.
+  Adapt — remix, transform, and build upon the material for any purpose,
+           even commercially.
+
+Under the following MANDATORY conditions:
+
+  ATTRIBUTION — You MUST give appropriate credit to Xavier Callens and
+  SocrateAI Lab, provide a link to this repository, indicate if changes
+  were made, and include the following citation in ALL publications,
+  presentations, datasets, or products that use or reference these results:
+
+    Callens, X. (2026). rusty-SUNDIALS: Formally Verified Scientific Machine
+    Learning Engine for Exascale Physics and Planetary Carbon Capture.
+    SocrateAI Lab | SymbioticFactory Research.
+    https://github.com/xaviercallens/rusty-SUNDIALS
+    License: CC BY 4.0
+
+  NO ADDITIONAL RESTRICTIONS — You may not apply legal terms or technological
+  measures that legally restrict others from doing anything this license permits.
+
+================================================================================
+PART III — INNOVATION RECOGNITION & SPECIFIC CLAIMS
+================================================================================
+
+The following scientific innovations are the exclusive intellectual contribution
+of Xavier Callens and MUST be attributed in any derived publication or product:
+
+  1. FLAGNO (Field-Aligned Graph Network Optimization) — O(1) weak-scaling
+     anisotropic preconditioning for XMHD plasma simulations.
+
+  2. Neuro-Symbolic SUNDIALS Bridge — Memory-safe Rust integration of LLNL
+     SUNDIALS with formally verified ML topologies via Lean 4.
+
+  3. Quantized Tensor Train (QTT) XMHD Integration — Phase-space folding for
+     6D gyrokinetic Boltzmann equations on commodity hardware.
+
+  4. Asynchronous LSS Adjoint Decoupling — CPU/GPU chaos-decoupled control
+     for real-time fusion plasma via Least Squares Shadowing.
+
+  5. PSC Protocol Stack (K–O) — Quantum-photonic, acoustofluidic, and
+     adjoint-guided RuBisCO enzyme evolution for 72,000 t CO₂/km²/yr yield.
+
+  6. SOP Reproducibility Platform — Community-executable scientific SOP
+     framework integrated into GCP serverless Mission Control.
+
+  7. Kalundborg 2.0 EIP Topology Optimizer — Global eco-industrial park
+     placement via geo-optimization for planetary regeneration.
+
+================================================================================
+PART IV — UPSTREAM NOTICES
+================================================================================
+
+This software builds upon SUNDIALS (Suite of Nonlinear and Differential/
+Algebraic Equation Solvers), developed by Lawrence Livermore National Security,
+LLC (LLNL). SUNDIALS is distributed under BSD 3-Clause. This project's
+innovations are original works layered on top of that foundation.
+
+SUNDIALS Copyright (c) 2002-2026, Lawrence Livermore National Security, LLC.
+SUNDIALS License: https://github.com/LLNL/sundials/blob/main/LICENSE
+
+================================================================================
+
+SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0

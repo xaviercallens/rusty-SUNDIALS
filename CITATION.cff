@@ -1,39 +1,67 @@
 cff-version: 1.2.0
 message: >-
   If you use this software, any derived scientific results, figures,
-  or methodologies in your research, please cite it using the metadata
-  below. Citation is mandatory for all academic, industrial, and
-  educational use.
-title: "rusty-SUNDIALS: Formally Verified Scientific Machine Learning Engine"
+  formal proofs, SOPs, or methodologies in your research, you MUST cite
+  it using the metadata below. Citation is mandatory for all academic,
+  industrial, and educational use under the CC BY 4.0 license.
+title: "rusty-SUNDIALS: Formally Verified Scientific Machine Learning Engine for Exascale Physics and Planetary Carbon Capture"
 type: software
+version: "9.0.1"
+date-released: "2026-05-14"
+license: "Apache-2.0 AND CC-BY-4.0"
+repository-code: "https://github.com/xaviercallens/rusty-SUNDIALS"
+url: "https://rusty-sundials-autoresearch-1003063861791.europe-west1.run.app"
 authors:
   - given-names: Xavier
     family-names: Callens
-    affiliation: SocrateAI Lab
-    orcid: ""
-license: BSD-3-Clause
-repository-code: "https://github.com/xaviercallens/rusty-SUNDIALS"
-version: "8.0.0"
-date-released: "2026-05-14"
+    affiliation: "SocrateAI Lab | SymbioticFactory Research | OpenCyclo Project"
+    city: "Cagnes-sur-Mer"
+    country: "FR"
+    email: "callensxavier@gmail.com"
 keywords:
   - scientific-computing
   - ODE-solvers
   - formal-verification
+  - Lean4
+  - Rust
+  - plasma-physics
+  - XMHD
+  - fusion
   - carbon-capture
   - bioreactor
   - machine-learning
-  - Lean4
-  - Rust
+  - SOP-reproducibility
+  - FLAGNO
+  - neuro-symbolic
+  - exascale
+  - planetary-regeneration
+  - eco-industrial
+  - Kalundborg
+abstract: >-
+  rusty-SUNDIALS is an open-source, formally verified neuro-symbolic
+  algorithmic framework bridging LLNL's SUNDIALS legacy solvers with
+  memory-safe Rust and Lean 4 theorem-proven machine learning topologies.
+  Original innovations include FLAGNO O(1) anisotropic preconditioning for
+  XMHD plasma simulations, QTT 6D phase-space folding, asynchronous LSS
+  adjoint chaos decoupling, and the PSC planetary carbon capture protocol
+  stack (Protocols K-O) projecting 72,000 t CO2/km2/year.
 preferred-citation:
   type: article
   authors:
     - given-names: Xavier
       family-names: Callens
-      affiliation: SocrateAI Lab
+      affiliation: "SocrateAI Lab | SymbioticFactory Research"
   title: >-
-    Disruptive Physics & Autonomous AI for Planetary-Scale Carbon Capture:
-    Breaking Classical Thermodynamic Ceilings via Quantum Photonics,
-    Acoustofluidics, and Adjoint-Guided Enzyme Design
+    Algorithmic Frameworks for Machine-Learning Augmented XMHD Integration:
+    From Formal Specification to Fearless Computation via rusty-SUNDIALS
   year: 2026
-  journal: "SymbioticFactory Research — SocrateAI Lab"
+  journal: "SocrateAI Lab — SymbioticFactory Research"
   url: "https://github.com/xaviercallens/rusty-SUNDIALS"
+  notes: "Lean 4 formally verified. GCP Cloud Run serverless. v9.0.1"
+references:
+  - type: software
+    authors:
+      - name: "Lawrence Livermore National Security, LLC"
+    title: "SUNDIALS: Suite of Nonlinear and Differential/Algebraic Equation Solvers"
+    url: "https://github.com/LLNL/sundials"
+    license: "BSD-3-Clause"
