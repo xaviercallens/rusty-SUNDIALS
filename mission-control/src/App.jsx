@@ -21,7 +21,7 @@ export default function App() {
         <div className="app-layout">
           <Sidebar />
           <div className="main-area">
-            <Header cost={1.41} budget={100} />
+            <Header cost={46.62} budget={100} />
             <main className="page-content">
               <Routes>
                 <Route path="/" element={<DashboardPage />} />

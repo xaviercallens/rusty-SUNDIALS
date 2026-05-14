@@ -4,7 +4,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 import api from '../api/client';
 
 const BREAKDOWN = [
-  { name: 'Cloud Run (compute)', value: 0.008, color: '#00e5ff' },
+  { name: 'Cloud Run (compute)', value: 8.508, color: '#00e5ff' },
+  { name: 'Vertex AI (GPUs)', value: 37.50, color: '#ff4081' },
   { name: 'Cloud Build', value: 0.50, color: '#ffb800' },
   { name: 'Artifact Registry', value: 0.10, color: '#a78bfa' },
   { name: 'GCS Storage', value: 0.01, color: '#00ff88' },
@@ -19,6 +20,8 @@ const EXPERIMENTS = [
   { name: 'Oxidize P3', cpu_sec: 22.3, cost: 0.0015, date: 'May 13' },
   { name: 'Verification', cpu_sec: 0.05, cost: 0.000003, date: 'May 13' },
   { name: 'Report Gen', cpu_sec: 0.02, cost: 0.000001, date: 'May 13' },
+  { name: 'HPC A100 Bench', cpu_sec: 25.0, cost: 37.50, date: 'May 14' },
+  { name: 'EIP Kalundborg 2.0', cpu_sec: 35.0, cost: 8.50, date: 'May 14' },
 ];
 
 export default function CostPage() {
