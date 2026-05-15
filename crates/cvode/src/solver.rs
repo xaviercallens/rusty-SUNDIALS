@@ -18,7 +18,9 @@ use nvector::{NVector, SerialVector};
 use sundials_core::Real;
 
 use crate::builder::CvodeBuilder;
-use crate::constants::{DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, Method, Task};
+use crate::constants::{
+    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, Method, Task,
+};
 use crate::error::CvodeError;
 use crate::nordsieck::NordsieckArray;
 use crate::step;
@@ -118,7 +120,9 @@ where
         init_step: Option<Real>,
         max_step: Option<Real>,
         min_step: Option<Real>,
-        jac: Option<Box<dyn FnMut(Real, &[Real], &mut DenseMat) -> Result<(), String> + Send + Sync>>,
+        jac: Option<
+            Box<dyn FnMut(Real, &[Real], &mut DenseMat) -> Result<(), String> + Send + Sync>,
+        >,
     ) -> Self {
         let n = y0.len();
         let mut zn = NordsieckArray::new(n);

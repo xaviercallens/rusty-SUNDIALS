@@ -25,8 +25,8 @@ fn main() -> Result<(), cvode::CvodeError> {
     let mut solver = Cvode::builder(Method::Bdf)
         .rtol(1e-4)
         .atol(1e-8)
-        .max_order(5)          // BDF-5 — same as LLNL cvRoberts_dns
-        .init_step(1e-4)       // LLNL h0 default for Robertson
+        .max_order(5) // BDF-5 — same as LLNL cvRoberts_dns
+        .init_step(1e-4) // LLNL h0 default for Robertson
         .max_steps(50000)
         // Analytical Jacobian — matches LLNL cvRoberts_dns dense Jacobian.
         // Eliminates 3 extra RHS evals per Jacobian compute (one per column of
@@ -39,16 +39,16 @@ fn main() -> Result<(), cvode::CvodeError> {
         .jacobian(|_t, y, j| {
             // Column 0: ∂f/∂y0
             j.cols[0][0] = -0.04;
-            j.cols[0][1] =  0.04;
-            j.cols[0][2] =  0.0;
+            j.cols[0][1] = 0.04;
+            j.cols[0][2] = 0.0;
             // Column 1: ∂f/∂y1
-            j.cols[1][0] =  1e4 * y[2];
+            j.cols[1][0] = 1e4 * y[2];
             j.cols[1][1] = -1e4 * y[2] - 6e7 * y[1];
-            j.cols[1][2] =  6e7 * y[1];
+            j.cols[1][2] = 6e7 * y[1];
             // Column 2: ∂f/∂y2
-            j.cols[2][0] =  1e4 * y[1];
+            j.cols[2][0] = 1e4 * y[1];
             j.cols[2][1] = -1e4 * y[1];
-            j.cols[2][2] =  0.0;
+            j.cols[2][2] = 0.0;
             Ok(())
         })
         .build(rhs, 0.0, y0)?;
@@ -79,8 +79,14 @@ fn main() -> Result<(), cvode::CvodeError> {
     let rhs_evals = solver.num_rhs_evals();
 
     println!("\nSolver statistics:");
-    println!("  Steps:      {steps}  (C ref: 1070, ratio: {:.1}x)", steps as f64 / 1070.0);
-    println!("  RHS evals:  {rhs_evals}  (C ref: 1537, ratio: {:.1}x)", rhs_evals as f64 / 1537.0);
+    println!(
+        "  Steps:      {steps}  (C ref: 1070, ratio: {:.1}x)",
+        steps as f64 / 1070.0
+    );
+    println!(
+        "  RHS evals:  {rhs_evals}  (C ref: 1537, ratio: {:.1}x)",
+        rhs_evals as f64 / 1537.0
+    );
     println!("  Final order: {}", solver.order());
     println!("  Wall time:  {wall_ms}ms");
 
@@ -100,4 +106,3 @@ fn main() -> Result<(), cvode::CvodeError> {
 
     Ok(())
 }
-
