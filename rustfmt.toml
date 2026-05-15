@@ -1,9 +1,4 @@
 # rustfmt.toml — workspace-level formatting config
-
+# Generated files under crates/sundials-core/src/generated/ carry
+# #![rustfmt::skip] attributes — no ignore list needed here.
 edition = "2021"
-
-# Skip the auto-generated SUNDIALS C bindings directory.
-# These files use Rust 2024 `let`-chains that rustfmt stable cannot parse.
-ignore = [
-    "crates/sundials-core/src/generated",
-]

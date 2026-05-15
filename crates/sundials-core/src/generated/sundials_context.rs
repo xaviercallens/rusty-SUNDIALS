@@ -304,17 +304,20 @@ impl SunContext {
 
     /// Explicit free equivalent (`SUNContext_Free`); also performed by `Drop`.
     pub fn free(&mut self) -> SunResult<()> {
-        if self.config.profiling_enabled
-            && !self.config.caliper_enabled
-            && let Some(p) = &self.profiler
-            && let Ok(v) = env::var("SUNPROFILER_PRINT")
-            && v != "0"
-        {
-            if matches!(v.as_str(), "1" | "TRUE" | "stdout") {
-                let mut out = std::io::stdout();
-                p.print(&mut out)?;
-            } else if let Ok(mut f) = OpenOptions::new().create(true).append(true).open(v) {
-                p.print(&mut f)?;
+        if self.config.profiling_enabled && !self.config.caliper_enabled {
+            if let Some(p) = &self.profiler {
+                if let Ok(v) = env::var("SUNPROFILER_PRINT") {
+                    if v != "0" {
+                        if matches!(v.as_str(), "1" | "TRUE" | "stdout") {
+                            let mut out = std::io::stdout();
+                            p.print(&mut out)?;
+                        } else if let Ok(mut f) =
+                            OpenOptions::new().create(true).append(true).open(v)
+                        {
+                            p.print(&mut f)?;
+                        }
+                    }
+                }
             }
         }
 
