@@ -24,6 +24,25 @@ from neuro_symbolic_v10 import validate_neuro_symbolic, NeuroSymbolicReport
 from peer_review_v10 import run_peer_review, PeerReviewResult
 from lean_proof_cache import get_cached_proof, store_proof, try_auto_tactics, proof_cache_stats
 
+# v11 subsystems (soft-import — gracefully degrade if not yet wired)
+try:
+    from hypothesis_validator_v11 import HypothesisValidator
+    _hyp_validator = HypothesisValidator(confidence_threshold=0.70)
+except ImportError:
+    _hyp_validator = None  # type: ignore
+
+try:
+    from peer_review_v11 import GwenPeerReviewer
+    _gwen_reviewer = GwenPeerReviewer(use_cache=True)
+except ImportError:
+    _gwen_reviewer = None  # type: ignore
+
+try:
+    from slurm_sim_v11 import SlurmSimulator, JobSpec
+    _slurm_sim = SlurmSimulator(n_nodes=4, gpus_per_node=8)
+except ImportError:
+    _slurm_sim = None  # type: ignore
+
 # Re-use v6 production subsystems for what still applies
 from orchestrator_prod import (
     _init_gemini, generate_hypothesis_real, synthesize_code,
@@ -260,6 +279,23 @@ class OrchestratorV10:
             self.context.pop("rejection_reason", None)
             self.log("   ✅ All 5 validation gates passed.")
 
+            # ── ②-b HYPOTHESIS VALIDATOR v11 (DeepProbLog + SymPy) ───────────
+            hyp_validation_result = None
+            if _hyp_validator is not None:
+                hypothesis_str = (
+                    hyp.get("mathematical_formulation") or
+                    hyp.get("method_name", method_name)
+                )
+                hyp_validation_result = _hyp_validator.validate(hypothesis_str)
+                icon = "✅" if hyp_validation_result.verdict == "VALID" else "⚠️"
+                self.log(
+                    f"   {icon} [HypValidator v11] {hyp_validation_result.verdict} "
+                    f"(confidence={hyp_validation_result.confidence:.0%}) "
+                    f"symbolic={hyp_validation_result.symbolic_form or '—'}"
+                )
+                if hyp_validation_result.verdict == "INVALID":
+                    self.log(f"   ℹ️  {hyp_validation_result.counterexample}")
+
             # ── ③ SUNDIALS SIMULATION ──────────────────────────────────────
             self.log("③ [SUNDIALS] Running simulation...")
             sim_results = run_sundials_simulation(hyp)
@@ -289,7 +325,7 @@ class OrchestratorV10:
                 continue
             self.log(f"   ✅ Certificate: {lean_cert}")
 
-            # ── ⑥ MULTI-LLM PEER REVIEW ────────────────────────────────────
+            # ── ⑥ MULTI-LLM PEER REVIEW (v10 + Gwen v11) ──────────────────
             self.log(f"⑥ [PeerReview v10] Multi-LLM review ({self.peer_reviewers})...")
             review: PeerReviewResult = run_peer_review(
                 hypothesis=hyp,
@@ -303,6 +339,30 @@ class OrchestratorV10:
 
             self.log(f"   Consensus: {review.consensus_score:.2f} "
                      f"({'PASSED' if review.consensus_passed else 'FAILED'})")
+
+            # Gwen v11 peer review (enriches — does not gate)
+            gwen_verdict = None
+            if _gwen_reviewer is not None:
+                hyp_str = hyp.get("method_name", method_name)
+                evidence = {
+                    "speedup": sim_results.get("speedup_vs_bdf", 1.0),
+                    "error_bound": sim_results.get("energy_drift", 1.0),
+                    "n_trials": 1,
+                    "lean4_certified": proof_passed,
+                    "seed_fixed": True,
+                }
+                try:
+                    gwen_verdict = _gwen_reviewer.review(hyp_str, evidence)
+                    self.log(
+                        f"   🤖 [Gwen v11] {gwen_verdict.verdict_str} "
+                        f"score={gwen_verdict.score:.2f} "
+                        f"novelty={gwen_verdict.novelty:.0%} "
+                        f"lean4={'✓' if gwen_verdict.lean4_ready else '—'}"
+                    )
+                    for sug in gwen_verdict.suggestions:
+                        self.log(f"      → {sug}")
+                except Exception as exc:
+                    self.log(f"   ⚠️ Gwen v11 error: {exc}")
 
             if not review.consensus_passed:
                 self.log("❌ REJECTED: Peer review consensus failed.")
@@ -319,15 +379,36 @@ class OrchestratorV10:
                                          speedup, self.output_dir)
             plot_path = generate_benchmark_plot(method_name, speedup, self.output_dir)
 
-            # Save full discovery JSON (includes peer review)
+            # Save full discovery JSON (v11 enriched)
             discovery = {
-                "version": "v10",
+                "version": "v11",
                 "method_name": method_name,
                 "hypothesis": hyp,
                 "simulation_results": sim_results,
                 "validation_report": report.to_dict(),
                 "lean_certificate": lean_cert,
                 "peer_review": review.to_dict(),
+                "hypothesis_validation_v11": (
+                    {
+                        "verdict": hyp_validation_result.verdict,
+                        "confidence": hyp_validation_result.confidence,
+                        "symbolic_form": hyp_validation_result.symbolic_form,
+                        "dimensional_ok": hyp_validation_result.dimensional_ok,
+                        "problog_score": hyp_validation_result.problog_score,
+                    }
+                    if hyp_validation_result else None
+                ),
+                "gwen_peer_review_v11": (
+                    {
+                        "verdict": gwen_verdict.verdict_str,
+                        "score": gwen_verdict.score,
+                        "novelty": gwen_verdict.novelty,
+                        "lean4_ready": gwen_verdict.lean4_ready,
+                        "critique": gwen_verdict.critique,
+                        "suggestions": gwen_verdict.suggestions,
+                    }
+                    if gwen_verdict else None
+                ),
                 "tex_file": tex_path,
                 "plot_file": plot_path,
                 "loop_iteration": self.loop_count,

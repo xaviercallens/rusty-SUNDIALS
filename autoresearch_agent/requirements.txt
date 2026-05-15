@@ -1,6 +1,6 @@
 # ── Core v6-v9 dependencies ─────────────────────────────────
 pyswip
-sympy
+sympy>=1.12.0
 pydantic
 langgraph
 google-generativeai
@@ -10,7 +10,7 @@ google-cloud-storage
 # ── v10 NEW: Multi-LLM Peer Review ───────────────────────────
 # Mistral API endpoint reviewer
 requests>=2.31.0
-mistralai>=0.4.0
+mistralai>=1.0.0            # v11: updated for structured JSON output
 
 # Gwen/Gemma via HuggingFace (open source reviewer)
 huggingface_hub>=0.22.0
@@ -20,12 +20,14 @@ huggingface_hub>=0.22.0
 # ── v10 NEW: Lean 4 Proof Cache ──────────────────────────────
 redis>=5.0.0
 
-# ── v10 NEW: Physics Validator ───────────────────────────────
+# ── v11 NEW: Hypothesis Validator (DeepProbLog + SymPy) ──────
+problog>=2.1.0              # DeepProbLog probabilistic logic
 # sympy already included above
 
 # ── v10 NEW: Explainability (Component 8) ────────────────────
 shap>=0.44.0
 pysr>=0.18.0
+lime>=0.2.0                 # v11: LIME fallback when SHAP is too slow
 
 # ── v10 NEW: Federated Research (Component 6) ────────────────
 flwr>=1.7.0
@@ -40,7 +42,7 @@ pyamg>=5.0.0                 # AMGX-compatible algebraic multigrid (CPU)
 # cupy-cuda12x>=13.0.0       # GPU sparse ops — uncomment for CUDA 12.x
 
 # ── v10 Component 6: Flower Federated Learning ───────────────
-flwr>=1.7.0
+# flwr already included above
 # flwr[simulation]>=1.7.0   # for multi-process simulation
 
 # ── v10 Component 7: PPO RL Agent ────────────────────────────
@@ -48,9 +50,8 @@ stable-baselines3>=2.3.0
 gymnasium>=0.29.0
 
 # ── v10 Component 8: SHAP + PySR Explainability ──────────────
-shap>=0.44.0
+# shap, lime, pysr already included above
 scikit-learn>=1.4.0           # SHAP TreeExplainer + GBM model
-pysr>=0.18.0                  # Symbolic regression (requires Julia backend)
 # To install Julia for PySR: julia --eval 'using Pkg; Pkg.add("SymbolicRegression")'
 
 # ── v10 SLURM / GCP Backend ──────────────────────────────────
