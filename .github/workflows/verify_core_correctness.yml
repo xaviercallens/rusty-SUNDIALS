@@ -4,23 +4,48 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+  push:
+    branches: [ "main", "release/**" ]
+    paths:
+      - 'crates/**'
+      - 'examples/**'
+      - 'scripts/verify_c_vs_rust.py'
 
 jobs:
   verify_c_vs_rust:
     name: Numerical Verification (C vs Rust)
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
 
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
-      
-    - name: Install System Dependencies for C SUNDIALS
+
+    - name: Cache Rust build artifacts
+      uses: Swatinem/rust-cache@v2
+      with:
+        key: verify-c-vs-rust
+
+    - name: Install System Dependencies
       run: |
-        sudo apt-get update
+        sudo apt-get update -qq
         sudo apt-get install -y cmake build-essential python3 python3-numpy
+
+    - name: Check workspace compiles (fast check before full build)
+      run: |
+        cargo check --workspace --all-targets 2>&1
+      env:
+        CARGO_INCREMENTAL: "0"
+
+    - name: Build robertson example
+      run: |
+        cargo build --release --example robertson 2>&1
+      env:
+        CARGO_INCREMENTAL: "0"
 
     - name: Run Core Correctness Verification
       run: |
         python3 scripts/verify_c_vs_rust.py
+      env:
+        RUST_LOG: info
