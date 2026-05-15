@@ -497,13 +497,18 @@ where
             self.jac_age += 1;
 
             // --- Error estimation ---
+            // SUNDIALS LTE: ||l[0] * err_coeff * acor||_wrms <= 1
+            // l[0] is the BDF normalisation coefficient (tq[2] in SUNDIALS).
+            // Without l[0], higher-order BDF overstates error by 1/l[0]
+            // (e.g. BDF-5: l[0]=60/137≈0.44 → 2.3× error inflation).
             let acor_s = self.acor.as_mut_slice();
             for i in 0..self.n {
                 acor_s[i] = acor_vec[i];
             }
 
+            let l0 = l[0]; // BDF leading coefficient (= 1 for BDF-1)
             let err_coeff = if self.method == Method::Bdf && self.q <= 5 {
-                BDF_ERR_COEFF[self.q]
+                BDF_ERR_COEFF[self.q] * l0
             } else {
                 1.0 / (self.q as Real + 1.0)
             };
