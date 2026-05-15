@@ -28,10 +28,33 @@ fn main() -> Result<(), cvode::CvodeError> {
         .max_order(5)          // BDF-5 — same as LLNL cvRoberts_dns
         .init_step(1e-4)       // LLNL h0 default for Robertson
         .max_steps(50000)
+        // Analytical Jacobian — matches LLNL cvRoberts_dns dense Jacobian.
+        // Eliminates 3 extra RHS evals per Jacobian compute (one per column of
+        // the 3×3 FD Jacobian), giving exact Newton directions.
+        // Layout: cols[j][i] = ∂f_i/∂y_j (column-major, same as SUNDIALS SUNDenseMatrix).
+        //
+        //   f0 = -0.04*y0 + 1e4*y1*y2
+        //   f1 =  0.04*y0 - 1e4*y1*y2 - 3e7*y1²
+        //   f2 =  3e7*y1²
+        .jacobian(|_t, y, j| {
+            // Column 0: ∂f/∂y0
+            j.cols[0][0] = -0.04;
+            j.cols[0][1] =  0.04;
+            j.cols[0][2] =  0.0;
+            // Column 1: ∂f/∂y1
+            j.cols[1][0] =  1e4 * y[2];
+            j.cols[1][1] = -1e4 * y[2] - 6e7 * y[1];
+            j.cols[1][2] =  6e7 * y[1];
+            // Column 2: ∂f/∂y2
+            j.cols[2][0] =  1e4 * y[1];
+            j.cols[2][1] = -1e4 * y[1];
+            j.cols[2][2] =  0.0;
+            Ok(())
+        })
         .build(rhs, 0.0, y0)?;
 
     println!("Robertson Chemical Kinetics (stiff system)");
-    println!("BDF method with adaptive step size");
+    println!("BDF method with adaptive step size + analytical Jacobian");
     println!("Reference: SUNDIALS 7.4.0 cvRoberts_dns (C)");
     println!("{:>12} {:>14} {:>14} {:>14}", "t", "y1", "y2", "y3");
     println!("{}", "-".repeat(58));

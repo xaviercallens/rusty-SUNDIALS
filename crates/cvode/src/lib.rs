@@ -26,6 +26,8 @@ pub use builder::CvodeBuilder;
 pub use constants::{Method, Task};
 pub use error::CvodeError;
 pub use solver::Cvode;
+/// Re-exported for use in analytical Jacobian closures passed to `.jacobian()`.
+pub use sundials_core::generated::sundials_dense::DenseMat;
 
 /// Return status from a successful solve step.
 #[derive(Debug, Clone, PartialEq)]
