@@ -277,3 +277,81 @@
 ### Error Enum Hardening (Low Priority)
 - [ ] Add `IntegrationFailure` as an explicit variant with `#[deprecated]` pointing to `ConvFailure`
 - [ ] Run full `cargo clippy -- -D warnings` pass after error enum change
+
+---
+
+## Phase 12: v11 Recommendations (In Progress)
+> Source: v11 recommendations document — 2026-05-15
+
+### 12.1 Immediate Priorities
+
+#### Hypothesis Validation — DeepProbLog + SymPy ✅ IMPLEMENTED
+- [x] `autoresearch_agent/hypothesis_validator_v11.py` — SymPy symbolic algebra + DeepProbLog probabilistic logic
+- [x] `ValidationResult` dataclass: verdict, confidence, LaTeX symbolic form, counterexample
+- [x] Graceful degradation when `sympy` / `problog` not installed
+- [ ] Add `sympy` and `problog` to `autoresearch_agent/requirements.txt`
+- [ ] Wire `HypothesisValidator` into `orchestrator_v10.py` hypothesis generation loop
+- [ ] Add unit tests: `autoresearch_agent/tests/test_hypothesis_validator.py`
+
+#### SUNDIALS Execution Automation — Rust/Python scripts
+- [ ] `scripts/run_robertson.sh` — parametric Robertson ODE launcher with CSV output
+- [ ] `scripts/run_tearing.sh` — 3D tearing mode MHD with configurable grid size
+- [ ] `autoresearch_agent/sundials_runner_v11.py` — Python wrapper that parses CSV results + feeds back to hypothesis validator
+- [ ] Rust side: add `--output-csv` flag to `examples/robertson.rs`
+
+#### Peer Review Automatisé — Gwen (Mistral AI) ✅ IMPLEMENTED
+- [x] `autoresearch_agent/peer_review_v11.py` — `GwenPeerReviewer` with Mistral Medium + local fallback
+- [x] Review cache (SHA-256 keyed JSON files) to avoid redundant API calls
+- [x] Structured `PeerReviewVerdict`: score, physical_ok, novelty, lean4_ready, critique, suggestions
+- [ ] Set `MISTRAL_API_KEY` in GitHub Secrets for CI peer-review runs
+- [ ] Wire `GwenPeerReviewer` into `orchestrator_v10.py` post-experiment pipeline
+- [ ] Add unit tests: `autoresearch_agent/tests/test_peer_review_v11.py`
+
+### 12.2 Hardware Optimizations
+
+#### cuSPARSE + TensorRT + AMGX (GPU acceleration)
+- [ ] Upgrade `autoresearch_agent/cusparse_amgx_v10.py` to v11:
+  - Add TensorRT INT8/FP8 quantization path for the GMRES preconditioner
+  - Benchmark AMGx vs classical ILU(0) on Robertson (N=10⁶ DOF)
+- [ ] Document cuSPARSE FP8 kernel invocation for community reproduction
+
+#### GDS (GPU Direct Storage) — OOM prevention
+- [x] OOM detection in `slurm_sim_v11.py` `SimulationBackend`
+- [ ] Add GDS environment variable setup to SLURM scripts (`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`)
+- [ ] Benchmark GDS throughput vs host-pinned memory transfer for large matrices
+
+### 12.3 Large-Scale Deployment (CEA HPC Community)
+
+#### SLURM + NCCL + GDS Simulation Mode ✅ IMPLEMENTED
+- [x] `autoresearch_agent/slurm_sim_v11.py` — faithful CEA HPC simulation
+  - `SimulationBackend`: 4-node V100 cluster emulation with partition modelling
+  - NCCL all-reduce bandwidth: `2*(N-1)/N * link_bw` formula
+  - GDS throughput emulation with memory-pressure degradation
+  - OOM detection with helpful fix suggestions
+  - `SlurmBackend` ABC for community real-cluster backends
+- [x] `docs/COMMUNITY_HPC_GUIDE.md` — step-by-step community contribution guide
+  - `CeaSlurmBackend` implementation template (real `sbatch` wrapping)
+  - Benchmark collection process with PR/Discussion instructions
+  - Community contributor table
+
+#### Federated Learning — Multi-site collaboration
+- [x] `autoresearch_agent/federated_v10.py` — Flower FedAvg baseline
+- [ ] Upgrade to v11: add differential privacy via `opacus`
+- [ ] Add CEA + ITER + university client simulation (3-site FedAvg)
+- [ ] Document how to connect a real Flower client from an HPC site
+
+### 12.4 Transparency & Explainability
+
+#### SHAP/LIME for RL Agent
+- [x] `autoresearch_agent/explainability_v10.py` — SHAP + PySR stage 1+2 pipeline
+- [ ] Upgrade to v11:
+  - Add LIME as fallback when SHAP kernel explainer is too slow (N > 10⁶)
+  - Export SHAP waterfall plots as SVG for docs/academic_figures/
+  - Add `rl_agent_v10.py` hook: call explainability after each episode
+- [ ] Add unit tests: `autoresearch_agent/tests/test_explainability_v11.py`
+
+#### Lean 4 Proofs — Automatic Tactics
+- [ ] `proofs/lean4/auto_tactics.lean` — `simp` + `omega` + `norm_num` tactic compositions
+- [ ] Add `Mathlib` dependency to `proofs/lean4/lakefile.lean`
+- [ ] Auto-generate Lean 4 stubs from `PeerReviewVerdict.lean4_ready == True` hypotheses
+- [ ] CI: run `lake build` on the proofs directory (add to `lean_proofs` workflow job)
