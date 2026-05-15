@@ -1,0 +1,15 @@
+{
+  "benchmark": "diffusion_2d_cvode_1024",
+  "command": "mpirun -n 1 cvode_diffusion_2D_mpicuda --nx 1024 --ny 1024 --ls cg",
+  "wall_time_s": null,
+  "exit_code": null,
+  "gpu": "A100-40GB",
+  "sundials_version": "7.4.0",
+  "status": "PENDING",
+  "timestamp": "2026-05-15T14:43:54.103145Z",
+  "llnl_reference": {
+    "wall_time_s": 18.0,
+    "machine": "Summit 2\u00d7 A100",
+    "expected_1gpu_s": 36.0
+  }
+}

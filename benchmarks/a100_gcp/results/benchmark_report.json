@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-05-15T14:46:15.426345+00:00",
+  "total_issues": 3,
+  "issues": [
+    "Robertson steps differ by 100% (Rust=0 vs C=1070) \u2014 check BDF order selection",
+    "Robertson RHS evals differ by 100% \u2014 possible Jacobian factorization count difference",
+    "Robertson conservation error 1.00e+00 > threshold 1.00e-12"
+  ],
+  "advection_reaction": {
+    "adv_react_3d_arkimex_n64": {
+      "wall_time_s": null,
+      "ratio_vs_ref_1gpu": null,
+      "status": "\u26aa PENDING",
+      "exit_code": null
+    },
+    "adv_react_3d_arkimex_n100": {
+      "wall_time_s": null,
+      "ratio_vs_ref_1gpu": null,
+      "status": "\u26aa PENDING",
+      "exit_code": null
+    }
+  },
+  "diffusion": {
+    "diffusion_2d_cvode_512": {
+      "wall_time_s": null,
+      "status": "\u26aa PENDING"
+    },
+    "diffusion_2d_cvode_1024": {
+      "wall_time_s": null,
+      "status": "\u26aa PENDING"
+    }
+  },
+  "robertson": {
+    "rust": {
+      "final_t": "4e+10",
+      "y1": "PENDING",
+      "y2": "PENDING",
+      "y3": "PENDING",
+      "steps": null,
+      "rhs_evals": null,
+      "order": null,
+      "max_conservation_error": null,
+      "status": "PENDING"
+    },
+    "c_ref": {
+      "steps": 1070,
+      "rhs_evals": 1537,
+      "max_conservation_error": 1.1e-15,
+      "y1_at_t4e10": 2.0833403e-08,
+      "y2_at_t4e10": 8.3333734e-14,
+      "y3_at_t4e10": 1.0,
+      "source": "LLNL cvRoberts_dns reference output, SUNDIALS 7.4.0"
+    },
+    "issues": [
+      "Robertson steps differ by 100% (Rust=0 vs C=1070) \u2014 check BDF order selection",
+      "Robertson RHS evals differ by 100% \u2014 possible Jacobian factorization count difference",
+      "Robertson conservation error 1.00e+00 > threshold 1.00e-12"
+    ]
+  }
+}

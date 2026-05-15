@@ -1,0 +1,19 @@
+{
+  "benchmark": "adv_react_3d_arkimex_n100",
+  "command": "mpirun -n 1 advection_reaction_3D_mpicuda --npts 100 --method ARK-IMEX",
+  "wall_time_s": null,
+  "exit_code": null,
+  "steps": null,
+  "rhs_evals": null,
+  "gpu": "A100-40GB",
+  "cuda_version": "12.1",
+  "sundials_version": "7.4.0",
+  "status": "PENDING",
+  "timestamp": "2026-05-15T14:43:54.103126Z",
+  "llnl_reference": {
+    "wall_time_s": 42.0,
+    "machine": "Summit IBM Power9 + 2\u00d7 A100 (jsrun -n 2 -a 1 -c 1 -g 1)",
+    "expected_1gpu_s": 84.0,
+    "note": "Linear scaling estimate: 1 GPU \u2248 2\u00d7 slower than 2-GPU run"
+  }
+}

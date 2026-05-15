@@ -1,0 +1,19 @@
+{
+  "benchmark": "adv_react_3d_arkimex_n64",
+  "command": "mpirun -n 1 advection_reaction_3D_mpicuda --npts 64 --method ARK-IMEX",
+  "wall_time_s": null,
+  "exit_code": null,
+  "steps": null,
+  "rhs_evals": null,
+  "reported_wall_time_s": null,
+  "max_error": null,
+  "gpu": "A100-40GB",
+  "cuda_version": "12.1",
+  "sundials_version": "7.4.0",
+  "status": "PENDING",
+  "timestamp": "2026-05-15T14:43:54.102363Z",
+  "llnl_reference": {
+    "wall_time_s": null,
+    "machine": "Estimated only"
+  }
+}

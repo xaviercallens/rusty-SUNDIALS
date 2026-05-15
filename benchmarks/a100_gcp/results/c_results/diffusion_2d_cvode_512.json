@@ -1,0 +1,14 @@
+{
+  "benchmark": "diffusion_2d_cvode_512",
+  "command": "mpirun -n 1 cvode_diffusion_2D_mpicuda --nx 512 --ny 512 --ls cg",
+  "wall_time_s": null,
+  "exit_code": null,
+  "gpu": "A100-40GB",
+  "sundials_version": "7.4.0",
+  "status": "PENDING",
+  "timestamp": "2026-05-15T14:43:54.103138Z",
+  "llnl_reference": {
+    "wall_time_s": null,
+    "note": "512\u00b2 not in LLNL docs"
+  }
+}
