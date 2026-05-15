@@ -68,25 +68,39 @@ jobs:
               > /tmp/vm_startup.sh
           chmod +x /tmp/vm_startup.sh
 
-      - name: Create A100 VM
+      - name: Create A100 VM (multi-zone fallback)
         id: create_vm
         run: |
-          gcloud compute instances create "$INSTANCE" \
-            --project="$PROJECT_ID" \
-            --zone="$ZONE" \
-            --machine-type="$MACHINE" \
-            --accelerator="count=1,type=nvidia-tesla-a100" \
-            --maintenance-policy=TERMINATE \
-            --no-restart-on-failure \
-            --image-family=common-cu129-ubuntu-2204-nvidia-580 \
-            --image-project=deeplearning-platform-release \
-            --boot-disk-size=200GB \
-            --boot-disk-type=pd-ssd \
-            --metadata-from-file=startup-script=/tmp/vm_startup.sh \
-            --metadata="results-bucket=$RESULTS_BUCKET" \
-            --scopes=cloud-platform \
-            --no-shielded-secure-boot
-          echo "vm_created=true" >> "$GITHUB_OUTPUT"
+          ZONES="us-central1-b us-central1-c us-central1-a us-east1-c europe-west4-a"
+          for Z in $ZONES; do
+            echo "Trying zone: $Z ..."
+            if gcloud compute instances create "$INSTANCE" \
+              --project="$PROJECT_ID" \
+              --zone="$Z" \
+              --machine-type="$MACHINE" \
+              --accelerator="count=1,type=nvidia-tesla-a100" \
+              --maintenance-policy=TERMINATE \
+              --no-restart-on-failure \
+              --image-family=common-cu129-ubuntu-2204-nvidia-580 \
+              --image-project=deeplearning-platform-release \
+              --boot-disk-size=200GB \
+              --boot-disk-type=pd-ssd \
+              --metadata-from-file=startup-script=/tmp/vm_startup.sh \
+              --metadata="results-bucket=$RESULTS_BUCKET" \
+              --scopes=cloud-platform \
+              --no-shielded-secure-boot 2>&1; then
+              echo "vm_created=true" >> "$GITHUB_OUTPUT"
+              echo "vm_zone=$Z"      >> "$GITHUB_OUTPUT"
+              echo "✅ VM created in $Z"
+              break
+            else
+              echo "⚠️  No capacity in $Z, trying next zone..."
+            fi
+          done
+          if [[ "$(grep vm_created "$GITHUB_OUTPUT" || true)" == "" ]]; then
+            echo "❌ No A100 capacity in any zone"
+            exit 1
+          fi
 
       - name: Wait for benchmark completion (poll GCS flag, max 5h)
         run: |
@@ -146,7 +160,8 @@ jobs:
         if: always() && steps.create_vm.outputs.vm_created == 'true' && inputs.skip_cleanup != 'true'
         run: |
           gcloud compute instances delete "$INSTANCE" \
-            --project="$PROJECT_ID" --zone="$ZONE" --quiet
+            --project="$PROJECT_ID" \
+            --zone="${{ steps.create_vm.outputs.vm_zone }}" --quiet
           echo "✅ VM deleted — billing stopped"
 
       - name: Cost summary
