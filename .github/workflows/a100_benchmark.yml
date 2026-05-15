@@ -1,0 +1,166 @@
+name: A100 GPU Benchmark (GCP)
+# ============================================================
+# Runs official SUNDIALS 7.4.0 benchmarks on GCP a2-highgpu-1g
+# (1× NVIDIA A100 40GB) and uploads results to GCS.
+#
+# Trigger: manual workflow_dispatch only (to control cost)
+# Budget:  < $100 per run (a2-highgpu-1g @ $3.67/hr, ~4h max)
+#
+# Required GitHub Secrets:
+#   GCP_SA_KEY          — Service Account JSON with Compute + Storage roles
+#   GCP_PROJECT_ID      — "gen-lang-client-0625573011"
+# ============================================================
+
+on:
+  workflow_dispatch:
+    inputs:
+      npts_adv:
+        description: 'Advection-Reaction grid points per dimension (64 or 100)'
+        required: false
+        default: '64'
+      nx_diff:
+        description: 'Diffusion 2D mesh points (512 or 1024)'
+        required: false
+        default: '512'
+      skip_cleanup:
+        description: 'Skip VM deletion (for debugging — WARNING: incurs cost)'
+        required: false
+        default: 'false'
+
+env:
+  PROJECT_ID:    gen-lang-client-0625573011
+  ZONE:          us-central1-a
+  INSTANCE:      rusty-sundials-a100-bench-${{ github.run_id }}
+  MACHINE:       a2-highgpu-1g
+  RESULTS_BUCKET: gs://gen-lang-client-0625573011-sundials-bench
+  REGION:        us-central1
+
+jobs:
+  benchmark:
+    name: SUNDIALS A100 Benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 360   # 6h hard limit (well within $100 budget)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Create GCS bucket (idempotent)
+        run: |
+          gsutil ls "$RESULTS_BUCKET" 2>/dev/null || \
+            gsutil mb -p "$PROJECT_ID" -l "$REGION" "$RESULTS_BUCKET"
+
+      - name: Prepare startup script (inject parameters)
+        run: |
+          sed -e "s/NPTS_ADV_PLACEHOLDER/${{ inputs.npts_adv }}/g" \
+              -e "s/NX_DIFF_PLACEHOLDER/${{ inputs.nx_diff }}/g" \
+              benchmarks/a100_gcp/scripts/vm_startup.sh \
+              > /tmp/vm_startup.sh
+          chmod +x /tmp/vm_startup.sh
+
+      - name: Create A100 VM
+        id: create_vm
+        run: |
+          gcloud compute instances create "$INSTANCE" \
+            --project="$PROJECT_ID" \
+            --zone="$ZONE" \
+            --machine-type="$MACHINE" \
+            --accelerator="count=1,type=nvidia-tesla-a100" \
+            --maintenance-policy=TERMINATE \
+            --restart-on-failure=no \
+            --image-family=common-cu121 \
+            --image-project=deeplearning-platform-release \
+            --boot-disk-size=200GB \
+            --boot-disk-type=pd-ssd \
+            --metadata-from-file=startup-script=/tmp/vm_startup.sh \
+            --metadata="results-bucket=$RESULTS_BUCKET" \
+            --scopes=cloud-platform \
+            --no-shielded-secure-boot
+          echo "vm_created=true" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for benchmark completion (poll GCS flag, max 5h)
+        run: |
+          TIMEOUT=18000  # 5 hours in seconds
+          ELAPSED=0
+          POLL=60
+          FLAG="${RESULTS_BUCKET}/benchmark_complete.flag"
+          echo "Polling for completion flag: $FLAG"
+          while [[ $ELAPSED -lt $TIMEOUT ]]; do
+            if gsutil -q stat "$FLAG" 2>/dev/null; then
+              echo "✅ Benchmark complete after ${ELAPSED}s"
+              break
+            fi
+            COST=$(echo "scale=2; $ELAPSED * 3.67 / 3600" | bc)
+            echo "  [${ELAPSED}s] Still running... \$${COST} so far"
+            sleep $POLL
+            ELAPSED=$((ELAPSED + POLL))
+          done
+          if ! gsutil -q stat "$FLAG" 2>/dev/null; then
+            echo "❌ Timeout after ${TIMEOUT}s"
+            exit 1
+          fi
+
+      - name: Download results from GCS
+        run: |
+          mkdir -p benchmarks/a100_gcp/results/{c_results,rust_results}
+          gsutil -m cp -r "${RESULTS_BUCKET}/c_results/*"    benchmarks/a100_gcp/results/c_results/    2>/dev/null || true
+          gsutil -m cp -r "${RESULTS_BUCKET}/rust_results/*" benchmarks/a100_gcp/results/rust_results/ 2>/dev/null || true
+          gsutil -m cp    "${RESULTS_BUCKET}/cost_summary.json" \
+                          "${RESULTS_BUCKET}/gpu_info.txt"   benchmarks/a100_gcp/results/ 2>/dev/null || true
+          gsutil cp       "${RESULTS_BUCKET}/benchmark.log"  benchmarks/a100_gcp/results/ 2>/dev/null || true
+          ls -la benchmarks/a100_gcp/results/
+
+      - name: Run analysis
+        run: |
+          pip install -q numpy scipy pandas matplotlib 2>/dev/null
+          python3 benchmarks/a100_gcp/analysis/analyze_results.py \
+            --results-dir benchmarks/a100_gcp/results \
+            --output       benchmarks/a100_gcp/results/benchmark_report.md
+          echo "---"
+          cat benchmarks/a100_gcp/results/benchmark_report.md
+
+      - name: Upload report to GCS
+        run: |
+          gsutil cp benchmarks/a100_gcp/results/benchmark_report.md \
+                    "${RESULTS_BUCKET}/benchmark_report.md"
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sundials-a100-benchmark-results
+          path: benchmarks/a100_gcp/results/
+          retention-days: 90
+
+      - name: Delete VM
+        if: always() && steps.create_vm.outputs.vm_created == 'true' && inputs.skip_cleanup != 'true'
+        run: |
+          gcloud compute instances delete "$INSTANCE" \
+            --project="$PROJECT_ID" --zone="$ZONE" --quiet
+          echo "✅ VM deleted — billing stopped"
+
+      - name: Cost summary
+        if: always()
+        run: |
+          if [[ -f benchmarks/a100_gcp/results/cost_summary.json ]]; then
+            python3 -c "
+import json, sys
+d = json.load(open('benchmarks/a100_gcp/results/cost_summary.json'))
+print(f\"Elapsed: {d.get('elapsed_hours','?'):.2f}h\")
+print(f\"Cost:    \${d.get('estimated_cost_usd','?'):.2f}\")
+print(f\"Budget:  \$100.00\")
+budget_ok = float(d.get('estimated_cost_usd', 999)) < 100
+print(f\"Status:  {'✅ WITHIN BUDGET' if budget_ok else '❌ OVER BUDGET'}\")
+sys.exit(0 if budget_ok else 1)
+"
+          fi

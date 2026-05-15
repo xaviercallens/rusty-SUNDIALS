@@ -1,0 +1,10 @@
+{
+  "instance": "rusty-sundials-a100-bench",
+  "machine_type": "a2-highgpu-1g",
+  "gpu": "nvidia-tesla-a100",
+  "elapsed_hours": 0.0,
+  "estimated_cost_usd": 0.0,
+  "hourly_rate_usd": 3.67,
+  "status": "PENDING \u2014 run workflow_dispatch: a100_benchmark.yml to execute",
+  "timestamp": "2026-05-15T14:43:54.108917Z"
+}

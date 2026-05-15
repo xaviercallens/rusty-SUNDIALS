@@ -1,0 +1,22 @@
+{
+  "rust": {
+    "final_t": "4e+10",
+    "y1": "PENDING",
+    "y2": "PENDING",
+    "y3": "PENDING",
+    "steps": null,
+    "rhs_evals": null,
+    "order": null,
+    "max_conservation_error": null,
+    "status": "PENDING"
+  },
+  "c_reference": {
+    "steps": 1070,
+    "rhs_evals": 1537,
+    "max_conservation_error": 1.1e-15,
+    "y1_at_t4e10": 2.0833403e-08,
+    "y2_at_t4e10": 8.3333734e-14,
+    "y3_at_t4e10": 1.0,
+    "source": "LLNL cvRoberts_dns reference output, SUNDIALS 7.4.0"
+  }
+}
