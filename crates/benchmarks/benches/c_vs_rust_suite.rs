@@ -1,4 +1,4 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use sundials_core::Real;
 
 fn vanderpol_rhs(t: Real, y: &[Real], ydot: &mut [Real]) {
