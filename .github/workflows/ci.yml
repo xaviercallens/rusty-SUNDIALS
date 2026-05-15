@@ -126,3 +126,94 @@ jobs:
         run: |
           cd proofs/lean4
           lean --run cvode.lean
+
+  robertson_benchmark:
+    name: Robertson Benchmark (CPU-only, no GCP)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Robertson example
+        run: cargo build --example robertson --release
+
+      - name: Run Robertson benchmark
+        id: bench
+        run: |
+          echo "=== Robertson Stiff ODE Benchmark (Rust BDF) ==="
+          START=$(date +%s%N)
+          ./target/release/examples/robertson 2>&1 | tee /tmp/robertson_output.txt
+          END=$(date +%s%N)
+          ELAPSED_MS=$(( (END - START) / 1000000 ))
+          echo "wall_time_ms=$ELAPSED_MS" >> "$GITHUB_OUTPUT"
+          echo ""
+          echo "Wall time: ${ELAPSED_MS}ms"
+
+      - name: Compare against LLNL C reference
+        run: |
+          python3 - << 'PYEOF'
+          import re, sys
+
+          output = open("/tmp/robertson_output.txt").read()
+          print("=== Raw output ===")
+          print(output)
+
+          # Extract key metrics
+          steps     = re.search(r"steps[^\d]*(\d+)",     output, re.I)
+          rhs_evals = re.search(r"rhs[^\d]*(\d+)",       output, re.I)
+          y1        = re.search(r"y1[^=]*=\s*([0-9eE+.\-]+)", output, re.I)
+          y2        = re.search(r"y2[^=]*=\s*([0-9eE+.\-]+)", output, re.I)
+          y3        = re.search(r"y3[^=]*=\s*([0-9eE+.\-]+)", output, re.I)
+
+          # LLNL C reference (cvRoberts_dns, SUNDIALS 7.4.0)
+          C_STEPS     = 1070
+          C_RHS       = 1537
+          C_Y1        = 2.0833403e-08
+          C_Y3        = 1.0000000e+00
+          CONS_TOL    = 1e-12
+
+          print("\n=== C vs Rust Comparison ===")
+          ok = True
+
+          if steps:
+              rust_steps = int(steps.group(1))
+              diff = abs(rust_steps - C_STEPS) / C_STEPS
+              status = "✅" if diff < 0.25 else "⚠️ "
+              print(f"Steps:     Rust={rust_steps:5d}  C={C_STEPS}  Δ={diff:.1%}  {status}")
+              if diff >= 0.25: ok = False
+          else:
+              print("Steps:     (not found in output)")
+
+          if rhs_evals:
+              rust_rhs = int(rhs_evals.group(1))
+              diff = abs(rust_rhs - C_RHS) / C_RHS
+              status = "✅" if diff < 0.35 else "⚠️ "
+              print(f"RHS evals: Rust={rust_rhs:5d}  C={C_RHS}  Δ={diff:.1%}  {status}")
+
+          if y1 and y3:
+              ry1 = float(y1.group(1))
+              ry3 = float(y3.group(1))
+              conservation = abs(ry1 + ry3 - 1.0)  # y2 negligible
+              cons_ok = conservation < CONS_TOL
+              status = "✅" if cons_ok else "🔴"
+              print(f"y1(final): Rust={ry1:.4e}  C={C_Y1:.4e}")
+              print(f"y3(final): Rust={ry3:.6f}  C={C_Y3:.6f}")
+              print(f"Conservation ‖y1+y3-1‖ ≈ {conservation:.2e}  {status}")
+              if not cons_ok: ok = False
+
+          print(f"\n{'✅ PASS — within LLNL reference bounds' if ok else '⚠️  Some metrics outside reference bounds'}")
+          sys.exit(0 if ok else 1)
+          PYEOF
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: robertson-benchmark-results
+          path: /tmp/robertson_output.txt
+          retention-days: 30
