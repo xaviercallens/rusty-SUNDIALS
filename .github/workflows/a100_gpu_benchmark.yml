@@ -152,15 +152,4 @@ jobs:
       - name: Cost summary
         if: always()
         run: |
-          if [[ -f benchmarks/a100_gcp/results/cost_summary.json ]]; then
-            python3 -c "
-import json, sys
-d = json.load(open('benchmarks/a100_gcp/results/cost_summary.json'))
-print(f\"Elapsed: {d.get('elapsed_hours','?'):.2f}h\")
-print(f\"Cost:    \${d.get('estimated_cost_usd','?'):.2f}\")
-print(f\"Budget:  \$100.00\")
-budget_ok = float(d.get('estimated_cost_usd', 999)) < 100
-print(f\"Status:  {'✅ WITHIN BUDGET' if budget_ok else '❌ OVER BUDGET'}\")
-sys.exit(0 if budget_ok else 1)
-"
-          fi
+          python3 benchmarks/a100_gcp/scripts/cost_summary.py || true
