@@ -256,3 +256,24 @@
 - [ ] Submit v10 auto-research results: *"Autonomous Discovery of Mixed-Precision Plasma Solvers via Neuro-Symbolic AI"* — NeurIPS 2026.
 - [ ] Submit formal verification results: *"Machine-Checked Stability Bounds for FP8 TensorCore AMG"* — FMCAD 2026.
 - [ ] Implement CVODES (adjoint sensitivity) Rust bindings for gradient-based parameter optimisation.
+
+---
+
+## Phase 12 — v11.0.0: CI Green + PinT + Stability *(Current Sprint)*
+
+### CI Fix (P0 — Blocker)
+- [x] Fix `crates/sundials-core/src/pint.rs` — gate `use rayon::prelude::*` behind `#[cfg(feature = "parallel")]`
+- [x] Fix `SundialsError::IntegrationFailure` → `SundialsError::ConvFailure` (variant did not exist)
+- [x] Add `parallel = ["rayon"]` feature to `sundials-core/Cargo.toml`
+- [x] Add `rayon = { workspace = true, optional = true }` dep to `sundials-core`
+- [x] Harden `verify_core_correctness.yml` — add `cargo check`, `rust-cache`, path triggers
+- [x] `rustfmt` pass on `pint.rs`
+
+### PinT Parallel-in-Time (Medium Priority)
+- [ ] Add integration test for `PararealOrchestrator` with mock coarse/fine solvers
+- [ ] Enable `parallel` feature in examples that use PinT (gate with `cfg(feature="parallel")`)
+- [ ] Benchmark Parareal vs sequential on Robertson + Brusselator (N=8 slices, 4 threads)
+
+### Error Enum Hardening (Low Priority)
+- [ ] Add `IntegrationFailure` as an explicit variant with `#[deprecated]` pointing to `ConvFailure`
+- [ ] Run full `cargo clippy -- -D warnings` pass after error enum change

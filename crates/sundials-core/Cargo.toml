@@ -6,10 +6,12 @@ license.workspace = true
 description = "Core types for rusty-SUNDIALS: Real, Context, error handling"
 
 [dependencies]
+rayon = { workspace = true, optional = true }
 
 [features]
 experimental = []
 regenerate-bindings = []
+parallel = ["rayon"]
 
 [dev-dependencies]
 criterion = "0.8.2"

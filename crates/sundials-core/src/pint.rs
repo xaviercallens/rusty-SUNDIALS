@@ -1,11 +1,18 @@
 //! Parallel-in-Time (PinT) Orchestrator using the Parareal Algorithm
 //!
-//! This module implements the Parareal algorithm, breaking the sequential bottleneck 
-//! of standard time integration. By decomposing the temporal domain $[T_0, T_f]$ into 
-//! $N$ time slices, it leverages `Rayon` to parallelize the expensive fine integration 
-//! steps, utilizing a cheap coarse solver to propagate initial conditions.
+//! This module implements the Parareal algorithm, breaking the sequential bottleneck
+//! of standard time integration. By decomposing the temporal domain $[T_0, T_f]$ into
+//! $N$ time slices, it parallelizes the expensive fine integration steps using
+//! Rayon (when the `parallel` feature is enabled) or falls back to sequential execution.
+//!
+//! Enable parallel execution with:
+//! ```toml
+//! sundials-core = { path = "...", features = ["parallel"] }
+//! ```
 
+#[cfg(feature = "parallel")]
 use rayon::prelude::*;
+
 use crate::{Real, Result, SundialsError};
 
 /// Defines the signatures for Coarse and Fine Solvers
@@ -51,7 +58,8 @@ where
         num_slices: usize,
     ) -> Result<Vec<Vec<Real>>> {
         if num_slices < 2 {
-            return Err(SundialsError::IntegrationFailure);
+            // ConvFailure is the closest standard error for invalid configuration
+            return Err(SundialsError::ConvFailure);
         }
 
         let dt = (t_end - t_start) / (num_slices as Real);
@@ -66,17 +74,29 @@ where
 
         // 1. Initial Coarse Pass (Sequential)
         for n in 0..num_slices {
-            y[n + 1] = self.coarse_solver.step(time_slices[n], time_slices[n + 1], &y[n])?;
+            y[n + 1] = self
+                .coarse_solver
+                .step(time_slices[n], time_slices[n + 1], &y[n])?;
         }
 
         // Parareal Iteration
         for k in 0..self.max_iterations {
             // 2. Parallel Fine Pass
             // F(y_n^k) computed in parallel across all time slices
+            #[cfg(feature = "parallel")]
             let fine_results: Vec<Result<Vec<Real>>> = (0..num_slices)
                 .into_par_iter()
                 .map(|n| {
-                    self.fine_solver.step(time_slices[n], time_slices[n + 1], &y[n])
+                    self.fine_solver
+                        .step(time_slices[n], time_slices[n + 1], &y[n])
+                })
+                .collect();
+
+            #[cfg(not(feature = "parallel"))]
+            let fine_results: Vec<Result<Vec<Real>>> = (0..num_slices)
+                .map(|n| {
+                    self.fine_solver
+                        .step(time_slices[n], time_slices[n + 1], &y[n])
                 })
                 .collect();
 
@@ -91,14 +111,18 @@ where
             // 3. Sequential Coarse Correction
             for n in 0..num_slices {
                 // Compute new coarse prediction from the updated y_n^{k+1}
-                let coarse_new = self.coarse_solver.step(time_slices[n], time_slices[n + 1], &y_next[n])?;
+                let coarse_new =
+                    self.coarse_solver
+                        .step(time_slices[n], time_slices[n + 1], &y_next[n])?;
                 // Compute old coarse prediction from y_n^k
-                let coarse_old = self.coarse_solver.step(time_slices[n], time_slices[n + 1], &y[n])?;
+                let coarse_old =
+                    self.coarse_solver
+                        .step(time_slices[n], time_slices[n + 1], &y[n])?;
 
                 // Parareal update: y_{n+1}^{k+1} = G(y_n^{k+1}) + F(y_n^k) - G(y_n^k)
                 for i in 0..y_next[n + 1].len() {
                     y_next[n + 1][i] = coarse_new[i] + fine_states[n][i] - coarse_old[i];
-                    
+
                     let diff = (y_next[n + 1][i] - y[n + 1][i]).abs();
                     if diff > max_diff {
                         max_diff = diff;
