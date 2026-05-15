@@ -40,7 +40,7 @@ pub mod auto_imex {
         pub fn route_spectrum(&mut self, eigenvalues: &[Real]) -> (&[usize], &[usize]) {
             self.implicit_vars.clear();
             self.explicit_vars.clear();
-            
+
             for (i, &eig) in eigenvalues.iter().enumerate() {
                 if eig.abs() > self.threshold {
                     self.implicit_vars.push(i);
@@ -48,7 +48,7 @@ pub mod auto_imex {
                     self.explicit_vars.push(i);
                 }
             }
-            
+
             (&self.implicit_vars, &self.explicit_vars)
         }
     }
@@ -78,7 +78,10 @@ pub mod neural_sgs {
         /// Returns the modified divergence or stress tensor.
         pub fn apply_closure(&self, macroscopic_field: &[Real]) -> Vec<Real> {
             // Simulated neural inference returning a closure field
-            macroscopic_field.iter().map(|&val| val * self.cascade_slope.abs() * 0.01).collect()
+            macroscopic_field
+                .iter()
+                .map(|&val| val * self.cascade_slope.abs() * 0.01)
+                .collect()
         }
     }
 }
@@ -107,9 +110,11 @@ pub mod hamiltonian_gat {
         /// Ensures $\Delta E / E_0 < 10^{-6}$ energy conservation.
         pub fn precond(&self, v: &[Real]) -> Vec<Real> {
             // Apply symplectic attention map
-            v.iter().map(|&x| x / (self.attention_heads as Real)).collect()
+            v.iter()
+                .map(|&x| x / (self.attention_heads as Real))
+                .collect()
         }
-        
+
         /// Validates the Hamiltonian energy conservation bound.
         pub fn verify_energy_bound(&self, drift: Real) -> bool {
             drift < self.energy_drift_tolerance
@@ -136,7 +141,9 @@ pub mod pcbf {
     impl ProbabilisticControlBarrier {
         /// Initializes the pCBF framework.
         pub fn new(margin: Real) -> Self {
-            Self { safety_margin: margin }
+            Self {
+                safety_margin: margin,
+            }
         }
 
         /// Computes the safe control action $u$ given state $x$ and environmental SDE $sde$.

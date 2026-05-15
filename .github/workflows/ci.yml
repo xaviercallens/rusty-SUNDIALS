@@ -2,98 +2,122 @@ name: rusty-SUNDIALS CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
 
 jobs:
   build_and_test:
     name: Build and Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        components: clippy, rustfmt
-        
-    - name: Cache Dependencies
-      uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@v4
 
-    - name: Check Formatting
-      run: cargo fmt --all -- --check
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
 
-    - name: Clippy Lints
-      run: cargo clippy --workspace -- -D warnings
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v2
 
-    - name: Build Workspace
-      run: cargo build --workspace --all-targets
+      - name: Check Formatting
+        # rustfmt.toml excludes crates/sundials-core/src/generated (Rust 2024 syntax)
+        run: cargo fmt --all -- --check
 
-    - name: Run Tests
-      run: cargo test --workspace
+      - name: Clippy Lints
+        run: cargo clippy --workspace --features experimental -- -D warnings
+
+      - name: Build Workspace
+        run: cargo build --workspace --all-targets --features experimental
+
+      - name: Run Tests
+        run: cargo test --workspace --features experimental
 
   docs:
     name: Build Documentation
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Rust
-      uses: dtolnay/rust-toolchain@stable
-      
-    - name: Build Docs
-      run: cargo doc --workspace --no-deps --document-private-items
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Docs
+        run: cargo doc --workspace --no-deps --document-private-items --features experimental
 
   coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        components: llvm-tools-preview
-    - name: Install grcov
-      run: cargo install grcov
-    - name: Run Tests with Coverage
-      env:
-        RUSTFLAGS: "-Cinstrument-coverage"
-        LLVM_PROFILE_FILE: "coverage-%p-%m.profraw"
-      run: cargo test --workspace
-    - name: Generate HTML Report
-      run: |
-        grcov . -s . --binary-path ./target/debug/ -t html --branch -o ./target/debug/coverage
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install grcov
+        run: cargo install grcov
+
+      - name: Run Tests with Coverage
+        env:
+          RUSTFLAGS: "-Cinstrument-coverage"
+          LLVM_PROFILE_FILE: "coverage-%p-%m.profraw"
+        # Include experimental feature so benchmark_a100_hpc compiles
+        run: cargo test --workspace --features experimental
+
+      - name: Generate HTML Report
+        run: |
+          grcov . -s . --binary-path ./target/debug/ -t html --branch \
+            -o ./target/debug/coverage
 
   wasm:
     name: Build WebAssembly
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: wasm32-unknown-unknown
-    - name: Build WASM
-      run: cargo build --workspace --exclude examples --target wasm32-unknown-unknown
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build WASM
+        # Exclude 'examples' crate: it has platform-specific deps (tokio, rayon)
+        # incompatible with wasm32-unknown-unknown target.
+        run: cargo build --workspace --exclude examples --target wasm32-unknown-unknown
 
   lean_proofs:
     name: Verify Lean 4 Proofs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up elan
-      run: |
-        curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
-        echo "$HOME/.elan/bin" >> $GITHUB_PATH
-    - name: Verify Proofs
-      run: |
-        cd proofs/lean4
-        lean --run cvode.lean
+      - uses: actions/checkout@v4
+
+      - name: Set up elan
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Verify Proofs
+        run: |
+          cd proofs/lean4
+          lean --run cvode.lean

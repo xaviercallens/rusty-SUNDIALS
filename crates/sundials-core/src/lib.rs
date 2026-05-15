@@ -20,8 +20,8 @@ pub mod ilu;
 pub mod math;
 pub mod mpir;
 pub mod pinn;
-pub mod sparse;
 pub mod pint;
+pub mod sparse;
 
 #[cfg(feature = "experimental")]
 pub mod experimental;
