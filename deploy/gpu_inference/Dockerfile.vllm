@@ -1,0 +1,127 @@
+# =============================================================================
+# rusty-SUNDIALS v10 — vLLM GPU Inference Server
+# =============================================================================
+# Serves TWO open-weight models on a single A100/L4 GPU via vLLM:
+#
+#   Model 1: Qwen/Qwen3-8B  (thinking mode, math + reasoning + peer review)
+#   Model 2: Qwen/Qwen2.5-Coder-7B-Instruct  (Rust code synthesis)
+#
+# Deployment targets:
+#   • GCP Vertex AI Custom Endpoint (A100 80GB, scale-to-zero)
+#   • Cloud Run GPU (L4 24GB) with both models at FP8/AWQ quantization
+#
+# GPU memory budget (A100 80GB FP16):
+#   Qwen3-8B           ≈ 16 GB (FP16) | 8 GB (FP8)
+#   Qwen2.5-Coder-7B   ≈ 14 GB (FP16) | 7 GB (FP8)
+#   KV-cache overhead  ≈ 8 GB
+#   Total              ≈ 38 GB  ← fits comfortably on A100 80GB
+#
+# For L4 24GB: use FP8 quantization (both models ≈ 15 GB combined)
+# =============================================================================
+
+# ── Base: NVIDIA CUDA 12.4 + Python 3.11 ─────────────────────────────────────
+FROM nvcr.io/nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    HF_HUB_CACHE=/model-cache \
+    TRANSFORMERS_CACHE=/model-cache \
+    TORCH_CUDA_ARCH_LIST="8.0;8.6;8.9;9.0" \
+    CUDA_VISIBLE_DEVICES=0
+
+# ── System dependencies ───────────────────────────────────────────────────────
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 python3.11-dev python3-pip python3.11-venv \
+    build-essential git curl wget ca-certificates \
+    libgomp1 \
+    && ln -sf /usr/bin/python3.11 /usr/bin/python3 \
+    && ln -sf /usr/bin/python3.11 /usr/bin/python \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# ── Python dependencies ───────────────────────────────────────────────────────
+# Pin vLLM version for Qwen3 thinking-mode support
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+        "vllm>=0.8.5" \
+        "torch==2.4.0" \
+        "torchvision" \
+        "transformers>=4.51.0" \
+        "accelerate>=0.34.0" \
+        "huggingface-hub>=0.24.0" \
+        "fastapi>=0.115.0" \
+        "uvicorn[standard]>=0.30.0" \
+        "pydantic>=2.7.0" \
+        "requests>=2.32.0" \
+        "numpy>=1.26.0" \
+        "sentencepiece" \
+        "tiktoken" \
+        "bitsandbytes>=0.43.0"
+
+# ── DeepProbLog + neuro-symbolic dependencies ─────────────────────────────────
+# Install DeepProbLog from ML-KULeuven (framework, not weights)
+RUN pip install --no-cache-dir \
+        problog>=2.2.4 \
+        torch-geometric \
+        "deepproblog @ git+https://github.com/ML-KULeuven/deepproblog.git" \
+        sympy>=1.13.0 \
+    || echo "⚠️ DeepProbLog git install failed — using problog fallback"
+
+# ── CodeBERT (microsoft/codebert-base) for semantic code embeddings ───────────
+# Used for code similarity search, NOT syntax validation (use cargo check for that)
+RUN pip install --no-cache-dir \
+        "transformers>=4.51.0" \
+        "sentence-transformers>=3.0.0"
+
+# ── Model pre-download (baked into image for fast cold start) ─────────────────
+# Set HF_TOKEN as build arg (never hardcoded)
+ARG HF_TOKEN=""
+ENV HF_TOKEN=${HF_TOKEN}
+
+# Download Qwen3-8B (math reasoning, peer review, proof tactics)
+RUN python3 -c "\
+from huggingface_hub import snapshot_download; \
+import os; \
+token = os.environ.get('HF_TOKEN') or None; \
+snapshot_download( \
+    'Qwen/Qwen3-8B', \
+    cache_dir='/model-cache', \
+    token=token, \
+    ignore_patterns=['*.gguf', '*.ggml', 'original/*'], \
+)" || echo "⚠️ Qwen3-8B pre-download skipped — will download at runtime"
+
+# Download Qwen2.5-Coder-7B-Instruct (Rust code synthesis)
+RUN python3 -c "\
+from huggingface_hub import snapshot_download; \
+import os; \
+token = os.environ.get('HF_TOKEN') or None; \
+snapshot_download( \
+    'Qwen/Qwen2.5-Coder-7B-Instruct', \
+    cache_dir='/model-cache', \
+    token=token, \
+    ignore_patterns=['*.gguf', '*.ggml', 'original/*'], \
+)" || echo "⚠️ Qwen2.5-Coder pre-download skipped — will download at runtime"
+
+# Download CodeBERT for embeddings
+RUN python3 -c "\
+from huggingface_hub import snapshot_download; \
+snapshot_download('microsoft/codebert-base', cache_dir='/model-cache')" \
+    || echo "⚠️ CodeBERT pre-download skipped"
+
+# ── Copy application code ─────────────────────────────────────────────────────
+COPY deploy/gpu_inference/ /app/
+COPY autoresearch_agent/ /app/autoresearch_agent/
+
+# ── Expose ports ──────────────────────────────────────────────────────────────
+# 8080: Main HTTP API (Cloud Run / Vertex AI expected port)
+# 8000: vLLM OpenAI-compatible endpoint (internal)
+EXPOSE 8080 8000
+
+# ── Health check ──────────────────────────────────────────────────────────────
+HEALTHCHECK --interval=30s --timeout=10s --start-period=180s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# ── Entrypoint: launches vLLM router + FastAPI gateway ───────────────────────
+CMD ["python3", "/app/server.py"]

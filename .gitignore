@@ -57,3 +57,12 @@ mission-control/.env
 mission-control/.env.local
 mission-control/.env.*.local
 
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Autoresearch intermediate run artifacts (keep SOC + autoresearch session dirs)
+autoresearch_agent/discoveries/v10_pipeline_*.json
