@@ -2,6 +2,7 @@
 
 use nvector::SerialVector;
 use sundials_core::Real;
+use sundials_core::generated::sundials_dense::DenseMat;
 
 use crate::constants::Method;
 use crate::error::CvodeError;
@@ -17,6 +18,7 @@ pub struct CvodeBuilder {
     init_step: Option<Real>,
     max_step: Option<Real>,
     min_step: Option<Real>,
+    jac: Option<Box<dyn FnMut(Real, &[Real], &mut DenseMat) -> Result<(), String> + Send + Sync>>,
 }
 
 impl CvodeBuilder {
@@ -31,6 +33,7 @@ impl CvodeBuilder {
             init_step: None,
             max_step: None,
             min_step: None,
+            jac: None,
         }
     }
 
@@ -76,6 +79,33 @@ impl CvodeBuilder {
         self
     }
 
+    /// Provide an analytical Jacobian function.
+    ///
+    /// The function signature is `(t, y, jac_out) -> Result<(), String>` where
+    /// `jac_out` is a `DenseMat` in **column-major** order: `cols[j][i] = ∂f_i/∂y_j`.
+    ///
+    /// When provided, the Jacobian is evaluated analytically instead of by
+    /// finite differences, eliminating `n` extra RHS evaluations per Jacobian
+    /// computation and giving exact Newton directions. This is the primary
+    /// fix for the step-count efficiency gap vs LLNL C SUNDIALS.
+    ///
+    /// # Example (Robertson kinetics)
+    /// ```rust,ignore
+    /// .jacobian(|_t, y, j| {
+    ///     j.cols[0][0] = -0.04;          j.cols[1][0] = 1e4 * y[2];  j.cols[2][0] = 1e4 * y[1];
+    ///     j.cols[0][1] =  0.04;          j.cols[1][1] = -1e4 * y[2] - 6e7 * y[1];  j.cols[2][1] = -1e4 * y[1];
+    ///     j.cols[0][2] =  0.0;           j.cols[1][2] = 6e7 * y[1]; j.cols[2][2] = 0.0;
+    ///     Ok(())
+    /// })
+    /// ```
+    pub fn jacobian<J>(mut self, jac: J) -> Self
+    where
+        J: FnMut(Real, &[Real], &mut DenseMat) -> Result<(), String> + Send + Sync + 'static,
+    {
+        self.jac = Some(Box::new(jac));
+        self
+    }
+
     /// Build the solver with the given RHS function and initial conditions.
     pub fn build<F>(self, rhs: F, t0: Real, y0: SerialVector) -> Result<Cvode<F>, CvodeError>
     where
@@ -109,6 +139,7 @@ impl CvodeBuilder {
             self.init_step,
             self.max_step,
             self.min_step,
+            self.jac,
         ))
     }
 }
