@@ -77,7 +77,7 @@ jobs:
             --machine-type="$MACHINE" \
             --accelerator="count=1,type=nvidia-tesla-a100" \
             --maintenance-policy=TERMINATE \
-            --restart-on-failure=no \
+            --no-restart-on-failure \
             --image-family=common-cu121 \
             --image-project=deeplearning-platform-release \
             --boot-disk-size=200GB \
