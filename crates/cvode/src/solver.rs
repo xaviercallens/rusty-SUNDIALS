@@ -543,17 +543,13 @@ where
                 let new_h = (self.h * eta).clamp(self.min_step, self.max_step);
                 let actual_eta = if self.h != 0.0 { new_h / self.h } else { 1.0 };
 
-                if order_changed {
-                    // Only reset qwait on actual order change (LLNL policy)
+                if (actual_eta - 1.0).abs() > 1e-6 || order_changed {
                     self.h = new_h;
                     self.zn.rescale(actual_eta, self.q);
-                    self.qwait = self.q + 1;
-                } else if (actual_eta - 1.0).abs() > 1e-6 {
-                    self.h = new_h;
-                    self.zn.rescale(actual_eta, self.q);
-                    // Don't reset qwait here — let order selection proceed freely
+                    self.qwait = self.q + 1; // wait before next change
+                } else {
+                    self.qwait = 1; // wait 1 more step before checking again
                 }
-                // (if eta ≈ 1, no rescale needed)
 
                 return Ok(());
             }
