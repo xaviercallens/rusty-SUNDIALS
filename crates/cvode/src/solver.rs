@@ -6,10 +6,11 @@
 //! - Newton iteration with cached Jacobian for implicit methods
 //! - Error estimation and step rejection
 //!
-//! Performance optimizations for Apple Silicon (M-series):
-//! - Jacobian caching: recompute only every ~20 steps or on convergence failure
+//! Performance — aligned with LLNL CVODE defaults:
+//! - Jacobian caching: recompute every 51 steps (MSBJ=51, was 20)
+//! - gamma refactor threshold DGMAX=0.2 (was 0.3)
+//! - Post-failure step growth capped at ETAMXF=0.2 (LLNL default)
 //! - Higher-order BDF: 10-100× fewer steps than order-1
-//! - Increased Newton iterations: 7 (vs 3) for better convergence per step
 //!
 //! Translated from: cvode.c (CVode, CVodeStep, CVodeNls)
 
@@ -17,7 +18,7 @@ use nvector::{NVector, SerialVector};
 use sundials_core::Real;
 
 use crate::builder::CvodeBuilder;
-use crate::constants::{MAX_ERR_TEST_FAILS, Method, Task};
+use crate::constants::{DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, Method, Task};
 use crate::error::CvodeError;
 use crate::nordsieck::NordsieckArray;
 use crate::step;
@@ -45,8 +46,7 @@ const BDF_L: [[f64; 6]; 6] = [
 /// BDF error test constants: C(q) = 1/(q+1) for the LTE estimator.
 const BDF_ERR_COEFF: [f64; 6] = [0.0, 0.5, 1.0 / 3.0, 0.25, 0.2, 1.0 / 6.0];
 
-/// Jacobian recomputation interval (steps between full Jacobian rebuilds).
-const JAC_RECOMPUTE_INTERVAL: usize = 20;
+// JAC_RECOMPUTE_INTERVAL, DGMAX_LSETUP, ETA_MAX_FAIL imported from constants.
 
 /// Maximum Newton iterations per step (increased for better convergence).
 const MAX_NEWTON_ITERS: usize = 7;
@@ -389,7 +389,7 @@ where
                     self.zn.rescale(0.25, self.q);
                     continue;
                 }
-            } else if gamma_ratio > 0.3 {
+            } else if gamma_ratio > DGMAX_LSETUP {
                 // gamma changed significantly — refactor with cached Jacobian
                 if self.refactor_m(gamma).is_err() {
                     // Jacobian might be stale → full recompute
@@ -564,7 +564,8 @@ where
                 ));
             }
             self.qwait = self.q + 1; // reset wait after failure
-            let eta = step::compute_eta(err_norm, self.q).min(0.5);
+            // Cap growth at ETA_MAX_FAIL=0.2 after error failure (LLNL ETAMXF).
+            let eta = step::compute_eta(err_norm, self.q).min(ETA_MAX_FAIL);
             self.h *= eta;
             self.zn.rescale(eta, self.q);
         }

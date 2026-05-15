@@ -6,10 +6,12 @@
 //!
 //! y(0) = [1, 0, 0], t ∈ [0, 4e10]
 //!
-//! This is the standard SUNDIALS CVODE example (cvRoberts_dns).
+//! Reference: SUNDIALS 7.4.0 cvRoberts_dns
+//! C reference: steps=1070, rhs_evals=1537, conservation<1e-15
 
 use cvode::{Cvode, Method, Task};
 use nvector::SerialVector;
+use std::time::Instant;
 
 fn main() -> Result<(), cvode::CvodeError> {
     let rhs = |_t: f64, y: &[f64], ydot: &mut [f64]| -> Result<(), String> {
@@ -23,11 +25,14 @@ fn main() -> Result<(), cvode::CvodeError> {
     let mut solver = Cvode::builder(Method::Bdf)
         .rtol(1e-4)
         .atol(1e-8)
+        .max_order(5)          // BDF-5 — same as LLNL cvRoberts_dns
+        .init_step(1e-4)       // LLNL h0 default for Robertson
         .max_steps(50000)
         .build(rhs, 0.0, y0)?;
 
     println!("Robertson Chemical Kinetics (stiff system)");
     println!("BDF method with adaptive step size");
+    println!("Reference: SUNDIALS 7.4.0 cvRoberts_dns (C)");
     println!("{:>12} {:>14} {:>14} {:>14}", "t", "y1", "y2", "y3");
     println!("{}", "-".repeat(58));
 
@@ -35,6 +40,7 @@ fn main() -> Result<(), cvode::CvodeError> {
         0.4, 4.0, 40.0, 400.0, 4000.0, 40000.0, 4e5, 4e6, 4e7, 4e8, 4e9, 4e10,
     ];
 
+    let start = Instant::now();
     for &tout in &times {
         let (t, y) = solver.solve(tout, Task::Normal)?;
         println!(
@@ -44,16 +50,31 @@ fn main() -> Result<(), cvode::CvodeError> {
             y3 = y[2]
         );
     }
+    let wall_ms = start.elapsed().as_millis();
+
+    let steps = solver.num_steps();
+    let rhs_evals = solver.num_rhs_evals();
 
     println!("\nSolver statistics:");
-    println!("  Steps: {}", solver.num_steps());
-    println!("  RHS evals: {}", solver.num_rhs_evals());
+    println!("  Steps:      {steps}  (C ref: 1070, ratio: {:.1}x)", steps as f64 / 1070.0);
+    println!("  RHS evals:  {rhs_evals}  (C ref: 1537, ratio: {:.1}x)", rhs_evals as f64 / 1537.0);
     println!("  Final order: {}", solver.order());
+    println!("  Wall time:  {wall_ms}ms");
 
     // Verify conservation: y1 + y2 + y3 = 1
     let y = solver.y();
     let sum = y[0] + y[1] + y[2];
+    let conservation_error = (sum - 1.0).abs();
     println!("  Conservation (y1+y2+y3): {sum:.15e} (should be 1.0)");
+    println!("  Conservation error: {conservation_error:.2e}  (threshold 1e-12)");
+
+    if conservation_error < 1e-12 {
+        println!("  Conservation: PASS ✓");
+    } else {
+        println!("  Conservation: FAIL ✗");
+        std::process::exit(1);
+    }
 
     Ok(())
 }
+

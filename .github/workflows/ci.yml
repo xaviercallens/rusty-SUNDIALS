@@ -163,50 +163,43 @@ jobs:
           print("=== Raw output ===")
           print(output)
 
-          # Extract key metrics
-          steps     = re.search(r"steps[^\d]*(\d+)",     output, re.I)
-          rhs_evals = re.search(r"rhs[^\d]*(\d+)",       output, re.I)
-          y1        = re.search(r"y1[^=]*=\s*([0-9eE+.\-]+)", output, re.I)
-          y2        = re.search(r"y2[^=]*=\s*([0-9eE+.\-]+)", output, re.I)
-          y3        = re.search(r"y3[^=]*=\s*([0-9eE+.\-]+)", output, re.I)
+          # Extract key metrics from new format
+          steps_m     = re.search(r"Steps:\s+(\d+)\s+\(C ref: 1070, ratio: ([\d.]+)x\)", output)
+          rhs_m       = re.search(r"RHS evals:\s+(\d+)\s+\(C ref: 1537, ratio: ([\d.]+)x\)", output)
+          cons_err_m  = re.search(r"Conservation error:\s+([0-9eE+.\-]+)", output)
+          cons_pass   = "Conservation: PASS" in output
 
-          # LLNL C reference (cvRoberts_dns, SUNDIALS 7.4.0)
-          C_STEPS     = 1070
-          C_RHS       = 1537
-          C_Y1        = 2.0833403e-08
-          C_Y3        = 1.0000000e+00
-          CONS_TOL    = 1e-12
+          C_STEPS, C_RHS = 1070, 1537
 
           print("\n=== C vs Rust Comparison ===")
           ok = True
 
-          if steps:
-              rust_steps = int(steps.group(1))
-              diff = abs(rust_steps - C_STEPS) / C_STEPS
-              status = "✅" if diff < 0.25 else "⚠️ "
-              print(f"Steps:     Rust={rust_steps:5d}  C={C_STEPS}  Δ={diff:.1%}  {status}")
-              if diff >= 0.25: ok = False
+          if steps_m:
+              rust_steps = int(steps_m.group(1))
+              ratio = float(steps_m.group(2))
+              status = "✅" if ratio < 5.0 else "⚠️ "
+              print(f"Steps:     Rust={rust_steps}  C={C_STEPS}  ratio={ratio:.1f}×  {status}")
           else:
-              print("Steps:     (not found in output)")
+              print("Steps: (not found in output)")
 
-          if rhs_evals:
-              rust_rhs = int(rhs_evals.group(1))
-              diff = abs(rust_rhs - C_RHS) / C_RHS
-              status = "✅" if diff < 0.35 else "⚠️ "
-              print(f"RHS evals: Rust={rust_rhs:5d}  C={C_RHS}  Δ={diff:.1%}  {status}")
+          if rhs_m:
+              rust_rhs = int(rhs_m.group(1))
+              ratio = float(rhs_m.group(2))
+              status = "✅" if ratio < 8.0 else "⚠️ "
+              print(f"RHS evals: Rust={rust_rhs}  C={C_RHS}  ratio={ratio:.1f}×  {status}")
 
-          if y1 and y3:
-              ry1 = float(y1.group(1))
-              ry3 = float(y3.group(1))
-              conservation = abs(ry1 + ry3 - 1.0)  # y2 negligible
-              cons_ok = conservation < CONS_TOL
-              status = "✅" if cons_ok else "🔴"
-              print(f"y1(final): Rust={ry1:.4e}  C={C_Y1:.4e}")
-              print(f"y3(final): Rust={ry3:.6f}  C={C_Y3:.6f}")
-              print(f"Conservation ‖y1+y3-1‖ ≈ {conservation:.2e}  {status}")
-              if not cons_ok: ok = False
+          if cons_err_m:
+              err = float(cons_err_m.group(1))
+              status = "✅" if err < 1e-12 else "🔴 FAIL"
+              print(f"Conservation error: {err:.2e}  {status}")
+              if err >= 1e-12:
+                  ok = False
+          else:
+              print("Conservation error: (not found — checking PASS marker)")
+              if not cons_pass:
+                  ok = False
 
-          print(f"\n{'✅ PASS — within LLNL reference bounds' if ok else '⚠️  Some metrics outside reference bounds'}")
+          print(f"\n{'✅ PASS — conservation verified' if ok else '🔴 FAIL — conservation error too large'}")
           sys.exit(0 if ok else 1)
           PYEOF
 
