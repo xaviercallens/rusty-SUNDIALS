@@ -34,6 +34,7 @@ env:
   MACHINE:       a2-highgpu-1g
   RESULTS_BUCKET: gs://gen-lang-client-0625573011-sundials-bench
   REGION:        us-central1
+  GH_TOKEN:      ${{ secrets.GH_PAT }}
 
 jobs:
   benchmark:
