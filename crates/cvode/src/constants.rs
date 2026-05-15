@@ -44,7 +44,7 @@ pub(crate) const MAX_NLS_ITERS: usize = 3;
 /// Safety factor for step size selection.
 pub(crate) const SAFETY: Real = 0.9;
 
-/// Maximum step size growth factor.
+/// Maximum step size growth factor (LLNL ETAMAX = 10).
 pub(crate) const ETA_MAX: Real = 10.0;
 
 /// Minimum step size reduction factor.

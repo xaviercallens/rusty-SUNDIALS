@@ -497,18 +497,13 @@ where
             self.jac_age += 1;
 
             // --- Error estimation ---
-            // SUNDIALS LTE: ||l[0] * err_coeff * acor||_wrms <= 1
-            // l[0] is the BDF normalisation coefficient (tq[2] in SUNDIALS).
-            // Without l[0], higher-order BDF overstates error by 1/l[0]
-            // (e.g. BDF-5: l[0]=60/137≈0.44 → 2.3× error inflation).
             let acor_s = self.acor.as_mut_slice();
             for i in 0..self.n {
                 acor_s[i] = acor_vec[i];
             }
 
-            let l0 = l[0]; // BDF leading coefficient (= 1 for BDF-1)
             let err_coeff = if self.method == Method::Bdf && self.q <= 5 {
-                BDF_ERR_COEFF[self.q] * l0
+                BDF_ERR_COEFF[self.q]
             } else {
                 1.0 / (self.q as Real + 1.0)
             };
@@ -548,13 +543,17 @@ where
                 let new_h = (self.h * eta).clamp(self.min_step, self.max_step);
                 let actual_eta = if self.h != 0.0 { new_h / self.h } else { 1.0 };
 
-                if (actual_eta - 1.0).abs() > 1e-6 || order_changed {
+                if order_changed {
+                    // Only reset qwait on actual order change (LLNL policy)
                     self.h = new_h;
                     self.zn.rescale(actual_eta, self.q);
-                    self.qwait = self.q + 1; // wait before next change
-                } else {
-                    self.qwait = 1; // wait 1 more step before checking again
+                    self.qwait = self.q + 1;
+                } else if (actual_eta - 1.0).abs() > 1e-6 {
+                    self.h = new_h;
+                    self.zn.rescale(actual_eta, self.q);
+                    // Don't reset qwait here — let order selection proceed freely
                 }
+                // (if eta ≈ 1, no rescale needed)
 
                 return Ok(());
             }
