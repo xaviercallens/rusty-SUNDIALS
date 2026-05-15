@@ -24,6 +24,13 @@ redis>=5.0.0
 problog>=2.1.0              # DeepProbLog probabilistic logic
 # sympy already included above
 
+# ── v11 NEW: Differential Privacy (DP-FedAvg) ────────────────
+opacus>=1.4.0               # Meta Opacus DP training (RDP accountant)
+
+# ── v11 NEW: TensorRT INT8/FP8 Preconditioner ─────────────────
+# tensorrt>=8.6.0           # NVIDIA TensorRT (install from NVIDIA, not PyPI)
+# cupy-cuda12x>=13.0.0      # cuBLAS INT8 GEMM (uncomment for CUDA 12.x)
+
 # ── v10 NEW: Explainability (Component 8) ────────────────────
 shap>=0.44.0
 pysr>=0.18.0

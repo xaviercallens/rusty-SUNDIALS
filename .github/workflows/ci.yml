@@ -9,6 +9,9 @@ on:
 env:
   CARGO_TERM_COLOR: always
   CARGO_INCREMENTAL: "0"
+  # API keys — sourced ONLY from GitHub Actions Secrets, never hardcoded
+  MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+  GEMINI_API_KEY:  ${{ secrets.GEMINI_API_KEY }}
 
 jobs:
   build_and_test:
