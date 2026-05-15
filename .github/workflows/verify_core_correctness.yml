@@ -34,13 +34,13 @@ jobs:
 
     - name: Check workspace compiles (fast check before full build)
       run: |
-        cargo check --workspace --all-targets 2>&1
+        cargo check --workspace --all-targets --features experimental 2>&1
       env:
         CARGO_INCREMENTAL: "0"
 
     - name: Build robertson example
       run: |
-        cargo build --release --example robertson 2>&1
+        cargo build --release --example robertson --features experimental 2>&1
       env:
         CARGO_INCREMENTAL: "0"
 
