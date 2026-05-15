@@ -66,3 +66,4 @@ __pycache__/
 
 # Autoresearch intermediate run artifacts (keep SOC + autoresearch session dirs)
 autoresearch_agent/discoveries/v10_pipeline_*.json
+.peer_review_cache/
