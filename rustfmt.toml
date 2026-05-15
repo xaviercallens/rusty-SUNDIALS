@@ -1,0 +1,9 @@
+# rustfmt.toml — workspace-level formatting config
+
+edition = "2021"
+
+# Skip the auto-generated SUNDIALS C bindings directory.
+# These files use Rust 2024 `let`-chains that rustfmt stable cannot parse.
+ignore = [
+    "crates/sundials-core/src/generated",
+]

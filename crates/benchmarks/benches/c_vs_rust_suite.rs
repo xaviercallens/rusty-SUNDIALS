@@ -1,11 +1,7 @@
-use criterion::{criterion_group, criterion_main, Criterion, black_box};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use sundials_core::Real;
 
-fn vanderpol_rhs(
-    t: Real,
-    y: &[Real],
-    ydot: &mut [Real],
-) {
+fn vanderpol_rhs(t: Real, y: &[Real], ydot: &mut [Real]) {
     let mu = 1.0;
     ydot[0] = y[1];
     ydot[1] = mu * (1.0 - y[0] * y[0]) * y[1] - y[0];
@@ -22,11 +18,7 @@ fn bench_vanderpol(c: &mut Criterion) {
     });
 }
 
-fn robertson_rhs(
-    t: Real,
-    y: &[Real],
-    ydot: &mut [Real],
-) {
+fn robertson_rhs(t: Real, y: &[Real], ydot: &mut [Real]) {
     ydot[0] = -0.04 * y[0] + 1e4 * y[1] * y[2];
     ydot[2] = 3e7 * y[1] * y[1];
     ydot[1] = -ydot[0] - ydot[2];
