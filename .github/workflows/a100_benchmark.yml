@@ -1,4 +1,4 @@
-name: A100 GPU Benchmark (GCP)
+name: A100 GPU Benchmark (GCP)  # v11
 # ============================================================
 # Runs official SUNDIALS 7.4.0 benchmarks on GCP a2-highgpu-1g
 # (1× NVIDIA A100 40GB) and uploads results to GCS.
