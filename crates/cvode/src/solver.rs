@@ -20,7 +20,7 @@ use sundials_core::Real;
 use crate::builder::CvodeBuilder;
 use crate::constants::{
     DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS, Method,
-    NLS_CRDOWN, NLS_TOL, Task,
+    NLS_COEF, NLS_CRDOWN, NLS_MIN_TOL, NLS_TOL, Task,
 };
 use crate::error::CvodeError;
 use crate::nordsieck::NordsieckArray;
@@ -93,15 +93,16 @@ pub struct Cvode<F> {
     // --- RHS function ---
     rhs: F,
 
-    // --- Optional analytical Jacobian: J(t, y, jac_out) ---
-    // When Some, replaces finite-difference Jacobian computation.
-    // jac_out is a DenseMat in column-major order: cols[j][i] = ∂f_i/∂y_j.
-    // This eliminates n extra RHS evaluations per Jacobian compute (n=3 for Robertson)
-    // and gives exact Jacobians — the primary cause of the 16× step gap vs LLNL C.
+    // --- Optional analytical Jacobian ---
     jac: Option<Box<dyn FnMut(Real, &[Real], &mut DenseMat) -> Result<(), String> + Send + Sync>>,
 
     // --- Status ---
     initialized: bool,
+
+    // --- H6 [v2 autoresearch]: adaptive m=0 tolerance ---
+    // Tracks ||acor||_WRMS from previous accepted step.
+    // When small (accurate prev step), tightens m=0 tol → 1-iter convergence.
+    prev_acor_norm: Real,
 }
 
 impl<F> Cvode<F>
@@ -165,6 +166,7 @@ where
             rhs,
             jac,
             initialized: false,
+            prev_acor_norm: NLS_TOL, // H6: start with standard tol until first step
         }
     }
 
@@ -435,13 +437,31 @@ where
                 }
             }
 
-            // --- Newton iteration — LLNL nls_newton.c logic ---
-            // H1: Use NLS_CRDOWN=0.3 relaxed tolerance (LLNL cvodenls.c:cvNewtonIteration)
-            // H2: Unified convergence check from iter 0 (no special m==0 case).
-            // H3: del_old initialised from first iter, rho computed from iter 1+.
+            // --- Newton iteration — LLNL cvNlsNewton (v2 corrected) ---
+            //
+            // H4 [corrected tq4]: tq4 = NLS_COEF / BDF_ERR_COEFF[q]
+            //   q=1: tq4=0.20  q=3: tq4=0.40  q=5: tq4=0.60
+            //   LLNL formula: tq[4] = NLSCOEF / tq[2]  where tq[2] ≈ BDF_ERR_COEFF[q]
+            //   Previous (broken): (q+1)/(l[0]*NLSCOEF) ≈ 137 → destabilised steps
+            //   Correct: 0.6 at q=5 → del ≤ 0.6 when converged (safe)
+            //
+            // H5: MAX_NLS_ITERS = 4 (constants.rs)
+            //
+            // H6 [adaptive tol]: tol_m0 = max(NLS_MIN_TOL, min(NLS_TOL, CRDOWN * prev_acor))
+            //   Tight when previous step was accurate → 1-iter convergence.
+            let err_coeff_q = if self.q <= 5 {
+                BDF_ERR_COEFF[self.q]
+            } else {
+                1.0 / (self.q as Real + 1.0)
+            };
+            let tq4 = NLS_COEF / err_coeff_q; // H4: 0.20–0.60 range
+            let tol_m0 = (NLS_CRDOWN * self.prev_acor_norm) // H6: adaptive
+                .clamp(NLS_MIN_TOL, NLS_TOL);
+
             let mut acor_vec = vec![0.0; self.n];
             let mut newton_converged = false;
-            let mut del_old: Real = 0.0; // H3: set from m=0 result
+            let mut del_old: Real = 0.0;
+            let mut crate_nls: Real = 1.0; // LLNL: crate, convergence rate
 
             for m in 0..MAX_NLS_ITERS {
                 let mut y_new = vec![0.0; self.n];
@@ -469,7 +489,7 @@ where
                     break;
                 }
 
-                // Update acor and compute WRMS norm of the correction δ
+                // Update acor, compute WRMS norm of correction δ
                 let mut del = 0.0;
                 for i in 0..self.n {
                     acor_vec[i] += b[i];
@@ -478,39 +498,33 @@ where
                 }
                 del = (del / self.n as f64).sqrt();
 
-                if m == 0 {
-                    // H3: record first delta as baseline for rho computation
-                    del_old = del;
-                    // H2: early exit on first iter if already converged
-                    if del < NLS_TOL {
-                        newton_converged = true;
+                // Update LLNL crate (convergence rate estimate)
+                if m > 0 {
+                    crate_nls = (NLS_CRDOWN * crate_nls).max(if del_old > 0.0 {
+                        del / del_old
+                    } else {
+                        1.0
+                    });
+                    // Divergence guard
+                    if crate_nls >= 0.9 {
                         break;
                     }
-                } else {
-                    // H1+H3: convergence-rate monitoring ρ = ||δₘ|| / ||δₘ₋₁||
-                    let rho = if del_old > 0.0 { del / del_old } else { 1.0 };
-
-                    // Divergence guard: abort if Newton is not contracting
-                    if rho >= 0.9 {
-                        break;
-                    }
-
-                    // H1: LLNL predictive convergence test with CRDOWN relaxation:
-                    // estimated remaining error = ρ·del/(1-ρ) < CRDOWN·tol
-                    let tol = NLS_TOL * NLS_CRDOWN.max(rho);
-                    if rho * del / (1.0 - rho) < tol {
-                        newton_converged = true;
-                        break;
-                    }
-
-                    // Fallback: direct norm test with CRDOWN-relaxed tolerance
-                    if del < NLS_TOL * NLS_CRDOWN {
-                        newton_converged = true;
-                        break;
-                    }
-
-                    del_old = del;
                 }
+
+                // H4: LLNL tq4 convergence test  (dcon = del*crate/tq4 ≤ 1)
+                let dcon = del * crate_nls.min(1.0) / tq4;
+                if dcon <= 1.0 {
+                    newton_converged = true;
+                    break;
+                }
+
+                // H6: adaptive m=0 early exit (tighter than tq4 for easy steps)
+                if m == 0 && del < tol_m0 {
+                    newton_converged = true;
+                    break;
+                }
+
+                del_old = del;
             }
 
             if !newton_converged {
@@ -547,6 +561,18 @@ where
 
             if err_norm <= 1.0 {
                 // --- Step accepted ---
+                // H6: record acor norm for next step's adaptive tol
+                let acor_slice = self.acor.as_slice();
+                let acor_norm: Real = {
+                    let s: Real = acor_slice
+                        .iter()
+                        .zip(self.ewt.as_slice())
+                        .map(|(a, e)| (a * e).powi(2))
+                        .sum();
+                    (s / self.n as Real).sqrt()
+                };
+                self.prev_acor_norm = acor_norm;
+
                 self.zn.correct(&l, &self.acor, self.q);
                 self.t += self.h;
                 self.nst += 1;

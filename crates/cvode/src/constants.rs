@@ -39,7 +39,10 @@ pub(crate) const MAX_ERR_TEST_FAILS: usize = 7;
 pub(crate) const MAX_CONV_FAILS: usize = 10;
 
 /// Maximum number of nonlinear solver iterations per step.
-pub(crate) const MAX_NLS_ITERS: usize = 3;
+/// H5 [v2]: 3→4 — one extra iter costs 1 RHS eval but avoids a 0.25× step
+/// shrink from conv failure (very expensive). LLNL default is also 3 but
+/// with a more lenient convergence test that rarely needs the 3rd iter.
+pub(crate) const MAX_NLS_ITERS: usize = 4;
 
 /// Safety factor for step size selection.
 pub(crate) const SAFETY: Real = 0.9;
@@ -76,3 +79,12 @@ pub(crate) const NLS_CRDOWN: Real = 0.3;
 
 /// Base Newton convergence tolerance (LLNL: del < 0.1 for first iter).
 pub(crate) const NLS_TOL: Real = 0.1;
+
+/// LLNL NLSCOEF for CORRECTED tq[4] formula: tq4 = NLS_COEF / BDF_ERR_COEFF[q].
+///   q=1: tq4=0.20  q=2: tq4=0.30  q=3: tq4=0.40  q=4: tq4=0.50  q=5: tq4=0.60
+/// Convergence: del * crate.min(1) / tq4 ≤ 1.0  (LLNL cvNlsNewton exact)
+/// Since tq4 ≤ 0.6, convergence requires del ≤ 0.6 — no step destabilization.
+pub(crate) const NLS_COEF: Real = 0.1;
+
+/// Minimum NLS tolerance floor for H6 adaptive m=0 check.
+pub(crate) const NLS_MIN_TOL: Real = 1e-4;
