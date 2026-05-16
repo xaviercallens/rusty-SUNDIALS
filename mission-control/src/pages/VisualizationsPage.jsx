@@ -5,21 +5,25 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export default function VisualizationsPage() {
   const [visualizations, setVisualizations] = useState([]);
+  const [autoResearch, setAutoResearch] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeViz, setActiveViz] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/visualizations`)
-      .then(res => res.json())
-      .then(data => {
-        setVisualizations(data);
-        if (data.length > 0) setActiveViz(data[0]);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch visualizations", err);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch(`${API_BASE}/api/visualizations`).then(res => res.json()),
+      fetch(`${API_BASE}/api/auto-research`).then(res => res.json())
+    ])
+    .then(([vizData, arData]) => {
+      setVisualizations(vizData);
+      setAutoResearch(arData);
+      if (vizData.length > 0) setActiveViz(vizData[0]);
+      setLoading(false);
+    })
+    .catch(err => {
+      console.error("Failed to fetch data", err);
+      setLoading(false);
+    });
   }, []);
 
   if (loading) {
@@ -115,6 +119,79 @@ export default function VisualizationsPage() {
                         </div>
                       ))}
                     </div>
+
+                    {/* Auto-Research Results Section */}
+                    {autoResearch.length > 0 && (
+                      <div className="mt-12 pt-8 border-t border-slate-800">
+                        <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500 mb-6 flex items-center gap-2">
+                          <Zap className="w-5 h-5 text-purple-400" /> 
+                          Auto-Research Optimization Methods
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {autoResearch.map((ar, idx) => (
+                            <div key={idx} className="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-lg">
+                              <div className="flex justify-between items-start mb-3">
+                                <h4 className="font-semibold text-e0e0ff text-sm">{ar.name}</h4>
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-wider">
+                                  {ar.status}
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-400 mb-4">{ar.findings?.description}</p>
+                              
+                              <div className="space-y-2">
+                                {ar.id === 'gpu-ablation-v1' && ar.findings?.benchmarks && (
+                                  <div className="text-xs bg-black/50 p-3 rounded border border-slate-800">
+                                    <div className="flex justify-between text-slate-500 mb-1">
+                                      <span>Best Method</span><span>Speedup</span>
+                                    </div>
+                                    <div className="flex justify-between text-cyan-400 font-mono">
+                                      <span>{ar.findings.benchmarks[3]?.method}</span>
+                                      <span>{ar.findings.benchmarks[3]?.speedup}</span>
+                                    </div>
+                                    <div className="mt-2 pt-2 border-t border-slate-800 text-slate-400">
+                                      {ar.findings.analysis?.total_speedup_decomposition}
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {ar.id === 'adaptive-precision-v1' && ar.findings?.improvement && (
+                                  <div className="text-xs bg-black/50 p-3 rounded border border-slate-800 text-slate-300">
+                                    <div className="text-purple-400 mb-1 font-medium">Trajectory: FP8 → FP16 → FP32</div>
+                                    {ar.findings.improvement}
+                                    <div className="mt-2 grid grid-cols-2 gap-2 text-center border-t border-slate-800 pt-2">
+                                      <div>
+                                        <div className="text-slate-500">Iters</div>
+                                        <div className="text-cyan-400 font-mono">{ar.findings.adaptive?.total_newton_iters}</div>
+                                      </div>
+                                      <div>
+                                        <div className="text-slate-500">Residual</div>
+                                        <div className="text-cyan-400 font-mono">{ar.findings.adaptive?.final_residual?.toExponential(1)}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {ar.id === 'arch-comparison-v1' && ar.findings?.architectures && (
+                                  <div className="text-xs bg-black/50 p-3 rounded border border-slate-800">
+                                    {ar.findings.architectures.map((arch, i) => (
+                                      <div key={i} className="flex justify-between mb-1 last:mb-0">
+                                        <span className={arch.recommended ? "text-cyan-400 font-medium" : "text-slate-400"}>
+                                          {arch.name.split(' ')[0]}
+                                        </span>
+                                        <span className="font-mono text-slate-500">{arch.inference_ms}ms</span>
+                                      </div>
+                                    ))}
+                                    <div className="mt-2 text-slate-400 border-t border-slate-800 pt-2">
+                                      Winner: {ar.findings.recommendation}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-64 text-slate-500">
