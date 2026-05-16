@@ -19,8 +19,8 @@ use sundials_core::Real;
 
 use crate::builder::CvodeBuilder;
 use crate::constants::{
-    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS,
-    Method, Task, NLS_CRDOWN, NLS_TOL,
+    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS, Method,
+    NLS_CRDOWN, NLS_TOL, Task,
 };
 use crate::error::CvodeError;
 use crate::nordsieck::NordsieckArray;
