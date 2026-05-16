@@ -19,9 +19,11 @@ use sundials_core::Real;
 
 use crate::builder::CvodeBuilder;
 use crate::constants::{
-    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS, Method,
-    NLS_COEF, NLS_CRDOWN, NLS_MIN_TOL, NLS_TOL, Task,
+    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS,
+    Method, NLS_CRDOWN, NLS_TOL, Task,
 };
+#[cfg(feature = "experimental-nls-v2")]
+use crate::constants::{NLS_COEF, NLS_MIN_TOL};
 use crate::error::CvodeError;
 use crate::nordsieck::NordsieckArray;
 use crate::step;
@@ -102,6 +104,7 @@ pub struct Cvode<F> {
     // --- H6 [v2 autoresearch]: adaptive m=0 tolerance ---
     // Tracks ||acor||_WRMS from previous accepted step.
     // When small (accurate prev step), tightens m=0 tol → 1-iter convergence.
+    #[cfg(feature = "experimental-nls-v2")]
     prev_acor_norm: Real,
 }
 
@@ -166,6 +169,7 @@ where
             rhs,
             jac,
             initialized: false,
+            #[cfg(feature = "experimental-nls-v2")]
             prev_acor_norm: NLS_TOL, // H6: start with standard tol until first step
         }
     }
@@ -437,31 +441,28 @@ where
                 }
             }
 
-            // --- Newton iteration — LLNL cvNlsNewton (v2 corrected) ---
-            //
-            // H4 [corrected tq4]: tq4 = NLS_COEF / BDF_ERR_COEFF[q]
-            //   q=1: tq4=0.20  q=3: tq4=0.40  q=5: tq4=0.60
-            //   LLNL formula: tq[4] = NLSCOEF / tq[2]  where tq[2] ≈ BDF_ERR_COEFF[q]
-            //   Previous (broken): (q+1)/(l[0]*NLSCOEF) ≈ 137 → destabilised steps
-            //   Correct: 0.6 at q=5 → del ≤ 0.6 when converged (safe)
-            //
-            // H5: MAX_NLS_ITERS = 4 (constants.rs)
-            //
-            // H6 [adaptive tol]: tol_m0 = max(NLS_MIN_TOL, min(NLS_TOL, CRDOWN * prev_acor))
-            //   Tight when previous step was accurate → 1-iter convergence.
-            let err_coeff_q = if self.q <= 5 {
-                BDF_ERR_COEFF[self.q]
-            } else {
-                1.0 / (self.q as Real + 1.0)
-            };
-            let tq4 = NLS_COEF / err_coeff_q; // H4: 0.20–0.60 range
-            let tol_m0 = (NLS_CRDOWN * self.prev_acor_norm) // H6: adaptive
-                .clamp(NLS_MIN_TOL, NLS_TOL);
-
+            // ═══════════════════════════════════════════════════════════════
+            // Newton iteration — two compile-time paths:
+            //   default:                 v11.3.0 stable (H1+H2+H3)
+            //   experimental-nls-v2:     v11.4.0 beta   (H4+H5+H6)
+            // ═══════════════════════════════════════════════════════════════
             let mut acor_vec = vec![0.0; self.n];
             let mut newton_converged = false;
             let mut del_old: Real = 0.0;
-            let mut crate_nls: Real = 1.0; // LLNL: crate, convergence rate
+
+            // --- V2 experimental: H4 corrected tq4 + H6 adaptive m=0 tol ---
+            #[cfg(feature = "experimental-nls-v2")]
+            let (tq4, tol_m0, mut crate_nls) = {
+                let err_coeff_q = if self.q <= 5 {
+                    BDF_ERR_COEFF[self.q]
+                } else {
+                    1.0 / (self.q as Real + 1.0)
+                };
+                let tq4 = NLS_COEF / err_coeff_q; // H4: 0.20–0.60
+                let tol_m0 = (NLS_CRDOWN * self.prev_acor_norm) // H6
+                    .clamp(NLS_MIN_TOL, NLS_TOL);
+                (tq4, tol_m0, 1.0_f64)
+            };
 
             for m in 0..MAX_NLS_ITERS {
                 let mut y_new = vec![0.0; self.n];
@@ -498,33 +499,66 @@ where
                 }
                 del = (del / self.n as f64).sqrt();
 
-                // Update LLNL crate (convergence rate estimate)
-                if m > 0 {
-                    crate_nls = (NLS_CRDOWN * crate_nls).max(if del_old > 0.0 {
-                        del / del_old
-                    } else {
-                        1.0
-                    });
-                    // Divergence guard
-                    if crate_nls >= 0.9 {
+                // ── Experimental V2 convergence (H4+H6) ──
+                #[cfg(feature = "experimental-nls-v2")]
+                {
+                    if m > 0 {
+                        crate_nls = (NLS_CRDOWN * crate_nls).max(
+                            if del_old > 0.0 { del / del_old } else { 1.0 },
+                        );
+                        if crate_nls >= 0.9 {
+                            break;
+                        }
+                    }
+                    // H4: dcon = del*crate/tq4 ≤ 1
+                    let dcon = del * crate_nls.min(1.0) / tq4;
+                    if dcon <= 1.0 {
+                        newton_converged = true;
+                        break;
+                    }
+                    // H6: adaptive m=0 early exit
+                    if m == 0 && del < tol_m0 {
+                        newton_converged = true;
                         break;
                     }
                 }
 
-                // H4: LLNL tq4 convergence test  (dcon = del*crate/tq4 ≤ 1)
-                let dcon = del * crate_nls.min(1.0) / tq4;
-                if dcon <= 1.0 {
-                    newton_converged = true;
-                    break;
+                // ── Stable V1 convergence (H1+H2+H3) ──
+                #[cfg(not(feature = "experimental-nls-v2"))]
+                {
+                    if m == 0 {
+                        del_old = del;
+                        // H2: early exit on first iter
+                        if del < NLS_TOL {
+                            newton_converged = true;
+                            break;
+                        }
+                    } else {
+                        // H1+H3: convergence rate ρ
+                        let rho = if del_old > 0.0 { del / del_old } else { 1.0 };
+                        if rho >= 0.9 {
+                            break; // divergence guard
+                        }
+                        // H1: predictive test with CRDOWN relaxation
+                        let tol = NLS_TOL * NLS_CRDOWN.max(rho);
+                        if rho * del / (1.0 - rho) < tol {
+                            newton_converged = true;
+                            break;
+                        }
+                        // Fallback: direct norm
+                        if del < NLS_TOL * NLS_CRDOWN {
+                            newton_converged = true;
+                            break;
+                        }
+                        del_old = del;
+                    }
                 }
 
-                // H6: adaptive m=0 early exit (tighter than tq4 for easy steps)
-                if m == 0 && del < tol_m0 {
-                    newton_converged = true;
-                    break;
+                // V2 needs del_old updated here (V1 does it inside its block)
+                #[cfg(feature = "experimental-nls-v2")]
+                {
+                    del_old = del;
                 }
-
-                del_old = del;
             }
 
             if !newton_converged {
@@ -562,16 +596,19 @@ where
             if err_norm <= 1.0 {
                 // --- Step accepted ---
                 // H6: record acor norm for next step's adaptive tol
-                let acor_slice = self.acor.as_slice();
-                let acor_norm: Real = {
-                    let s: Real = acor_slice
-                        .iter()
-                        .zip(self.ewt.as_slice())
-                        .map(|(a, e)| (a * e).powi(2))
-                        .sum();
-                    (s / self.n as Real).sqrt()
-                };
-                self.prev_acor_norm = acor_norm;
+                #[cfg(feature = "experimental-nls-v2")]
+                {
+                    let acor_slice = self.acor.as_slice();
+                    let acor_norm: Real = {
+                        let s: Real = acor_slice
+                            .iter()
+                            .zip(self.ewt.as_slice())
+                            .map(|(a, e)| (a * e).powi(2))
+                            .sum();
+                        (s / self.n as Real).sqrt()
+                    };
+                    self.prev_acor_norm = acor_norm;
+                }
 
                 self.zn.correct(&l, &self.acor, self.q);
                 self.t += self.h;

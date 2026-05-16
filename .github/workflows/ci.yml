@@ -210,3 +210,65 @@ jobs:
           name: robertson-benchmark-results
           path: /tmp/robertson_output.txt
           retention-days: 30
+
+  robertson_benchmark_experimental:
+    name: Robertson Benchmark (experimental-nls-v2)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Robertson (experimental-nls-v2)
+        run: cargo build --example robertson --release --features experimental-nls-v2
+
+      - name: Run Robertson benchmark (experimental)
+        id: bench
+        run: |
+          echo "=== Robertson Benchmark (experimental-nls-v2) ==="
+          START=$(date +%s%N)
+          ./target/release/examples/robertson 2>&1 | tee /tmp/robertson_exp_output.txt
+          END=$(date +%s%N)
+          ELAPSED_MS=$(( (END - START) / 1000000 ))
+          echo "Wall time: ${ELAPSED_MS}ms"
+
+      - name: Validate experimental results
+        run: |
+          python3 - << 'PYEOF'
+          import re, sys
+
+          output = open("/tmp/robertson_exp_output.txt").read()
+          print("=== Experimental V2 results ===")
+          print(output)
+
+          cons_err_m = re.search(r"Conservation error:\s+([0-9eE+.\-]+)", output)
+          cons_pass = "Conservation: PASS" in output
+          steps_m = re.search(r"Steps:\s+(\d+)", output)
+
+          ok = True
+          if cons_err_m:
+              err = float(cons_err_m.group(1))
+              if err >= 1e-12:
+                  ok = False
+                  print(f"🔴 Conservation error {err:.2e} >= 1e-12")
+          if steps_m:
+              steps = int(steps_m.group(1))
+              if steps > 1440:
+                  ok = False
+                  print(f"🔴 Steps {steps} > 1440 (revert threshold)")
+
+          print(f"\n{'✅ PASS' if ok else '🔴 FAIL'}")
+          sys.exit(0 if ok else 1)
+          PYEOF
+
+      - name: Upload experimental results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: robertson-benchmark-experimental
+          path: /tmp/robertson_exp_output.txt
+          retention-days: 30

@@ -5,6 +5,10 @@ edition.workspace = true
 license.workspace = true
 publish = false
 
+[features]
+default = []
+experimental-nls-v2 = ["cvode/experimental-nls-v2"]
+
 [dependencies]
 cvode = { path = "../crates/cvode" }
 nvector = { path = "../crates/nvector" }

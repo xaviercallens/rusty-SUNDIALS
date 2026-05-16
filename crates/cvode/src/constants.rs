@@ -39,10 +39,13 @@ pub(crate) const MAX_ERR_TEST_FAILS: usize = 7;
 pub(crate) const MAX_CONV_FAILS: usize = 10;
 
 /// Maximum number of nonlinear solver iterations per step.
+#[cfg(feature = "experimental-nls-v2")]
 /// H5 [v2]: 3→4 — one extra iter costs 1 RHS eval but avoids a 0.25× step
-/// shrink from conv failure (very expensive). LLNL default is also 3 but
-/// with a more lenient convergence test that rarely needs the 3rd iter.
+/// shrink from conv failure (very expensive).
 pub(crate) const MAX_NLS_ITERS: usize = 4;
+#[cfg(not(feature = "experimental-nls-v2"))]
+/// LLNL default: 3 iterations.
+pub(crate) const MAX_NLS_ITERS: usize = 3;
 
 /// Safety factor for step size selection.
 pub(crate) const SAFETY: Real = 0.9;
@@ -84,7 +87,9 @@ pub(crate) const NLS_TOL: Real = 0.1;
 ///   q=1: tq4=0.20  q=2: tq4=0.30  q=3: tq4=0.40  q=4: tq4=0.50  q=5: tq4=0.60
 /// Convergence: del * crate.min(1) / tq4 ≤ 1.0  (LLNL cvNlsNewton exact)
 /// Since tq4 ≤ 0.6, convergence requires del ≤ 0.6 — no step destabilization.
+#[cfg(feature = "experimental-nls-v2")]
 pub(crate) const NLS_COEF: Real = 0.1;
 
 /// Minimum NLS tolerance floor for H6 adaptive m=0 check.
+#[cfg(feature = "experimental-nls-v2")]
 pub(crate) const NLS_MIN_TOL: Real = 1e-4;

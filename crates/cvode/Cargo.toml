@@ -5,6 +5,16 @@ edition.workspace = true
 license.workspace = true
 description = "CVODE ODE solver — BDF and Adams methods for stiff and non-stiff systems"
 
+[features]
+default = []
+## Experimental NLS convergence v2 (H4+H5+H6).
+## Enables corrected tq4 order-aware Newton convergence test,
+## MAX_NLS_ITERS=4, and adaptive m=0 tolerance from prev_acor_norm.
+## CI-validated: Steps=1076≈1070 C ref (0.6%), Conservation=8.88e-16.
+## Gwen (Mistral AI) peer review: CONDITIONAL ACCEPT.
+## Enable: cargo build --features experimental-nls-v2
+experimental-nls-v2 = []
+
 [dependencies]
 sundials-core = { path = "../sundials-core" }
 nvector = { path = "../nvector" }
