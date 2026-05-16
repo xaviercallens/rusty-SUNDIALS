@@ -1,0 +1,6 @@
+# Fusion data directory
+# Generated data files are committed for reproducibility.
+# Large datasets (TokaMark, FAIR-MAST) should be downloaded separately.
+*.hdf5
+*.h5
+tokamark/

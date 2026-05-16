@@ -1,0 +1,10 @@
+parameter,value,unit
+B0_T,5.300000e+00,T
+ne_m3,1.000000e+20,m^-3
+Te_keV,2.500000e+01,keV
+v_A_ms,8.180836e+06,m/s
+eta_Ohm_m,1.000000e-08,Ω·m
+tau_R_s,5.026548e+02,s
+tau_A_s,2.444738e-07,s
+S_lundquist,2.056068e+09,—
+gamma_tearing_s1,1.056684e+01,s^-1
