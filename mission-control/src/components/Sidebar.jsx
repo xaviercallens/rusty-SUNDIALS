@@ -19,6 +19,7 @@ const navItems = [
   { to: '/education', icon: Lightbulb, label: 'Media' },
   { to: '/sop', icon: CheckSquare, label: 'SOP Reproduce' },
   { to: '/peer-review', icon: Brain, label: 'Peer Review' },
+  { to: '/reproducibility', icon: CheckSquare, label: 'Reproduce POC' },
   { to: '/cost', icon: DollarSign, label: 'Cost' },
   { to: '/settings', icon: Settings, label: 'Config' },
 ];

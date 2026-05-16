@@ -70,6 +70,18 @@ def create_visualization(viz: VisualizationCreate):
     save_db(db)
     return viz
 
+@app.post("/api/peer_review/poc")
+def trigger_poc():
+    import subprocess
+    script_path = os.path.join(os.path.dirname(__file__), "..", "scripts", "reproduce_v12_poc.py")
+    subprocess.run(["python3", script_path], check=True)
+    
+    poc_file = os.path.join(DATA_DIR, "fusion", "poc_output", "v12_poc_results.json")
+    if os.path.exists(poc_file):
+        with open(poc_file, "r") as f:
+            return json.load(f)
+    return {"error": "POC generation failed."}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8080)), reload=True)

@@ -2,7 +2,7 @@
  * API Client for Rusty-SUNDIALS Mission Control
  * Sends Google Sign-In JWT as Bearer token for role-based access.
  */
-const API_BASE = import.meta.env.VITE_API_URL || '';
+export const API_BASE = import.meta.env.VITE_API_URL || '';
 
 function getToken() {
   return localStorage.getItem('mc_token') || '';
