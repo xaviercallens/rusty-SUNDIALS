@@ -46,7 +46,10 @@ fn main() -> Result<(), cvode::CvodeError> {
     {
         let nni = solver.num_newton_iters();
         let steps = solver.num_steps();
-        println!("  Newton iters: {nni}  (NI/step: {:.2})", nni as f64 / steps as f64);
+        println!(
+            "  Newton iters: {nni}  (NI/step: {:.2})",
+            nni as f64 / steps as f64
+        );
     }
     println!("  Final order: {}", solver.order());
     println!("\n✅ PASS");

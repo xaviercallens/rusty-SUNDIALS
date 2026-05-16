@@ -44,10 +44,20 @@ fn main() -> Result<(), cvode::CvodeError> {
     #[cfg(feature = "experimental-nls-v2")]
     {
         let nni = solver.num_newton_iters();
-        println!("  Newton iters: {nni}  (NI/step: {:.2})", nni as f64 / steps as f64);
+        println!(
+            "  Newton iters: {nni}  (NI/step: {:.2})",
+            nni as f64 / steps as f64
+        );
     }
     println!("  Final order: {}", solver.order());
     println!("  Conservation error: {cons_err:.2e}  (threshold 1e-12)");
-    println!("\n{}", if cons_err < 1e-6 { "✅ PASS" } else { "🔴 FAIL" });
+    println!(
+        "\n{}",
+        if cons_err < 1e-6 {
+            "✅ PASS"
+        } else {
+            "🔴 FAIL"
+        }
+    );
     Ok(())
 }

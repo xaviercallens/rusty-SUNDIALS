@@ -59,7 +59,11 @@ impl Options {
             }
             i += 1;
         }
-        Options { output_csv, rtol, atol }
+        Options {
+            output_csv,
+            rtol,
+            atol,
+        }
     }
 }
 
@@ -98,7 +102,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Header
     if use_csv {
-        writeln!(writer, "t,y1,y2,y3,steps,rhs_evals,order,conservation_error")?;
+        writeln!(
+            writer,
+            "t,y1,y2,y3,steps,rhs_evals,order,conservation_error"
+        )?;
     } else {
         writeln!(writer, "Robertson Chemical Kinetics (stiff system)")?;
         writeln!(writer, "BDF method with adaptive step size")?;
@@ -137,7 +144,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         writeln!(writer, "  Steps: {}", solver.num_steps())?;
         writeln!(writer, "  RHS evals: {}", solver.num_rhs_evals())?;
         writeln!(writer, "  Final order: {}", solver.order())?;
-        writeln!(writer, "  Conservation (y1+y2+y3): {sum:.15e} (should be 1.0)")?;
+        writeln!(
+            writer,
+            "  Conservation (y1+y2+y3): {sum:.15e} (should be 1.0)"
+        )?;
     }
 
     Ok(())
