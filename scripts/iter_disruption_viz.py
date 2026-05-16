@@ -58,29 +58,27 @@ def make_disruption_mesh(time_frac):
     for i in range(n_rho):
         R[i,:], Z[i,:] = shaped_boundary(theta, rho[i])
 
-    # Te profile: peaked → flattened during disruption
-    # Pre-disruption: Te = Te0 * (1 - rho^2)^2
-    # During thermal quench: m=2/n=1 tearing mode island + rapid cooling
-    Te_base = Te0 * (1 - RHO**2)**2
+    Te = np.zeros_like(RHO)
+    j_phi = np.zeros_like(RHO)
 
-    # Tearing mode island (m=2, n=1) — grows during disruption
+    csv_path = os.path.join(PROJECT, "data", "fusion", "rust_sim_output", f"iter_state_t{time_frac:.2f}.csv")
+    if os.path.exists(csv_path):
+        import csv
+        with open(csv_path, 'r') as f:
+            reader = csv.reader(f)
+            next(reader) # skip header
+            for row in reader:
+                if row[0] == 'plasma':
+                    ir, it, t_val, j_val = int(row[1]), int(row[2]), float(row[3]), float(row[4])
+                    Te[ir, it] = t_val
+                    j_phi[ir, it] = j_val
+    else:
+        print(f"Warning: {csv_path} not found. Ensure the Rust simulation was run.")
+        Te = np.ones_like(RHO) * 2.0
+
+    # Poloidal flux perturbation from tearing mode (still analytical for the mesh Z coordinates)
     island_width = 0.05 + 0.35 * time_frac  # w/a grows from 5% to 40%
     rs = 0.45  # rational surface q=2
-    island = island_width * np.exp(-((RHO - rs)/0.08)**2) * np.cos(2*THETA)
-
-    # Thermal quench: exponential collapse of core Te
-    quench_factor = np.exp(-3.0 * time_frac)  # e-folding over disruption
-    edge_heating = 0.15 * time_frac * np.exp(-((RHO - 0.85)/0.1)**2)
-
-    Te = Te_base * quench_factor * (1 + island) + Te0 * edge_heating
-    Te = np.clip(Te, 2.0, Te0)
-
-    # Current density: redistributes during current quench
-    j_base = 1.2e6 * (1 - RHO**2)**1.5
-    j_redistribute = 0.4 * time_frac * np.exp(-((RHO - 0.7)/0.15)**2)
-    j_phi = j_base * (1 - 0.6*time_frac) * (1 + j_redistribute)
-
-    # Poloidal flux perturbation from tearing mode
     psi_pert = island_width * 0.5 * np.exp(-((RHO - rs)/0.1)**2) * np.cos(2*THETA)
     psi = 35.0 + RHO * 1.1 + psi_pert
 
@@ -128,22 +126,20 @@ def make_vessel(time_frac):
     grid.points = points
     grid.dimensions = [n_theta, n_r, 1]
 
-    # Induced current: peaks during current quench (time_frac ~ 0.5-0.8)
-    # J_induced ~ -dI_p/dt * mutual_inductance * exp(-t/tau_vessel)
-    THETA_V = np.tile(theta, (n_r, 1))
-    RHO_V = np.linspace(0, 1, n_r)[:, None] * np.ones((1, n_theta))
+    j_induced = np.zeros_like(R_vessel)
 
-    current_quench = 4.0 * time_frac * np.exp(-2.0 * time_frac)  # peaks at t~0.5
-    j_induced_base = 3.3e5 * current_quench  # A/m^2
-
-    # Poloidal variation: stronger at inboard midplane (1/R effect)
-    poloidal_var = 1.0 + 0.4 * np.cos(THETA_V) - 0.2 * np.cos(2*THETA_V)
-    # Skin effect: current concentrated near inner surface
-    skin_depth = 0.3 + 0.5 * RHO_V  # normalized
-    skin_factor = np.exp(-RHO_V / 0.3)
-
-    j_induced = j_induced_base * poloidal_var * skin_factor
-    j_induced = np.clip(j_induced, 1.4e-8, 3.3e5)
+    csv_path = os.path.join(PROJECT, "data", "fusion", "rust_sim_output", f"iter_state_t{time_frac:.2f}.csv")
+    if os.path.exists(csv_path):
+        import csv
+        with open(csv_path, 'r') as f:
+            reader = csv.reader(f)
+            next(reader) # skip header
+            for row in reader:
+                if row[0] == 'vessel':
+                    ir, it, j_val = int(row[1]), int(row[2]), float(row[3])
+                    j_induced[ir, it] = j_val
+    else:
+        print(f"Warning: {csv_path} not found.")
 
     grid.point_data['j_induced'] = j_induced.ravel(order='F')
 

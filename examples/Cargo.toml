@@ -143,3 +143,7 @@ path = "robertson_paper_data.rs"
 [[example]]
 name = "robertson_csv"
 path = "robertson_csv.rs"
+
+[[example]]
+name = "iter_disruption"
+path = "iter_disruption.rs"
