@@ -88,6 +88,16 @@ fn main() -> Result<(), cvode::CvodeError> {
         rhs_evals as f64 / 1537.0
     );
     println!("  Final order: {}", solver.order());
+    // H8: Newton iteration instrumentation for paper
+    #[cfg(feature = "experimental-nls-v2")]
+    {
+        let nni = solver.num_newton_iters();
+        let ni_per_step = nni as f64 / steps as f64;
+        println!(
+            "  Newton iters: {nni}  (C ref: 1537, ratio: {:.2}x, NI/step: {ni_per_step:.2} vs C 1.44)",
+            nni as f64 / 1537.0
+        );
+    }
     println!("  Wall time:  {wall_ms}ms");
 
     // Verify conservation: y1 + y2 + y3 = 1

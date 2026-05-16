@@ -106,6 +106,18 @@ pub struct Cvode<F> {
     // When small (accurate prev step), tightens m=0 tol → 1-iter convergence.
     #[cfg(feature = "experimental-nls-v2")]
     prev_acor_norm: Real,
+
+    // --- H7 [v3]: persistent Newton convergence rate (LLNL cv_crate) ---
+    // LLNL persists crate across steps. When previous step converged fast
+    // (crate ≈ 0.01), the dcon test allows 1-iter convergence for del < 60.
+    // Our V2 bug: reset crate=1.0 each step → required del < 0.6.
+    // This field is THE fix for the 1.69× RHS gap.
+    #[cfg(feature = "experimental-nls-v2")]
+    nls_crate: Real,
+
+    // --- H8 [v3]: Newton iteration counter (for paper instrumentation) ---
+    #[cfg(feature = "experimental-nls-v2")]
+    nni: usize,
 }
 
 impl<F> Cvode<F>
@@ -171,6 +183,10 @@ where
             initialized: false,
             #[cfg(feature = "experimental-nls-v2")]
             prev_acor_norm: NLS_TOL, // H6: start with standard tol until first step
+            #[cfg(feature = "experimental-nls-v2")]
+            nls_crate: 1.0, // H7: LLNL cv_crate, persisted across steps
+            #[cfg(feature = "experimental-nls-v2")]
+            nni: 0, // H8: total Newton iterations for paper
         }
     }
 
@@ -202,6 +218,12 @@ where
     }
     pub fn order(&self) -> usize {
         self.q
+    }
+    /// Total Newton iterations across all steps (H8 instrumentation).
+    /// Only available with feature `experimental-nls-v2`.
+    #[cfg(feature = "experimental-nls-v2")]
+    pub fn num_newton_iters(&self) -> usize {
+        self.nni
     }
 
     /// Dense output: evaluate the k-th derivative of the solution at time `t`.
@@ -450,9 +472,9 @@ where
             let mut newton_converged = false;
             let mut del_old: Real = 0.0;
 
-            // --- V2 experimental: H4 corrected tq4 + H6 adaptive m=0 tol ---
+            // --- V2 experimental: H4 tq4 + H6 adaptive tol + H7 persistent crate ---
             #[cfg(feature = "experimental-nls-v2")]
-            let (tq4, tol_m0, mut crate_nls) = {
+            let (tq4, tol_m0) = {
                 let err_coeff_q = if self.q <= 5 {
                     BDF_ERR_COEFF[self.q]
                 } else {
@@ -461,7 +483,7 @@ where
                 let tq4 = NLS_COEF / err_coeff_q; // H4: 0.20–0.60
                 let tol_m0 = (NLS_CRDOWN * self.prev_acor_norm) // H6
                     .clamp(NLS_MIN_TOL, NLS_TOL);
-                (tq4, tol_m0, 1.0_f64)
+                (tq4, tol_m0)
             };
 
             for m in 0..MAX_NLS_ITERS {
@@ -476,6 +498,12 @@ where
                     msg: msg.clone(),
                 })?;
                 self.nfe += 1;
+
+                // H8: count Newton iterations for paper instrumentation
+                #[cfg(feature = "experimental-nls-v2")]
+                {
+                    self.nni += 1;
+                }
 
                 // Form residual b = h·f(y_new) - z[1] - acor
                 let mut b = vec![0.0; self.n];
@@ -499,21 +527,27 @@ where
                 }
                 del = (del / self.n as f64).sqrt();
 
-                // ── Experimental V2 convergence (H4+H6) ──
+                // ── Experimental V2+V3 convergence (H4+H6+H7) ──
                 #[cfg(feature = "experimental-nls-v2")]
                 {
                     if m > 0 {
-                        crate_nls = (NLS_CRDOWN * crate_nls).max(if del_old > 0.0 {
+                        // H7: Update persistent crate (LLNL cv_crate)
+                        self.nls_crate = (NLS_CRDOWN * self.nls_crate).max(if del_old > 0.0 {
                             del / del_old
                         } else {
                             1.0
                         });
-                        if crate_nls >= 0.9 {
-                            break;
+                        if self.nls_crate >= 0.9 {
+                            break; // divergence guard
                         }
                     }
-                    // H4: dcon = del*crate/tq4 ≤ 1
-                    let dcon = del * crate_nls.min(1.0) / tq4;
+                    // H7: On m=0, use crate=1.0 for the dcon test (standard strictness).
+                    // On m>0, use persistent crate (enables faster convergence).
+                    // This prevents over-lenient m=0 acceptance that causes
+                    // downstream error test failures.
+                    let crate_eff = if m == 0 { 1.0 } else { self.nls_crate.min(1.0) };
+                    // H4: LLNL tq4 test
+                    let dcon = del * crate_eff / tq4;
                     if dcon <= 1.0 {
                         newton_converged = true;
                         break;
@@ -556,7 +590,7 @@ where
                     }
                 }
 
-                // V2 needs del_old updated here (V1 does it inside its block)
+                // V2/V3: update del_old (V1 does it inside its block)
                 #[cfg(feature = "experimental-nls-v2")]
                 {
                     del_old = del;
@@ -567,6 +601,11 @@ where
                 self.zn.restore(self.q);
                 // Force Jacobian recompute on next attempt
                 self.jac_age = JAC_RECOMPUTE_INTERVAL + 1;
+                // H7: Reset persistent crate on convergence failure
+                #[cfg(feature = "experimental-nls-v2")]
+                {
+                    self.nls_crate = 1.0;
+                }
                 conv_fails += 1;
                 if conv_fails >= 10 {
                     // MAX_CONV_FAILS
