@@ -19,8 +19,8 @@ use sundials_core::Real;
 
 use crate::builder::CvodeBuilder;
 use crate::constants::{
-    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS,
-    Method, NLS_CRDOWN, NLS_TOL, Task,
+    Method, Task, DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS,
+    MAX_NLS_ITERS, NLS_CRDOWN, NLS_TOL,
 };
 #[cfg(feature = "experimental-nls-v2")]
 use crate::constants::{NLS_COEF, NLS_MIN_TOL};
@@ -503,9 +503,11 @@ where
                 #[cfg(feature = "experimental-nls-v2")]
                 {
                     if m > 0 {
-                        crate_nls = (NLS_CRDOWN * crate_nls).max(
-                            if del_old > 0.0 { del / del_old } else { 1.0 },
-                        );
+                        crate_nls = (NLS_CRDOWN * crate_nls).max(if del_old > 0.0 {
+                            del / del_old
+                        } else {
+                            1.0
+                        });
                         if crate_nls >= 0.9 {
                             break;
                         }
@@ -662,7 +664,7 @@ where
                 ));
             }
             self.qwait = self.q + 1; // reset wait after failure
-            // Cap growth at ETA_MAX_FAIL=0.2 after error failure (LLNL ETAMXF).
+                                     // Cap growth at ETA_MAX_FAIL=0.2 after error failure (LLNL ETAMXF).
             let eta = step::compute_eta(err_norm, self.q).min(ETA_MAX_FAIL);
             self.h *= eta;
             self.zn.rescale(eta, self.q);
