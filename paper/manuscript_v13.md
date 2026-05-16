@@ -95,7 +95,7 @@ The solver has been validated against 33 canonical ODE benchmarks:
 | Lorenz Attractor | 3 | Non-stiff | ✅ Validated |
 | ITER Disruption MHD | 168,000 | Extreme | ✅ Validated |
 
-![System Architecture](paper/figures/fig_architecture.png)
+![System Architecture](figures/fig_architecture.png)
 *Figure 1: rusty-SUNDIALS v12 Neural-FGMRES Architecture showing the data flow from the FP64 BDF integrator through the Krylov solver to the FP8 Tensor Core accelerator, with Lean 4 verification.*
 
 ---
@@ -200,30 +200,30 @@ A critical peer-review concern was that PCIe bus latency between CPU and GPU wou
 
 *Table 1: At production scale (168K DOF), the A100 Tensor Core achieves a 512× speedup over CPU-only SpMV, with PCIe transfer contributing only 21% of total GPU time.*
 
-![PCIe Scaling Benchmark](paper/figures/fig_pcie_scaling.png)
+![PCIe Scaling Benchmark](figures/fig_pcie_scaling.png)
 *Figure 2: SpMV execution time scaling — CPU grows quadratically while GPU remains sub-linear.*
 
 ### 6.2 FGMRES Residual Convergence
 
-![Residual Convergence](paper/figures/fig_residual_convergence.png)
+![Residual Convergence](figures/fig_residual_convergence.png)
 *Figure 3: FGMRES residual norms — FP64 converges to machine epsilon; FP8 tracks identically for 19 iterations then plateaus at ~10⁻³ due to E4M3 dynamic range limitations. This plateau is above the Newton convergence tolerance, confirming the Lean 4 stability bound is tight.*
 
 ### 6.3 ITER Disruption Visualizations
 
 Simulation output was rendered following the IMAS-ParaView standard [5] used by the ITER Organization for official disruption modeling with the JOREK code [6].
 
-![Thermal Quench Hero Figure](data/fusion/vtk_output/iter_disruption_hero.png)
+![Thermal Quench Hero Figure](../data/fusion/vtk_output/iter_disruption_hero.png)
 *Figure 4: Cross-sectional snapshot of the thermal quench showing the $T_e$ collapse from 25 keV to edge values, with $m=2$ island structures visible at $ρ \approx 0.45$.*
 
-![3D Toroidal Eddy Currents](data/fusion/vtk_output/iter_disruption_3d_torus.png)
+![3D Toroidal Eddy Currents](../data/fusion/vtk_output/iter_disruption_3d_torus.png)
 *Figure 5: 3D toroidal rendering of induced vacuum vessel eddy currents during the disruption, showing poloidal variation and radial skin-depth attenuation.*
 
-![Disruption Sequence](data/fusion/vtk_output/iter_disruption_sequence.png)
+![Disruption Sequence](../data/fusion/vtk_output/iter_disruption_sequence.png)
 *Figure 6: Four-panel temporal sequence — pre-disruption equilibrium ($t=0$), thermal quench onset ($t=0.4$), current quench peak ($t=0.7$), and post-disruption remnant ($t=1.0$).*
 
 ### 6.4 Cost Analysis
 
-![Cost Comparison](paper/figures/fig_cost_comparison.png)
+![Cost Comparison](figures/fig_cost_comparison.png)
 *Figure 7: Per-run cost comparison across compute platforms. rusty-SUNDIALS achieves a 650,000× cost reduction over traditional HPC allocations.*
 
 | Platform | Cost/Run | Notes |
