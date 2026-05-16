@@ -17,19 +17,6 @@ fn main() -> Result<(), cvode::CvodeError> {
         Ok(())
     };
 
-    let jac = |_t: f64, y: &[f64], j: &mut sundials_core::DenseMat| -> Result<(), String> {
-        j.set(0, 0, -0.04);
-        j.set(0, 1, 1e4 * y[2]);
-        j.set(0, 2, 1e4 * y[1]);
-        j.set(1, 0, 0.04);
-        j.set(1, 1, -1e4 * y[2] - 6e7 * y[1]);
-        j.set(1, 2, -1e4 * y[1]);
-        j.set(2, 0, 0.0);
-        j.set(2, 1, 6e7 * y[1]);
-        j.set(2, 2, 0.0);
-        Ok(())
-    };
-
     let y0 = SerialVector::from_slice(&[1.0, 0.0, 0.0]);
     let mut solver = Cvode::builder(Method::Bdf)
         .rtol(1e-4)
@@ -37,8 +24,19 @@ fn main() -> Result<(), cvode::CvodeError> {
         .max_order(5)
         .init_step(1e-4)
         .max_steps(50000)
+        .jacobian(|_t, y, j| {
+            j.cols[0][0] = -0.04;
+            j.cols[0][1] = 0.04;
+            j.cols[0][2] = 0.0;
+            j.cols[1][0] = 1e4 * y[2];
+            j.cols[1][1] = -1e4 * y[2] - 6e7 * y[1];
+            j.cols[1][2] = 6e7 * y[1];
+            j.cols[2][0] = 1e4 * y[1];
+            j.cols[2][1] = -1e4 * y[1];
+            j.cols[2][2] = 0.0;
+            Ok(())
+        })
         .build(rhs, 0.0, y0)?;
-    solver.set_jacobian(jac);
 
     // CSV header
     println!("step,t,h,order,nfe,y1,y2,y3,conservation_error");
@@ -47,7 +45,6 @@ fn main() -> Result<(), cvode::CvodeError> {
     let t_final = 4e10;
     let mut t_current = 0.0_f64;
 
-    // Use OneStep mode to capture every internal step
     while t_current < t_final {
         match solver.solve(t_final, Task::OneStep) {
             Ok((t_ret, _flag)) => {

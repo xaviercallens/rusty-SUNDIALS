@@ -63,7 +63,7 @@ impl Options {
     }
 }
 
-fn main() -> Result<(), cvode::CvodeError> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opts = Options::parse();
 
     let rhs = |_t: f64, y: &[f64], ydot: &mut [f64]| -> Result<(), String> {
