@@ -46,44 +46,40 @@ fn main() -> Result<(), cvode::CvodeError> {
     let mut t_current = 0.0_f64;
 
     while t_current < t_final {
-        match solver.solve(t_final, Task::OneStep) {
-            Ok((t_ret, _flag)) => {
-                step_count += 1;
-                let y = solver.y();
-                let h = solver.step_size();
-                let q = solver.order();
-                let nfe = solver.num_rhs_evals();
-                let cons_err = (y[0] + y[1] + y[2] - 1.0).abs();
+        let (t_ret, _flag) = solver.solve(t_final, Task::OneStep)?;
+        step_count += 1;
 
-                // Output at log-spaced intervals to keep CSV manageable
-                let emit = step_count <= 100
-                    || (step_count <= 500 && step_count % 10 == 0)
-                    || step_count % 50 == 0;
+        // Collect all data after solve() returns (no mutable borrow conflict)
+        let h = solver.step_size();
+        let q = solver.order();
+        let nfe = solver.num_rhs_evals();
+        let y0_val = solver.y()[0];
+        let y1_val = solver.y()[1];
+        let y2_val = solver.y()[2];
+        let cons_err = (y0_val + y1_val + y2_val - 1.0).abs();
 
-                if emit {
-                    println!(
-                        "{step_count},{t_ret:.6e},{h:.6e},{q},{nfe},{:.10e},{:.10e},{:.10e},{cons_err:.2e}",
-                        y[0], y[1], y[2]
-                    );
-                }
-                t_current = t_ret;
-            }
-            Err(e) => {
-                eprintln!("Solver error at step {step_count}: {e}");
-                break;
-            }
+        // Output at log-spaced intervals to keep CSV manageable
+        let emit = step_count <= 100
+            || (step_count <= 500 && step_count % 10 == 0)
+            || step_count % 50 == 0;
+
+        if emit {
+            println!(
+                "{step_count},{t_ret:.6e},{h:.6e},{q},{nfe},{y0_val:.10e},{y1_val:.10e},{y2_val:.10e},{cons_err:.2e}"
+            );
         }
+        t_current = t_ret;
     }
 
     // Final summary line
-    let y = solver.y();
     let steps = solver.num_steps();
     let rhs_evals = solver.num_rhs_evals();
+    let y_final = solver.y();
+    let cons = (y_final[0] + y_final[1] + y_final[2] - 1.0).abs();
     #[cfg(feature = "experimental-nls-v2")]
     let nni = solver.num_newton_iters();
     #[cfg(not(feature = "experimental-nls-v2"))]
     let nni = 0usize;
-    let cons = (y[0] + y[1] + y[2] - 1.0).abs();
 
     eprintln!("# Summary: steps={steps} rhs={rhs_evals} nni={nni} ni_per_step={:.2} conservation={cons:.2e}",
         nni as f64 / steps as f64);
