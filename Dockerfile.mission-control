@@ -1,0 +1,26 @@
+FROM node:20-slim AS frontend-builder
+
+WORKDIR /app/mission-control
+COPY mission-control/package*.json ./
+RUN npm install
+COPY mission-control/ ./
+ENV VITE_API_URL=""
+RUN npm run build
+
+FROM python:3.9-slim
+
+WORKDIR /app
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy backend code
+COPY backend/ ./backend/
+# Copy the built frontend
+COPY --from=frontend-builder /app/mission-control/dist ./mission-control/dist
+# Copy the data folder (contains images and CSVs)
+COPY data/ ./data/
+
+ENV PORT=8080
+EXPOSE 8080
+
+CMD ["python", "backend/main.py"]

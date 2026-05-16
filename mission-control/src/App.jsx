@@ -17,6 +17,7 @@ import SopPage from './pages/SopPage';
 import PeerReviewPage from './pages/PeerReviewPage';
 import BenchmarksPage from './pages/BenchmarksPage';
 import DatasetsPage from './pages/DatasetsPage';
+import VisualizationsPage from './pages/VisualizationsPage';
 
 export default function App() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
                 <Route path="/peer-review" element={<PeerReviewPage />} />
                 <Route path="/benchmarks" element={<BenchmarksPage />} />
                 <Route path="/datasets" element={<DatasetsPage />} />
+                <Route path="/visualizations" element={<VisualizationsPage />} />
               </Routes>
             </main>
           </div>
