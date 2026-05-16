@@ -349,8 +349,8 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8080)), reload=True)
 
-# Mount the frontend React app — at /app to not shadow /api routes
+# Mount the frontend React app at root — FastAPI API routes registered above
+# take precedence over this catch-all static mount.
 FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "mission-control", "dist"))
 if os.path.exists(FRONTEND_DIR):
-    app.mount("/app", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
-
+    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
