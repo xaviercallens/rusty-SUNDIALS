@@ -108,26 +108,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     for &tout in &times {
         let (t, y) = solver.solve(tout, Task::Normal)?;
-        let conservation = (y[0] + y[1] + y[2] - 1.0).abs();
+        let y0_val = y[0];
+        let y1_val = y[1];
+        let y2_val = y[2];
+        let conservation = (y0_val + y1_val + y2_val - 1.0).abs();
+        // Drop the borrow on y before accessing solver stats
+        drop(y);
         if use_csv {
+            let steps = solver.num_steps();
+            let rhs = solver.num_rhs_evals();
+            let order = solver.order();
             writeln!(
                 writer,
-                "{t:.6e},{y1:.10e},{y2:.10e},{y3:.10e},{steps},{rhs},{order},{cons:.4e}",
-                y1   = y[0],
-                y2   = y[1],
-                y3   = y[2],
-                steps = solver.num_steps(),
-                rhs   = solver.num_rhs_evals(),
-                order = solver.order(),
-                cons  = conservation,
+                "{t:.6e},{y0_val:.10e},{y1_val:.10e},{y2_val:.10e},{steps},{rhs},{order},{conservation:.4e}",
             )?;
         } else {
             writeln!(
                 writer,
-                "{t:12.4e} {y1:14.6e} {y2:14.6e} {y3:14.6e}",
-                y1 = y[0],
-                y2 = y[1],
-                y3 = y[2],
+                "{t:12.4e} {y0_val:14.6e} {y1_val:14.6e} {y2_val:14.6e}",
             )?;
         }
     }
