@@ -440,11 +440,6 @@ where
                     self.zn.rescale(0.25, self.q);
                     continue;
                 }
-                // H7: Reset persistent crate when Jacobian recomputed (LLNL jcur=TRUE)
-                #[cfg(feature = "experimental-nls-v2")]
-                {
-                    self.nls_crate = 1.0;
-                }
             } else if gamma_ratio > DGMAX_LSETUP {
                 // gamma changed significantly — refactor with cached Jacobian
                 if self.refactor_m(gamma).is_err() {
@@ -535,19 +530,24 @@ where
                 // ── Experimental V2+V3 convergence (H4+H6+H7) ──
                 #[cfg(feature = "experimental-nls-v2")]
                 {
-                    // H7: Update persistent crate from iter 1+ (LLNL cv_crate)
-                    // On m=0, self.nls_crate carries over from PREVIOUS STEP.
-                    // Clamped to [0.01, 0.9] to prevent extreme leniency.
                     if m > 0 {
-                        self.nls_crate = (NLS_CRDOWN * self.nls_crate)
-                            .max(if del_old > 0.0 { del / del_old } else { 1.0 })
-                            .max(0.01); // H7 floor: prevent crate → 0
+                        // H7: Update persistent crate (LLNL cv_crate)
+                        self.nls_crate = (NLS_CRDOWN * self.nls_crate).max(if del_old > 0.0 {
+                            del / del_old
+                        } else {
+                            1.0
+                        });
                         if self.nls_crate >= 0.9 {
                             break; // divergence guard
                         }
                     }
-                    // H4: LLNL tq4 test with PERSISTENT crate
-                    let dcon = del * self.nls_crate.min(1.0) / tq4;
+                    // H7: On m=0, use crate=1.0 for the dcon test (standard strictness).
+                    // On m>0, use persistent crate (enables faster convergence).
+                    // This prevents over-lenient m=0 acceptance that causes
+                    // downstream error test failures.
+                    let crate_eff = if m == 0 { 1.0 } else { self.nls_crate.min(1.0) };
+                    // H4: LLNL tq4 test
+                    let dcon = del * crate_eff / tq4;
                     if dcon <= 1.0 {
                         newton_converged = true;
                         break;
