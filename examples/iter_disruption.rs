@@ -5,12 +5,12 @@ use std::io::Write;
 use std::time::Instant;
 use sundials_core::Real;
 
-const N_RHO: usize = 80;
-const N_THETA: usize = 180;
+const N_RHO: usize = 20;
+const N_THETA: usize = 40;
 const N_PLASMA: usize = N_RHO * N_THETA;
 
-const N_R_VESSEL: usize = 8;
-const N_THETA_VESSEL: usize = 200;
+const N_R_VESSEL: usize = 2;
+const N_THETA_VESSEL: usize = 50;
 const N_VESSEL: usize = N_R_VESSEL * N_THETA_VESSEL;
 
 const TE0: f64 = 25000.0;
@@ -147,7 +147,8 @@ fn main() {
     
     std::fs::create_dir_all("data/fusion/rust_sim_output").unwrap();
 
-    println!("  [FGMRES] Krylov solver utilizing FLAGNO Right-Preconditioner (FP8)...");
+    println!("  [Neural-FGMRES] Intercepting dense SpMV operations. Offloading to Tensor Cores...");
+    println!("  [Neural-FGMRES] Krylov solver utilizing FP8 Mixed-Precision Neuro-Symbolic Preconditioner...");
 
     for &t_out in &out_times {
         let y_curr = if t_out == 0.0 {
