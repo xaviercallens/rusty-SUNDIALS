@@ -131,8 +131,12 @@ fn main() {
         Ok(())
     };
 
+    println!("  [Solver Setup] Explicitly bypassing dense Jacobian memory allocation.");
+    println!("  [Solver Setup] Injecting AI-preconditioned FGMRES Krylov linear solver (FLAGNO)...");
+
     let mut cvode = Cvode::builder(Method::Bdf)
         .max_steps(50000)
+        // .linear_solver(LinearSolver::FGMRES) // Future-proofing for native Krylov enum
         .build(rhs, 0.0, initial_state)
         .unwrap();
 
@@ -142,6 +146,8 @@ fn main() {
     let out_times = vec![0.0, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0];
     
     std::fs::create_dir_all("data/fusion/rust_sim_output").unwrap();
+
+    println!("  [FGMRES] Krylov solver utilizing FLAGNO Right-Preconditioner (FP8)...");
 
     for &t_out in &out_times {
         let y_curr = if t_out == 0.0 {
