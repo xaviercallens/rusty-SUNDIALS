@@ -591,6 +591,15 @@ class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href=
 <p>This ensures proofs remain valid as the implementation evolves. The
 CI pipeline currently verifies 3 files covering the NLS API, diagonal
 solver, and linear solver interfaces. ## 7. GPU Acceleration Roadmap</p>
+<blockquote>
+<p><strong>Note:</strong> Figures referenced below are in the
+<code>paper/</code> directory: - <code>fig3_comparison.pdf</code> —
+Figure 3: Rust vs C reference metric comparison -
+<code>fig4_evolution.pdf</code> — Figure 4: Performance evolution across
+v11.x versions - <code>fig1_step_size.pdf</code> — Figure 1: Step size
+adaptation (requires CSV data) - <code>fig2_bdf_order.pdf</code> —
+Figure 2: BDF order selection (requires CSV data)</p>
+</blockquote>
 <h3 id="motivation">7.1 Motivation</h3>
 <p>The remaining 1.69× RHS evaluation gap (2,602 vs. 1,537) is dominated
 by Jacobian computation overhead. For large-scale systems (<span

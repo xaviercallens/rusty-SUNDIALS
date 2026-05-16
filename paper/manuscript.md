@@ -306,6 +306,13 @@ All Lean 4 proofs are verified on every commit via GitHub Actions:
 This ensures proofs remain valid as the implementation evolves. The CI pipeline currently verifies 3 files covering the NLS API, diagonal solver, and linear solver interfaces.
 ## 7. GPU Acceleration Roadmap
 
+> **Note:** Figures referenced below are in the `paper/` directory:
+> - `fig3_comparison.pdf` — Figure 3: Rust vs C reference metric comparison
+> - `fig4_evolution.pdf` — Figure 4: Performance evolution across v11.x versions
+> - `fig1_step_size.pdf` — Figure 1: Step size adaptation (requires CSV data)
+> - `fig2_bdf_order.pdf` — Figure 2: BDF order selection (requires CSV data)
+
+
 ### 7.1 Motivation
 
 The remaining 1.69× RHS evaluation gap (2,602 vs. 1,537) is dominated by Jacobian computation overhead. For large-scale systems ($N > 10^4$), Jacobian assembly and LU factorization become the bottleneck. Modern GPU architectures such as the NVIDIA A100 (80 GB HBM2e, 312 TFLOPS FP64) offer massive parallelism for these operations.

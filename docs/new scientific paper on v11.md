@@ -1,0 +1,1 @@
+create a new scientific paper on v11 of Sundials focusing on his rust version, solver robutness and improvement to leverage rust and standard GPU infrastructure on A100 for example. Leverage all the autoresearch results,  hypothesis, experiences and benchmark. Generate each section as md and compile a pdf version.
