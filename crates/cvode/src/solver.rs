@@ -19,7 +19,8 @@ use sundials_core::Real;
 
 use crate::builder::CvodeBuilder;
 use crate::constants::{
-    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, Method, Task,
+    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS, Method,
+    NLS_CRDOWN, NLS_TOL, Task,
 };
 use crate::error::CvodeError;
 use crate::nordsieck::NordsieckArray;
@@ -434,15 +435,15 @@ where
                 }
             }
 
-            // --- Newton iteration with convergence-rate monitoring ---
-            // Following Brown, Hindmarsh & Petzold (1994): track ρ = ||δₘ||/||δₘ₋₁||.
-            // Convergence test: ρ·del/(1-ρ) < tol  (predicts remaining error).
-            // Divergence guard: ρ > 0.9 → abort immediately.
+            // --- Newton iteration — LLNL nls_newton.c logic ---
+            // H1: Use NLS_CRDOWN=0.3 relaxed tolerance (LLNL cvodenls.c:cvNewtonIteration)
+            // H2: Unified convergence check from iter 0 (no special m==0 case).
+            // H3: del_old initialised from first iter, rho computed from iter 1+.
             let mut acor_vec = vec![0.0; self.n];
             let mut newton_converged = false;
-            let mut del_old: Real = 1.0;
+            let mut del_old: Real = 0.0; // H3: set from m=0 result
 
-            for m in 0..MAX_NEWTON_ITERS {
+            for m in 0..MAX_NLS_ITERS {
                 let mut y_new = vec![0.0; self.n];
                 for i in 0..self.n {
                     y_new[i] = y_pred[i] + l_0 * acor_vec[i];
@@ -455,7 +456,7 @@ where
                 })?;
                 self.nfe += 1;
 
-                // Form residual b = h*f(y_new) - z[1] - acor
+                // Form residual b = h·f(y_new) - z[1] - acor
                 let mut b = vec![0.0; self.n];
                 let z1 = self.zn.get(1).as_slice();
                 for i in 0..self.n {
@@ -468,7 +469,7 @@ where
                     break;
                 }
 
-                // Update acor and compute WRMS norm of the correction
+                // Update acor and compute WRMS norm of the correction δ
                 let mut del = 0.0;
                 for i in 0..self.n {
                     acor_vec[i] += b[i];
@@ -477,27 +478,39 @@ where
                 }
                 del = (del / self.n as f64).sqrt();
 
-                // Convergence-rate monitoring (ρ = del / del_old)
-                if m > 0 {
-                    let rho = del / del_old;
-                    // Divergence guard: abort if Newton is not contracting
-                    if rho > 0.9 {
-                        break; // will trigger newton_converged = false → retry with smaller h
-                    }
-                    // Predictive convergence test (SUNDIALS criterion):
-                    // estimated remaining error = ρ·del / (1 - ρ) < tol
-                    if rho < 1.0 && rho * del / (1.0 - rho) < 0.1 {
+                if m == 0 {
+                    // H3: record first delta as baseline for rho computation
+                    del_old = del;
+                    // H2: early exit on first iter if already converged
+                    if del < NLS_TOL {
                         newton_converged = true;
                         break;
                     }
-                }
+                } else {
+                    // H1+H3: convergence-rate monitoring ρ = ||δₘ|| / ||δₘ₋₁||
+                    let rho = if del_old > 0.0 { del / del_old } else { 1.0 };
 
-                // Simple norm-based convergence (fallback for m == 0)
-                if del < 0.1 {
-                    newton_converged = true;
-                    break;
+                    // Divergence guard: abort if Newton is not contracting
+                    if rho >= 0.9 {
+                        break;
+                    }
+
+                    // H1: LLNL predictive convergence test with CRDOWN relaxation:
+                    // estimated remaining error = ρ·del/(1-ρ) < CRDOWN·tol
+                    let tol = NLS_TOL * NLS_CRDOWN.max(rho);
+                    if rho * del / (1.0 - rho) < tol {
+                        newton_converged = true;
+                        break;
+                    }
+
+                    // Fallback: direct norm test with CRDOWN-relaxed tolerance
+                    if del < NLS_TOL * NLS_CRDOWN {
+                        newton_converged = true;
+                        break;
+                    }
+
+                    del_old = del;
                 }
-                del_old = del;
             }
 
             if !newton_converged {

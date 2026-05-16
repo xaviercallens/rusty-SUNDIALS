@@ -68,3 +68,11 @@ pub(crate) const JAC_RECOMPUTE_INTERVAL: usize = 51;
 
 /// gamma change threshold for lsetup (LLNL DGMAX = 0.2).
 pub(crate) const DGMAX_LSETUP: Real = 0.2;
+
+/// Newton convergence rate factor (LLNL CRDOWN = 0.3).
+/// Used to relax the predictive convergence test: tol = NLS_TOL * max(CRDOWN, rho).
+/// Allows early exit when the contraction rate already implies convergence.
+pub(crate) const NLS_CRDOWN: Real = 0.3;
+
+/// Base Newton convergence tolerance (LLNL: del < 0.1 for first iter).
+pub(crate) const NLS_TOL: Real = 0.1;
