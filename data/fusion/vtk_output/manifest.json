@@ -1,0 +1,31 @@
+{
+  "generator": "rusty-SUNDIALS v11.5.0 / export_imas_paraview.py",
+  "timestamp": "2026-05-16T10:36:07.719412Z",
+  "imas_version": "3.42.0",
+  "paraview_version": "5.12+",
+  "imas_paraview_version": "2.3.0",
+  "files": {
+    "equilibrium_csv": "/Volumes/MacCleanerStorage/xdev/x-rusty-SUNDIALS/rusty-SUNDIALS/data/fusion/iter_equilibrium.csv",
+    "imas_hdf5": "/Volumes/MacCleanerStorage/xdev/x-rusty-SUNDIALS/rusty-SUNDIALS/data/fusion/imas_export/rusty_sundials_equilibrium.h5",
+    "vtk_midplane": "/Volumes/MacCleanerStorage/xdev/x-rusty-SUNDIALS/rusty-SUNDIALS/data/fusion/vtk_output/iter_midplane.vtk",
+    "paraview_script": "/Volumes/MacCleanerStorage/xdev/x-rusty-SUNDIALS/rusty-SUNDIALS/data/fusion/vtk_output/render_iter_equilibrium.py"
+  },
+  "visualization_targets": [
+    "IMAS-ParaView (3D GGD \u2192 VTK)",
+    "ParaView standalone (VTK structured grid)",
+    "VR (CAVE-type / HMD via ParaView VR plugin)"
+  ],
+  "iter_parameters": {
+    "R0_m": 6.2,
+    "a_m": 2.0,
+    "B0_T": 5.3,
+    "Ip_MA": 15.0,
+    "kappa": 1.7,
+    "delta": 0.33
+  },
+  "references": {
+    "imas_paraview": "https://github.com/iterorganization/IMAS-ParaView",
+    "eurofusion_3d_viz": "https://euro-fusion.org/member-news/3d-visualization-brings-nuclear-fusion-to-life/",
+    "springer_fusion_viz": "https://link.springer.com/article/10.1007/s10894-026-00549-z"
+  }
+}

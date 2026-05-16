@@ -4,3 +4,5 @@
 *.hdf5
 *.h5
 tokamark/
+*.vtk
+*.h5
