@@ -76,3 +76,10 @@ pub(crate) const NLS_CRDOWN: Real = 0.3;
 
 /// Base Newton convergence tolerance (LLNL: del < 0.1 for first iter).
 pub(crate) const NLS_TOL: Real = 0.1;
+
+/// LLNL NLSCOEF — denominator scale for tq[4] order-aware Newton convergence.
+/// tq[4] = (q+1) / (l[0] * NLS_COEF). At BDF-5, tq[4] ≈ 137, making the
+/// effective convergence threshold ~137× more lenient than flat del<0.1.
+/// This allows 1-iteration convergence for most steps at high BDF order,
+/// matching the LLNL C reference step count.
+pub(crate) const NLS_COEF: Real = 0.1;

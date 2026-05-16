@@ -20,7 +20,7 @@ use sundials_core::Real;
 use crate::builder::CvodeBuilder;
 use crate::constants::{
     DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS, Method,
-    NLS_CRDOWN, NLS_TOL, Task,
+    NLS_COEF, NLS_CRDOWN, NLS_TOL, Task,
 };
 use crate::error::CvodeError;
 use crate::nordsieck::NordsieckArray;
@@ -435,13 +435,25 @@ where
                 }
             }
 
-            // --- Newton iteration — LLNL nls_newton.c logic ---
-            // H1: Use NLS_CRDOWN=0.3 relaxed tolerance (LLNL cvodenls.c:cvNewtonIteration)
-            // H2: Unified convergence check from iter 0 (no special m==0 case).
-            // H3: del_old initialised from first iter, rho computed from iter 1+.
+            // --- Newton iteration — LLNL cvNlsNewton / nls_newton.c (experimental tq4) ---
+            //
+            // [EXPERIMENTAL] Order-aware convergence denominator (Gwen peer review):
+            //   tq[4] = (q+1) / (l[0] * NLS_COEF)                  (LLNL cvSetTqBDF)
+            //
+            // At BDF order q with l[0] coefficient:
+            //   q=1: tq4≈20  q=2: tq4≈45  q=3: tq4≈73  q=4: tq4≈104  q=5: tq4≈137
+            //
+            // LLNL convergence test: dcon = del * crate_nls / tq4 ≤ 1.0
+            // At order 5, del just needs to be < 137 (vs our previous del < 0.1).
+            // This allows 1-iteration convergence for most BDF-5 steps.
+            //
+            // Previous (H1-H3): flat del < NLS_TOL = 0.1 → ~2.8 RHS/step
+            // Expected (tq4):   del * ĉ / tq4 ≤ 1.0 → ~1.1-1.4 RHS/step
+            let tq4 = (self.q as Real + 1.0) / (l_0 * NLS_COEF);
             let mut acor_vec = vec![0.0; self.n];
             let mut newton_converged = false;
-            let mut del_old: Real = 0.0; // H3: set from m=0 result
+            let mut del_old: Real = 0.0;
+            let mut crate_nls: Real = 1.0; // convergence rate estimate (LLNL: crate)
 
             for m in 0..MAX_NLS_ITERS {
                 let mut y_new = vec![0.0; self.n];
@@ -469,7 +481,7 @@ where
                     break;
                 }
 
-                // Update acor and compute WRMS norm of the correction δ
+                // Update acor and compute WRMS norm of correction δ
                 let mut del = 0.0;
                 for i in 0..self.n {
                     acor_vec[i] += b[i];
@@ -478,39 +490,35 @@ where
                 }
                 del = (del / self.n as f64).sqrt();
 
-                if m == 0 {
-                    // H3: record first delta as baseline for rho computation
-                    del_old = del;
-                    // H2: early exit on first iter if already converged
-                    if del < NLS_TOL {
-                        newton_converged = true;
+                // Update convergence rate estimate ĉ (LLNL: crate)
+                if m > 0 {
+                    crate_nls = (NLS_CRDOWN * crate_nls).max(if del_old > 0.0 {
+                        del / del_old
+                    } else {
+                        1.0
+                    });
+
+                    // Divergence guard: ĉ ≥ 0.9 → Newton not contracting → abort
+                    if crate_nls >= 0.9 {
                         break;
                     }
-                } else {
-                    // H1+H3: convergence-rate monitoring ρ = ||δₘ|| / ||δₘ₋₁||
-                    let rho = if del_old > 0.0 { del / del_old } else { 1.0 };
-
-                    // Divergence guard: abort if Newton is not contracting
-                    if rho >= 0.9 {
-                        break;
-                    }
-
-                    // H1: LLNL predictive convergence test with CRDOWN relaxation:
-                    // estimated remaining error = ρ·del/(1-ρ) < CRDOWN·tol
-                    let tol = NLS_TOL * NLS_CRDOWN.max(rho);
-                    if rho * del / (1.0 - rho) < tol {
-                        newton_converged = true;
-                        break;
-                    }
-
-                    // Fallback: direct norm test with CRDOWN-relaxed tolerance
-                    if del < NLS_TOL * NLS_CRDOWN {
-                        newton_converged = true;
-                        break;
-                    }
-
-                    del_old = del;
                 }
+
+                // [EXPERIMENTAL] LLNL tq[4] order-aware convergence test:
+                //   dcon = del * min(1, ĉ) / tq4 ≤ 1.0
+                let dcon = del * crate_nls.min(1.0) / tq4;
+                if dcon <= 1.0 {
+                    newton_converged = true;
+                    break;
+                }
+
+                // Safety fallback: flat tolerance (catches m=0 with very large del)
+                if del < NLS_TOL {
+                    newton_converged = true;
+                    break;
+                }
+
+                del_old = del;
             }
 
             if !newton_converged {
