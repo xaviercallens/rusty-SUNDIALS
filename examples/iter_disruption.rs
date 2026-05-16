@@ -5,12 +5,12 @@ use std::io::Write;
 use std::time::Instant;
 use sundials_core::Real;
 
-const N_RHO: usize = 20;
-const N_THETA: usize = 40;
+const N_RHO: usize = 200;
+const N_THETA: usize = 400;
 const N_PLASMA: usize = N_RHO * N_THETA;
 
-const N_R_VESSEL: usize = 2;
-const N_THETA_VESSEL: usize = 50;
+const N_R_VESSEL: usize = 20;
+const N_THETA_VESSEL: usize = 400;
 const N_VESSEL: usize = N_R_VESSEL * N_THETA_VESSEL;
 
 const TE0: f64 = 25000.0;
@@ -146,7 +146,6 @@ fn main() {
 
     // Output times matching the python script
     let out_times = vec![0.0, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0];
-
     std::fs::create_dir_all("data/fusion/rust_sim_output").unwrap();
 
     println!("  [Neural-FGMRES] Intercepting dense SpMV operations. Offloading to Tensor Cores...");
@@ -158,7 +157,6 @@ fn main() {
         let y_curr = if t_out == 0.0 {
             y0_vec.clone()
         } else {
-            println!("  [SUNDIALS] Integrating to t={:.2}...", t_out);
             let (_, y) = cvode.solve(t_out, Task::Normal).unwrap();
 
             // Convert N_Vector to slice
