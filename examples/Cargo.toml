@@ -147,3 +147,7 @@ path = "robertson_csv.rs"
 [[example]]
 name = "iter_disruption"
 path = "iter_disruption.rs"
+
+[[example]]
+name = "iter_disruption_3d"
+path = "iter_disruption_3d.rs"
