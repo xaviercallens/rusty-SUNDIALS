@@ -81,8 +81,11 @@ fn main() -> Result<(), cvode::CvodeError> {
     #[cfg(not(feature = "experimental-nls-v2"))]
     let nni = 0usize;
 
-    eprintln!("# Summary: steps={steps} rhs={rhs_evals} nni={nni} ni_per_step={:.2} conservation={cons:.2e}",
-        nni as f64 / steps as f64);
+    let ni_per_step = nni as f64 / steps as f64;
+    eprintln!(
+        "# Summary: steps={steps} rhs={rhs_evals} nni={nni} \
+         ni_per_step={ni_per_step:.2} conservation={cons:.2e}"
+    );
 
     Ok(())
 }
