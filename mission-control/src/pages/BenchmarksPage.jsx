@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import GlowPanel from '../components/GlowPanel';
 
-// ─── Embedded benchmark data ────────────────────────────────────────────────
+// ─── Embedded benchmark data ─────────────────────────────────────────────────
 const BENCHMARKS = [
   {
     id: 'robertson',
@@ -10,39 +10,49 @@ const BENCHMARKS = [
     reference: 'SUNDIALS 7.4.0',
     description: 'Stiff 3-species chemical kinetics ODE. Classic BDF benchmark. y(0)=[1,0,0], t∈[0,4×10¹⁰].',
     equation: "dy₁/dt = -0.04y₁ + 1e4·y₂·y₃\ndy₂/dt = 0.04y₁ - 1e4·y₂·y₃ - 3e7·y₂²\ndy₃/dt = 3e7·y₂²",
-    ciUrl: 'https://github.com/xaviercallens/rusty-SUNDIALS/actions/runs/25953795792',
+    ciUrl: 'https://github.com/xaviercallens/rusty-SUNDIALS/actions',
     status: 'PASS',
     versions: [
       {
-        label: 'v11.1.0 (FD Jacobian)',
-        version: 'v11.1.0',
-        jacobian: 'Finite Difference',
-        steps: 16951,
-        rhsEvals: 74778,
-        conservationError: 6.33e-15,
-        wallMs: 12,
-        order: 5,
-        pass: true,
+        label: 'v11.1.0 — FD Jacobian',
+        version: 'v11.1.0', tag: 'baseline',
+        jacobian: 'Finite Difference', steps: 16951, rhsEvals: 74778,
+        conservationError: 6.33e-15, wallMs: 12, order: 5, pass: true,
+        fix: null, pending: false,
       },
       {
-        label: 'v11.2.0 (Analytical Jacobian) ← current',
-        version: 'v11.2.0',
-        jacobian: 'Analytical 3×3',
-        steps: 960,
-        rhsEvals: 2707,
-        conservationError: 1.33e-15,
-        wallMs: 0,
-        order: 5,
-        pass: true,
+        label: 'v11.2.0 — Analytical Jacobian',
+        version: 'v11.2.0', tag: 'stable',
+        jacobian: 'Analytical 3×3', steps: 960, rhsEvals: 2707,
+        conservationError: 1.33e-15, wallMs: 0, order: 5, pass: true,
+        fix: 'PR #49 — Analytical Jacobian API → steps ÷17.7, RHS ÷27.6',
+        peerReview: null, pending: false,
+      },
+      {
+        label: 'v11.3.0 — Newton H1+H2+H3',
+        version: 'v11.3.0', tag: 'stable',
+        jacobian: 'Analytical 3×3', steps: 903, rhsEvals: 2536,
+        conservationError: 2.89e-15, wallMs: 0, order: 5, pass: true,
+        fix: 'PR #50 — CRDOWN=0.3 + H2 unified check + H3 del_old init',
+        peerReview: { verdict: 'ACCEPT', reviewer: 'Gwen (Mistral AI)',
+          note: 'Clear improvements. Conservation at machine-epsilon. Recommend tq[4] order-aware Newton test to close remaining RHS gap.' },
+        pending: false,
+      },
+      {
+        label: 'v11.4.0-exp — tq4 Order-Aware NLS ⚗️ [REJECTED]',
+        version: 'v11.4.0-exp', tag: 'experimental',
+        jacobian: 'Analytical 3×3', steps: 2410, rhsEvals: 5005,
+        conservationError: 3.33e-15, wallMs: 1, order: 4, pass: false,
+        fix: 'PR #51 — LLNL tq[4]=(q+1)/(l₀·NLSCOEF): tq4≈137 at BDF-5, too loose → step regression',
+        peerReview: { verdict: 'REJECT', reviewer: 'Gwen (Mistral AI)',
+          note: 'del<137 allows large corrections that destabilize steps. tq4 requires full LLNL ewt+tq[2] coupling not yet implemented. Revert to v11.3.0.' },
+        pending: false,
       },
     ],
     reference_c: {
       label: 'LLNL C Reference (cvRoberts_dns)',
-      steps: 1070,
-      rhsEvals: 1537,
-      conservationError: 1.1e-15,
-      wallMs: 5,
-      order: 5,
+      steps: 1070, rhsEvals: 1537,
+      conservationError: 1.1e-15, wallMs: 5, order: 5,
     },
     outputTable: [
       { t: '4.0e-1', y1: '9.851768e-1', y2: '3.386478e-5', y3: '1.478938e-2', c_y1: '9.851712e-1', c_y2: '3.386380e-5', c_y3: '1.479101e-2' },
@@ -158,7 +168,7 @@ export default function BenchmarksPage() {
   const [activeTab, setActiveTab] = useState('comparison');
   const bench = BENCHMARKS.find(b => b.id === selectedId);
   const ref = bench.reference_c;
-  const latest = bench.versions[bench.versions.length - 1];
+  const latest = [...bench.versions].reverse().find(v => !v.pending) || bench.versions[bench.versions.length - 1];
 
   const tabStyle = (active) => ({
     padding: '7px 18px', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600,
@@ -232,10 +242,15 @@ export default function BenchmarksPage() {
           </div>
 
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: 6, marginBottom: 18 }}>
-            {['comparison', 'history', 'solution'].map(tab => (
+          <div style={{ display: 'flex', gap: 6, marginBottom: 18, flexWrap: 'wrap' }}>
+            {[
+              ['comparison', '📊 C vs Rust'],
+              ['history', '📈 Version History'],
+              ['solution', '📋 Solution Table'],
+              ['autoresearch', '🤖 Auto-Research'],
+            ].map(([tab, label]) => (
               <button key={tab} style={tabStyle(activeTab === tab)} onClick={() => setActiveTab(tab)}>
-                {tab === 'comparison' ? '📊 C vs Rust' : tab === 'history' ? '📈 Version History' : '📋 Solution Table'}
+                {label}
               </button>
             ))}
           </div>
@@ -324,47 +339,49 @@ export default function BenchmarksPage() {
           {/* History tab */}
           {activeTab === 'history' && (
             <div>
-              <div style={{ fontSize: 12, color: '#5050a0', marginBottom: 12 }}>Version-over-version efficiency evolution:</div>
+              <div style={{ fontSize: 12, color: '#5050a0', marginBottom: 12 }}>Auto-research evolution — all versions vs LLNL C reference:</div>
               {bench.versions.map((v, i) => (
                 <div key={i} style={{
-                  background: 'rgba(255,255,255,0.03)', border: '1px solid #2a2a4a',
+                  background: v.pending ? 'rgba(255,200,0,0.03)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${v.pending ? '#3a3a1a' : '#2a2a4a'}`,
                   borderRadius: 8, padding: 14, marginBottom: 10,
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, alignItems: 'center' }}>
                     <span style={{ fontWeight: 700, color: '#e0e0ff', fontSize: 13 }}>{v.label}</span>
-                    <StatusBadge pass={v.pass} />
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      {v.pending && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 999, background: 'rgba(255,215,0,0.15)', color: '#ffd700', border: '1px solid #ffd700' }}>⏳ CI RUNNING</span>}
+                      {!v.pending && v.pass !== null && <StatusBadge pass={v.pass} />}
+                      {v.peerReview && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 999, background: 'rgba(0,255,136,0.1)', color: '#00ff88', border: '1px solid #00ff88' }}>👩‍🔬 {v.peerReview.verdict}</span>}
+                    </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                     {[
-                      ['Steps', v.steps, ref.steps],
-                      ['RHS Evals', v.rhsEvals, ref.rhsEvals],
-                      ['Conservation', v.conservationError.toExponential(2), '< 1e-12'],
-                      ['Jacobian', v.jacobian, '—'],
-                    ].map(([label, val, refVal]) => (
+                      ['Steps', v.pending ? null : v.steps],
+                      ['RHS Evals', v.pending ? null : v.rhsEvals],
+                      ['Conservation', v.pending ? null : v.conservationError],
+                      ['Jacobian', v.jacobian],
+                    ].map(([label, val]) => (
                       <div key={label} style={{ textAlign: 'center' }}>
                         <div style={{ fontSize: 10, color: '#5050a0', textTransform: 'uppercase' }}>{label}</div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#c0c0ff', fontFamily: 'monospace', marginTop: 2 }}>{typeof val === 'number' ? val.toLocaleString() : val}</div>
-                        {refVal !== '—' && typeof val === 'number' && (
-                          <div style={{ fontSize: 10, marginTop: 2 }}>{pct(val, ref.steps)}</div>
-                        )}
+                        <div style={{ fontSize: 13, fontWeight: 700, fontFamily: 'monospace', marginTop: 2, color: val === null ? '#3a3a5a' : '#c0c0ff' }}>
+                          {val === null ? '—' : typeof val === 'number' && val < 1e-3 ? val.toExponential(2) : typeof val === 'number' ? val.toLocaleString() : val}
+                        </div>
+                        {typeof val === 'number' && val > 1 && label === 'Steps' && <div style={{ fontSize: 10, marginTop: 2 }}>{pct(val, ref.steps)}</div>}
+                        {typeof val === 'number' && val > 1 && label === 'RHS Evals' && <div style={{ fontSize: 10, marginTop: 2 }}>{pct(val, ref.rhsEvals)}</div>}
                       </div>
                     ))}
                   </div>
-                  {i < bench.versions.length - 1 && (
-                    <div style={{ marginTop: 10, fontSize: 11, color: '#5050a0' }}>
-                      ↓ Fix: Analytical Jacobian API (PR #49) — steps ÷17.7, RHS evals ÷27.6
-                    </div>
-                  )}
+                  {v.fix && <div style={{ marginTop: 10, fontSize: 11, color: '#5050a0', borderTop: '1px solid #1a1a3a', paddingTop: 8 }}>↑ {v.fix}</div>}
+                  {v.peerReview && <div style={{ marginTop: 8, fontSize: 11, color: '#7878aa', background: 'rgba(0,255,136,0.04)', borderRadius: 4, padding: 8 }}><b style={{ color: '#00ff88' }}>Gwen:</b> {v.peerReview.note}</div>}
                 </div>
               ))}
-              {/* Reference row */}
               <div style={{ background: 'rgba(120,120,255,0.06)', border: '1px solid rgba(120,120,255,0.2)', borderRadius: 8, padding: 14 }}>
                 <div style={{ fontWeight: 700, color: '#7878ff', fontSize: 13, marginBottom: 8 }}>{ref.label}</div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                   {[['Steps', ref.steps], ['RHS Evals', ref.rhsEvals], ['Conservation', ref.conservationError.toExponential(2)], ['Jacobian', 'Analytical 3×3']].map(([label, val]) => (
                     <div key={label} style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: 10, color: '#5050a0', textTransform: 'uppercase' }}>{label}</div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: '#7878ff', fontFamily: 'monospace', marginTop: 2 }}>{typeof val === 'number' ? val.toLocaleString() : val}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#7878ff', fontFamily: 'monospace', marginTop: 2 }}>{typeof val === 'number' ? val.toLocaleString() : val}</div>
                     </div>
                   ))}
                 </div>
@@ -376,13 +393,47 @@ export default function BenchmarksPage() {
           {activeTab === 'solution' && (
             <div>
               <div style={{ fontSize: 12, color: '#5050a0', marginBottom: 8 }}>
-                Solution values at SUNDIALS standard output times (Rust v11.2.0 vs C reference):
+                Solution at SUNDIALS standard output times — Rust {latest.version} vs C reference:
               </div>
               <SolutionTable rows={bench.outputTable} />
               <div style={{ marginTop: 14, fontSize: 11, color: '#5050a0', lineHeight: 1.7 }}>
                 <b style={{ color: '#7878aa' }}>Note:</b> y₁ spans 8 orders of magnitude (1→5e-8) over 4×10¹⁰ time units.
-                Agreement to 4+ significant figures confirms BDF-5 accuracy. y₃→1.0 asymptote
-                (all species converted to product) is correctly captured.
+                Agreement to 4+ significant figures confirms BDF-5 accuracy.
+              </div>
+            </div>
+          )}
+
+          {/* Auto-Research tab */}
+          {activeTab === 'autoresearch' && (
+            <div>
+              <div style={{ fontSize: 12, color: '#5050a0', marginBottom: 16 }}>Autonomous loop: hypothesize → implement → CI benchmark → Gwen peer review → merge</div>
+              {[
+                { step: '01', title: 'Root Cause Analysis', done: true, detail: 'FD Jacobian: 16,951 steps (15.8× C). Truncation error across 11-order coefficient range.', version: 'v11.1.0' },
+                { step: '02', title: 'Analytical Jacobian API (PR #49)', done: true, detail: 'Exact 3×3 ∂f/∂y. Steps: 16,951→960 (÷17.7). RHS: 74,778→2,707 (÷27.6). Peer: N/A.', version: 'v11.2.0' },
+                { step: '03', title: 'H1+H2+H3 Newton Fixes (PR #50)', done: true, detail: 'CRDOWN=0.3 relaxed tol + unified m=0 check + correct del_old. Steps: 960→903. RHS: 2,707→2,536.', version: 'v11.3.0' },
+                { step: '04', title: 'Gwen Peer Review — ACCEPT ✅', done: true, detail: '"Clear improvements. Conservation at machine-epsilon. Recommend tq[4] order-aware Newton test." — Mistral AI', version: 'v11.3.0' },
+                { step: '05', title: 'tq4 Order-Aware NLS ⚗️ (PR #51) — FALSIFIED', done: true, detail: 'CI result: Steps 2,410 (+2.67×), RHS 5,005 (+1.97×), Order dropped 5→4. tq4≈137 too loose: del<137 allows large corrections that destabilize steps → more rejections.', version: 'v11.4.0-exp' },
+                { step: '06', title: 'Gwen Peer Review — REJECT ❌', done: true, detail: '"del<137 allows large corrections that destabilize steps. tq4 requires full LLNL ewt+tq[2] coupling. Revert to v11.3.0." — Mistral AI. v11.3.0 remains the stable recommended release.', version: 'v11.3.0 ✅' },
+              ].map(({ step, title, done, detail, version }) => (
+                <div key={step} style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0,
+                    background: done ? 'rgba(0,255,136,0.15)' : 'rgba(255,215,0,0.08)',
+                    border: `2px solid ${done ? '#00ff88' : '#ffd700'}`,
+                    color: done ? '#00ff88' : '#ffd700' }}>{step}</div>
+                  <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 6, padding: '10px 14px',
+                    border: `1px solid ${done ? '#1a3a2a' : '#3a3a1a'}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 700, color: done ? '#e0e0ff' : '#7878aa', fontSize: 13 }}>{title}</span>
+                      <span style={{ fontSize: 10, color: '#5050a0', fontFamily: 'monospace' }}>{version}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#7878aa', marginTop: 5, lineHeight: 1.6 }}>{detail}</div>
+                  </div>
+                </div>
+              ))}
+              <div style={{ marginTop: 12, padding: 12, background: 'rgba(255,77,77,0.04)', border: '1px solid rgba(255,77,77,0.2)', borderRadius: 8, fontSize: 12, color: '#a07070' }}>
+                <b style={{ color: '#ff6666' }}>❌ tq4 Hypothesis Falsified</b> — PR #51 closed. Steps regressed 903→2,410.
+                Gwen (REJECT): "tq4 requires full LLNL ewt+tq[2] coupling not yet implemented."
+                <br/><b style={{ color: '#00ff88' }}>✅ Current stable: v11.3.0 (H1+H2+H3) — 903 steps, 2,536 RHS evals, conservation 2.89e-15.</b>
               </div>
             </div>
           )}
