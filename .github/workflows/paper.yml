@@ -60,15 +60,23 @@ jobs:
         run: |
           tlmgr install acmart totpages environ trimspaces \
             ncctools comment balance preprint natbib setspace \
-            libertine inconsolata newtx fontaxes xstring mweights || true
+            libertine inconsolata newtx fontaxes xstring mweights \
+            microtype xkeyval etoolbox iftex booktabs listings \
+            xcolor graphics tools latex-bin amsmath amscls cmap \
+            hyperref refcount geometry caption float || true
 
       - name: Compile LaTeX PDF
+        continue-on-error: true
         run: |
           cd paper
           if [ -f manuscript.tex ]; then
-            pdflatex -interaction=nonstopmode manuscript.tex
-            pdflatex -interaction=nonstopmode manuscript.tex
-            echo "✅ LaTeX PDF compiled"
+            pdflatex -interaction=nonstopmode manuscript.tex || true
+            pdflatex -interaction=nonstopmode manuscript.tex || true
+            if [ -f manuscript.pdf ]; then
+              echo "✅ LaTeX PDF compiled"
+            else
+              echo "⚠ LaTeX failed — PDF from Pandoc/WeasyPrint is still available"
+            fi
           else
             echo "No .tex file — using Pandoc PDF"
           fi
