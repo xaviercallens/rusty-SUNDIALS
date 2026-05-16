@@ -16,6 +16,7 @@ import SettingsPage from './pages/SettingsPage';
 import SopPage from './pages/SopPage';
 import PeerReviewPage from './pages/PeerReviewPage';
 import BenchmarksPage from './pages/BenchmarksPage';
+import DatasetsPage from './pages/DatasetsPage';
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
                 <Route path="/sop" element={<SopPage />} />
                 <Route path="/peer-review" element={<PeerReviewPage />} />
                 <Route path="/benchmarks" element={<BenchmarksPage />} />
+                <Route path="/datasets" element={<DatasetsPage />} />
               </Routes>
             </main>
           </div>

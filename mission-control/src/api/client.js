@@ -42,6 +42,18 @@ async function request(path, options = {}) {
   if (path === '/kalundborg') return MOCK_RESULTS.kalundborg;
   if (path === '/hpc_exascale') return MOCK_RESULTS.hpc_exascale;
   if (path === '/planetary') return MOCK_RESULTS.planetary;
+
+  // Datasets API
+  if (path === '/api/datasets') {
+    const { MOCK_DATASETS, DATASET_STATS } = await import('./datasetsMockData');
+    return { datasets: MOCK_DATASETS, stats: DATASET_STATS };
+  }
+  if (path.startsWith('/api/datasets/')) {
+    const id = path.replace('/api/datasets/', '');
+    const { MOCK_DATASETS } = await import('./datasetsMockData');
+    const ds = MOCK_DATASETS.find(d => d.id === id);
+    return ds || { error: 'Dataset not found' };
+  }
   
   const token = getToken();
   const headers = {
@@ -103,6 +115,10 @@ export const api = {
   // SOP Reproducibility
   getSopData: () => request('/api/sop'),
   executeSop: (protocol_id) => request('/api/sop/execute', { method: 'POST', body: JSON.stringify({ protocol_id }) }),
+
+  // Datasets
+  getDatasets: () => request('/api/datasets'),
+  getDataset: (id) => request(`/api/datasets/${id}`),
 };
 
 export default api;
