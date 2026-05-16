@@ -1,0 +1,96 @@
+name: Paper Figures & PDF
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'paper/**'
+      - 'examples/robertson_paper_data.rs'
+      - 'examples/hires.rs'
+      - 'examples/vanderpol.rs'
+  workflow_dispatch:
+
+jobs:
+  generate_figures:
+    name: Generate Paper Figures & Extended Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install matplotlib numpy
+
+      - name: Build examples
+        run: cargo build --examples --features experimental-nls-v2
+
+      - name: Run Robertson (CSV data for figures)
+        run: |
+          cargo run --example robertson_paper_data --features experimental-nls-v2 \
+            > paper/data_exp.csv 2>paper/summary_exp.txt
+          echo "=== Robertson CSV Summary ==="
+          cat paper/summary_exp.txt
+
+      - name: Run Robertson (benchmark stats)
+        run: |
+          cargo run --example robertson --features experimental-nls-v2 2>&1 | tee /tmp/robertson_output.txt
+
+      - name: Run HIRES Benchmark
+        run: |
+          cargo run --example hires --features experimental-nls-v2 2>&1 | tee /tmp/hires_output.txt
+
+      - name: Run Van der Pol Benchmark
+        run: |
+          cargo run --example vanderpol --features experimental-nls-v2 2>&1 | tee /tmp/vanderpol_output.txt
+
+      - name: Generate all figures
+        run: python3 paper/generate_figures.py
+
+      - name: Install LaTeX (TinyTeX)
+        uses: r-lib/actions/setup-tinytex@v2
+
+      - name: Install LaTeX packages
+        run: |
+          tlmgr install acmart totpages environ trimspaces \
+            ncctools comment balance preprint natbib setspace \
+            libertine inconsolata newtx fontaxes xstring mweights || true
+
+      - name: Compile LaTeX PDF
+        run: |
+          cd paper
+          if [ -f manuscript.tex ]; then
+            pdflatex -interaction=nonstopmode manuscript.tex
+            pdflatex -interaction=nonstopmode manuscript.tex
+            echo "✅ LaTeX PDF compiled"
+          else
+            echo "No .tex file — using Pandoc PDF"
+          fi
+
+      - name: Upload figures & PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-figures-and-pdf
+          path: |
+            paper/fig*.pdf
+            paper/fig*.png
+            paper/manuscript.pdf
+            paper/data_exp.csv
+            paper/summary_exp.txt
+          retention-days: 90
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: extended-benchmarks
+          path: |
+            /tmp/robertson_output.txt
+            /tmp/hires_output.txt
+            /tmp/vanderpol_output.txt
+          retention-days: 90

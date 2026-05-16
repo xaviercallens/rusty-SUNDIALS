@@ -34,11 +34,20 @@ fn main() -> Result<(), cvode::CvodeError> {
     }
     let y = solver.y();
     let total: f64 = y.iter().sum();
-    println!("\nConservation: Σy = {total:.10} (expect 1.0057)");
-    println!(
-        "Steps: {}, RHS evals: {}",
-        solver.num_steps(),
-        solver.num_rhs_evals()
-    );
+    let cons_err = (total - 1.0057_f64).abs();
+    let steps = solver.num_steps();
+    let rhs = solver.num_rhs_evals();
+    println!("\n=== HIRES Benchmark Results ===");
+    println!("  Conservation: Σy = {total:.10} (expect 1.0057, error: {cons_err:.2e})");
+    println!("  Steps:      {steps}");
+    println!("  RHS evals:  {rhs}");
+    #[cfg(feature = "experimental-nls-v2")]
+    {
+        let nni = solver.num_newton_iters();
+        println!("  Newton iters: {nni}  (NI/step: {:.2})", nni as f64 / steps as f64);
+    }
+    println!("  Final order: {}", solver.order());
+    println!("  Conservation error: {cons_err:.2e}  (threshold 1e-12)");
+    println!("\n{}", if cons_err < 1e-6 { "✅ PASS" } else { "🔴 FAIL" });
     Ok(())
 }

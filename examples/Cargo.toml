@@ -135,3 +135,11 @@ path = "optimize_photonics.rs"
 [[example]]
 name = "benchmark_a100_hpc"
 path = "benchmark_a100_hpc.rs"
+
+[[example]]
+name = "robertson_paper_data"
+path = "robertson_paper_data.rs"
+
+[[example]]
+name = "robertson_csv"
+path = "robertson_csv.rs"

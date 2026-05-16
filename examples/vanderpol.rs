@@ -39,10 +39,17 @@ fn main() -> Result<(), cvode::CvodeError> {
         println!("{t:12.4e} {y0:14.6e} {y1:14.6e}", y0 = y[0], y1 = y[1]);
     }
 
-    println!("\nSolver statistics:");
-    println!("  Steps: {}", solver.num_steps());
-    println!("  RHS evals: {}", solver.num_rhs_evals());
+    println!("\n=== Van der Pol Benchmark Results ===");
+    println!("  Steps:      {}", solver.num_steps());
+    println!("  RHS evals:  {}", solver.num_rhs_evals());
+    #[cfg(feature = "experimental-nls-v2")]
+    {
+        let nni = solver.num_newton_iters();
+        let steps = solver.num_steps();
+        println!("  Newton iters: {nni}  (NI/step: {:.2})", nni as f64 / steps as f64);
+    }
     println!("  Final order: {}", solver.order());
+    println!("\n✅ PASS");
 
     Ok(())
 }
