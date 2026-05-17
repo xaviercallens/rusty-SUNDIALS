@@ -11,6 +11,7 @@ import PublicationsPage from './pages/PublicationsPage';
 import DocsPage from './pages/DocsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import EducationPage from './pages/EducationPage';
+import IterEducationKitPage from './pages/IterEducationKitPage';
 import CostPage from './pages/CostPage';
 import SettingsPage from './pages/SettingsPage';
 import SopPage from './pages/SopPage';
@@ -37,6 +38,7 @@ export default function App() {
                 <Route path="/physics" element={<PhysicsPage />} />
                 <Route path="/publications" element={<PublicationsPage />} />
                 <Route path="/education" element={<EducationPage />} />
+                <Route path="/iter-education" element={<IterEducationKitPage />} />
                 <Route path="/cost" element={<CostPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/docs" element={<DocsPage />} />

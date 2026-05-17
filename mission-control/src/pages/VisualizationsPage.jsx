@@ -92,16 +92,31 @@ export default function VisualizationsPage() {
                 {activeViz.images && activeViz.images.length > 0 ? (
                   <div className="space-y-8">
                     {/* Hero Image */}
-                    <div className="rounded-lg overflow-hidden border border-slate-800 shadow-2xl relative group">
-                      <div className="absolute top-4 left-4 bg-black/70 backdrop-blur px-3 py-1 rounded text-xs font-mono border border-slate-700 z-10 flex items-center gap-2">
-                        <Activity className="w-3 h-3 text-red-400" />
-                        Te Collapse / Plasma Current
+                    <div className="relative rounded-xl overflow-hidden border border-slate-700 bg-black shadow-2xl group">
+                      {activeViz.images[0].endsWith('.mp4') ? (
+                        <video 
+                          src={`${API_BASE}${activeViz.images[0]}`} 
+                          autoPlay 
+                          loop 
+                          muted 
+                          playsInline
+                          className="w-full h-[500px] object-cover"
+                        />
+                      ) : (
+                        <img 
+                          src={`${API_BASE}${activeViz.images[0]}`} 
+                          alt="Main Visualization" 
+                          className="w-full h-[500px] object-cover"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90"></div>
+                      <div className="absolute bottom-0 left-0 p-6">
+                        <span className="px-3 py-1 bg-cyan-500/20 border border-cyan-400 text-cyan-400 text-xs rounded-full uppercase tracking-wider font-semibold mb-3 inline-block">
+                          Primary View
+                        </span>
+                        <h2 className="text-3xl font-bold text-white mb-2">{activeViz.title}</h2>
+                        <p className="text-slate-300 max-w-2xl">{activeViz.description}</p>
                       </div>
-                      <img 
-                        src={`${API_BASE}${activeViz.images[0]}`} 
-                        alt="Hero Visualization" 
-                        className="w-full h-auto object-cover transform transition duration-700 group-hover:scale-[1.02]"
-                      />
                     </div>
 
                     {/* Secondary Images Grid */}
@@ -109,13 +124,27 @@ export default function VisualizationsPage() {
                       <Layers className="w-5 h-5 text-cyan-400" /> Output Stages
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
-                      {activeViz.images.slice(1).map((img, idx) => (
-                        <div key={idx} className="rounded-lg overflow-hidden border border-slate-800 bg-black">
-                           <img 
-                            src={`${API_BASE}${img}`} 
-                            alt={`Stage ${idx+1}`} 
-                            className="w-full h-auto object-cover opacity-80 hover:opacity-100 transition cursor-pointer"
-                           />
+                      {activeViz.images.slice(1).map((media, idx) => (
+                        <div key={idx} className="border border-slate-800 rounded-lg overflow-hidden bg-black flex flex-col group relative">
+                          {media.endsWith('.mp4') ? (
+                            <video 
+                              src={`${API_BASE}${media}`} 
+                              autoPlay 
+                              loop 
+                              muted 
+                              playsInline
+                              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          ) : (
+                            <img 
+                              src={`${API_BASE}${media}`} 
+                              alt={`Slice ${idx + 1}`}
+                              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <span className="text-xs text-slate-300 font-medium">Secondary View {idx + 1}</span>
+                          </div>
                         </div>
                       ))}
                     </div>

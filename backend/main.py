@@ -53,6 +53,7 @@ def load_db():
                 "description": "3D toroidal extension (672K DOF) — 16 toroidal slices with n=1 helical tearing mode coupling cos(2θ-φ).",
                 "tags": ["MHD", "Plasma", "ITER", "3D", "Toroidal", "n=1"],
                 "images": [
+                    "/static/data/fusion/vtk_output_3d/iter_3d_torus_video.mp4",
                     "/static/data/fusion/vtk_output_3d/iter_3d_torus_hero.png",
                     "/static/data/fusion/vtk_output_3d/iter_3d_all_slices.png",
                     "/static/data/fusion/vtk_output_3d/iter_3d_temporal_sequence.png",

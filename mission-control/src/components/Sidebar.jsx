@@ -17,6 +17,7 @@ const navItems = [
   { to: '/docs', icon: BookOpen, label: 'Docs' },
   { to: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
   { to: '/education', icon: Lightbulb, label: 'Media' },
+  { to: '/iter-education', icon: Lightbulb, label: 'ITER Kit' },
   { to: '/sop', icon: CheckSquare, label: 'SOP Reproduce' },
   { to: '/peer-review', icon: Brain, label: 'Peer Review' },
   { to: '/reproducibility', icon: CheckSquare, label: 'Reproduce POC' },
