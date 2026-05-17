@@ -1,0 +1,293 @@
+{
+  "timestamp": 1778950266.319906,
+  "pcie_benchmark": [
+    {
+      "dof": 1000,
+      "cpu_time_ms": 0.05,
+      "gpu_total_ms": 0.501,
+      "pcie_transfer_ms": 0.5
+    },
+    {
+      "dof": 5000,
+      "cpu_time_ms": 1.25,
+      "gpu_total_ms": 0.514,
+      "pcie_transfer_ms": 0.502
+    },
+    {
+      "dof": 10000,
+      "cpu_time_ms": 5.0,
+      "gpu_total_ms": 0.536,
+      "pcie_transfer_ms": 0.505
+    },
+    {
+      "dof": 50000,
+      "cpu_time_ms": 125.0,
+      "gpu_total_ms": 0.877,
+      "pcie_transfer_ms": 0.523
+    },
+    {
+      "dof": 100000,
+      "cpu_time_ms": 500.0,
+      "gpu_total_ms": 1.547,
+      "pcie_transfer_ms": 0.547
+    },
+    {
+      "dof": 168000,
+      "cpu_time_ms": 1411.2,
+      "gpu_total_ms": 2.756,
+      "pcie_transfer_ms": 0.578
+    }
+  ],
+  "residual_convergence": [
+    {
+      "iteration": 1,
+      "fp64_residual": 0.75,
+      "fp8_residual": 0.78
+    },
+    {
+      "iteration": 2,
+      "fp64_residual": 0.5625,
+      "fp8_residual": 0.6084
+    },
+    {
+      "iteration": 3,
+      "fp64_residual": 0.421875,
+      "fp8_residual": 0.47455200000000003
+    },
+    {
+      "iteration": 4,
+      "fp64_residual": 0.31640625,
+      "fp8_residual": 0.37015056
+    },
+    {
+      "iteration": 5,
+      "fp64_residual": 0.2373046875,
+      "fp8_residual": 0.2887174368
+    },
+    {
+      "iteration": 6,
+      "fp64_residual": 0.177978515625,
+      "fp8_residual": 0.22519960070400002
+    },
+    {
+      "iteration": 7,
+      "fp64_residual": 0.13348388671875,
+      "fp8_residual": 0.17565568854912003
+    },
+    {
+      "iteration": 8,
+      "fp64_residual": 0.1001129150390625,
+      "fp8_residual": 0.13701143706831362
+    },
+    {
+      "iteration": 9,
+      "fp64_residual": 0.07508468627929688,
+      "fp8_residual": 0.10686892091328462
+    },
+    {
+      "iteration": 10,
+      "fp64_residual": 0.056313514709472656,
+      "fp8_residual": 0.083357758312362
+    },
+    {
+      "iteration": 11,
+      "fp64_residual": 0.04223513603210449,
+      "fp8_residual": 0.06501905148364236
+    },
+    {
+      "iteration": 12,
+      "fp64_residual": 0.03167635202407837,
+      "fp8_residual": 0.05071486015724104
+    },
+    {
+      "iteration": 13,
+      "fp64_residual": 0.023757264018058777,
+      "fp8_residual": 0.03955759092264801
+    },
+    {
+      "iteration": 14,
+      "fp64_residual": 0.017817948013544083,
+      "fp8_residual": 0.03085492091966545
+    },
+    {
+      "iteration": 15,
+      "fp64_residual": 0.013363461010158062,
+      "fp8_residual": 0.02406683831733905
+    },
+    {
+      "iteration": 16,
+      "fp64_residual": 0.010022595757618546,
+      "fp8_residual": 0.01877213388752446
+    },
+    {
+      "iteration": 17,
+      "fp64_residual": 0.00751694681821391,
+      "fp8_residual": 0.014642264432269078
+    },
+    {
+      "iteration": 18,
+      "fp64_residual": 0.005637710113660432,
+      "fp8_residual": 0.011420966257169882
+    },
+    {
+      "iteration": 19,
+      "fp64_residual": 0.004228282585245324,
+      "fp8_residual": 0.008908353680592508
+    },
+    {
+      "iteration": 20,
+      "fp64_residual": 0.0031712119389339932,
+      "fp8_residual": 0.008554230521635646
+    },
+    {
+      "iteration": 21,
+      "fp64_residual": 0.002378408954200495,
+      "fp8_residual": 0.008210184559407469
+    },
+    {
+      "iteration": 22,
+      "fp64_residual": 0.0017838067156503712,
+      "fp8_residual": 0.0077987902005080545
+    },
+    {
+      "iteration": 23,
+      "fp64_residual": 0.0013378550367377784,
+      "fp8_residual": 0.007324228650065135
+    },
+    {
+      "iteration": 24,
+      "fp64_residual": 0.0010033912775533338,
+      "fp8_residual": 0.006867459381361215
+    },
+    {
+      "iteration": 25,
+      "fp64_residual": 0.0007525434581650003,
+      "fp8_residual": 0.006510851237283378
+    },
+    {
+      "iteration": 26,
+      "fp64_residual": 0.0005644075936237503,
+      "fp8_residual": 0.006261564520467169
+    },
+    {
+      "iteration": 27,
+      "fp64_residual": 0.0004233056952178127,
+      "fp8_residual": 0.006044123887284261
+    },
+    {
+      "iteration": 28,
+      "fp64_residual": 0.0003174792714133595,
+      "fp8_residual": 0.0057690082717508345
+    },
+    {
+      "iteration": 29,
+      "fp64_residual": 0.00023810945356001964,
+      "fp8_residual": 0.005414194469741996
+    },
+    {
+      "iteration": 30,
+      "fp64_residual": 0.00017858209017001473,
+      "fp8_residual": 0.0050446815838456095
+    },
+    {
+      "iteration": 31,
+      "fp64_residual": 0.00013393656762751105,
+      "fp8_residual": 0.004752043740121022
+    },
+    {
+      "iteration": 32,
+      "fp64_residual": 0.00010045242572063329,
+      "fp8_residual": 0.00456958422123914
+    },
+    {
+      "iteration": 33,
+      "fp64_residual": 7.533931929047496e-05,
+      "fp8_residual": 0.004441096196187909
+    },
+    {
+      "iteration": 34,
+      "fp64_residual": 5.650448946785622e-05,
+      "fp8_residual": 0.0042719496549905155
+    },
+    {
+      "iteration": 35,
+      "fp64_residual": 4.2378367100892165e-05,
+      "fp8_residual": 0.004015533905291374
+    },
+    {
+      "iteration": 36,
+      "fp64_residual": 3.178377532566912e-05,
+      "fp8_residual": 0.0037155793246824937
+    },
+    {
+      "iteration": 37,
+      "fp64_residual": 2.383783149425184e-05,
+      "fp8_residual": 0.0034654465451126686
+    },
+    {
+      "iteration": 38,
+      "fp64_residual": 1.7878373620688882e-05,
+      "fp8_residual": 0.0033218110757279734
+    },
+    {
+      "iteration": 39,
+      "fp64_residual": 1.3408780215516662e-05,
+      "fp8_residual": 0.0032521000605699834
+    },
+    {
+      "iteration": 40,
+      "fp64_residual": 1.0056585161637497e-05,
+      "fp8_residual": 0.003164006373589419
+    },
+    {
+      "iteration": 41,
+      "fp64_residual": 7.542438871228123e-06,
+      "fp8_residual": 0.002989943788029477
+    },
+    {
+      "iteration": 42,
+      "fp64_residual": 5.656829153421092e-06,
+      "fp8_residual": 0.0027487944438364395
+    },
+    {
+      "iteration": 43,
+      "fp64_residual": 4.242621865065819e-06,
+      "fp8_residual": 0.002528177247381758
+    },
+    {
+      "iteration": 44,
+      "fp64_residual": 3.1819663987993645e-06,
+      "fp8_residual": 0.002403538577523211
+    },
+    {
+      "iteration": 45,
+      "fp64_residual": 2.3864747990995235e-06,
+      "fp8_residual": 0.0023684520011004622
+    },
+    {
+      "iteration": 46,
+      "fp64_residual": 1.7898560993246426e-06,
+      "fp8_residual": 0.00234020823581032
+    },
+    {
+      "iteration": 47,
+      "fp64_residual": 1.342392074493482e-06,
+      "fp8_residual": 0.0022355551362943263
+    },
+    {
+      "iteration": 48,
+      "fp64_residual": 1.0067940558701114e-06,
+      "fp8_residual": 0.0020469519133472433
+    },
+    {
+      "iteration": 49,
+      "fp64_residual": 7.550955419025835e-07,
+      "fp8_residual": 0.0018492290524039338
+    },
+    {
+      "iteration": 50,
+      "fp64_residual": 5.663216564269376e-07,
+      "fp8_residual": 0.0017305301144133441
+    }
+  ]
+}

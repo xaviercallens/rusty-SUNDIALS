@@ -1,0 +1,39 @@
+steps:
+  # Step 1: Run the Rust 3D simulation
+  - name: 'rustlang/rust:nightly'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Building and executing 3D Plasma Toroidal model..."
+        # Pass auto-research flags to match the local configuration
+        export RUSTY_SUNDIALS_GPU_ABLATION=1
+        export RUSTY_SUNDIALS_ADAPTIVE_PRECISION=1
+        export RUSTY_SUNDIALS_ARCHITECTURE="FNO"
+        
+        # Run the 3D disruption model
+        cargo run --example iter_disruption_3d --release
+        
+        # Create artifacts dir and copy the raw data output
+        mkdir -p /workspace/artifacts
+        cp data/fusion/rust_sim_output_3d/*.csv /workspace/artifacts/ || true
+
+  # Step 2: Generate 3D Visualizations using Python
+  - name: 'python:3.11-slim'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Installing Python dependencies for visualization..."
+        pip install matplotlib numpy scipy
+        
+        echo "Generating 3D Plasma Visualizations..."
+        python3 scripts/iter_disruption_3d_viz.py
+        
+        # Copy the generated figures to the artifacts directory
+        cp data/fusion/vtk_output_3d/*.png /workspace/artifacts/ || true
+
+artifacts:
+  objects:
+    location: 'gs://mopga-487511_cloudbuild/rusty-sundials-artifacts/3d_plasma_run'
+    paths: ['/workspace/artifacts/*']

@@ -1,16 +1,3 @@
 .git
 target/
 node_modules/
-*.tar.gz
-repo.tar.gz
-__pycache__
-.env
-.env.local
-proofs/
-docs/
-paper/*.md
-crates/
-examples/*.rs
-scripts/
-*.lock
-Cargo.toml

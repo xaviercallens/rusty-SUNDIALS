@@ -118,10 +118,10 @@ export default function IterEducationKitPage() {
           <div className="bg-[#0a0e14] border-l-4 border-cyan-500 p-8 rounded-r-xl">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-cyan-500/10 rounded-lg"><Network className="w-6 h-6 text-cyan-400" /></div>
-              <h2 className="text-2xl font-bold text-white">The SciML Solution</h2>
+              <h2 className="text-2xl font-bold text-white">IMAS & The SciML Solution</h2>
             </div>
             <p className="text-slate-400 mb-4 leading-relaxed">
-              To mitigate disruptions, we must simulate them faster than real-time. Traditional Magnetohydrodynamics (MHD) solvers are bottlenecked by dense Jacobian matrices and immense computational overhead.
+              Leveraging the <a href="https://www.iter.org/node/20687/release-imas-infrastructure-and-physics-models-open-source" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">ITER IMAS Infrastructure and Physics Models Open Source</a>, we simulate disruptions faster than real-time. Traditional Magnetohydrodynamics (MHD) solvers are bottlenecked by dense Jacobian matrices and immense computational overhead.
             </p>
             <p className="text-slate-400 leading-relaxed">
               <strong className="text-cyan-400">rusty-SUNDIALS</strong> integrates a novel <em>Neural-FGMRES</em> preconditioner. By using a Graph Neural Network (MPNN) to approximate the inverse Jacobian, we bypass the $O(N^3)$ computational wall, achieving a 150x speedup while maintaining strict mathematical guarantees via Lean 4 formal verification.
@@ -139,20 +139,58 @@ export default function IterEducationKitPage() {
             </p>
             <div className="bg-black/50 p-4 rounded border border-slate-800 font-mono text-xs text-orange-200">
               <div className="flex justify-between border-b border-slate-800 pb-2 mb-2">
-                <span>> OPTIMIZATION TARGET:</span>
+                <span>&gt; OPTIMIZATION TARGET:</span>
                 <span className="text-orange-400">NEWTON ITERS &lt; 5</span>
               </div>
               <div className="flex justify-between border-b border-slate-800 pb-2 mb-2">
-                <span>> ADAPTIVE TRAJECTORY:</span>
+                <span>&gt; ADAPTIVE TRAJECTORY:</span>
                 <span className="text-cyan-400">FP8 → FP16 → FP32</span>
               </div>
               <div className="flex justify-between">
-                <span>> HARDWARE ABLATION:</span>
+                <span>&gt; HARDWARE ABLATION:</span>
                 <span className="text-green-400">H100 TENSOR CORES ACTIVE</span>
               </div>
             </div>
           </div>
+        </div>
 
+        {/* EPFL & Euro-Fusion Visualization Showcase */}
+        <div className="mb-12 bg-black border border-slate-800 rounded-xl overflow-hidden relative shadow-2xl">
+          <div className="absolute top-4 left-4 z-10 bg-black/80 backdrop-blur px-3 py-1 border border-slate-700 rounded text-xs text-slate-300 font-mono">
+            SOURCE FEED: EPFL / EM+
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            <div className="p-8 flex flex-col justify-center">
+              <h2 className="text-3xl font-bold text-white mb-4">Particle Motions in a Tokamak</h2>
+              <p className="text-slate-400 mb-6 leading-relaxed">
+                Visualizing fusion plasmas is critical to understanding the complex, chaotic dynamics of magnetic confinement. 
+                Recent achievements in 3D visualization bring nuclear fusion to life, providing researchers with unprecedented clarity into the behavior of electrons and ions inside the vacuum vessel.
+              </p>
+              <div className="space-y-3">
+                <a href="https://euro-fusion.org/member-news/3d-visualization-brings-nuclear-fusion-to-life/" target="_blank" rel="noreferrer" className="block p-3 bg-slate-900/50 hover:bg-slate-800 border border-slate-800 rounded transition-colors text-sm text-cyan-400">
+                  Read Euro-Fusion Article: 3D Visualization Brings Nuclear Fusion to Life
+                </a>
+                <a href="https://www.researchgate.net/publication/399928853_Visualization_of_fusion_plasmas" target="_blank" rel="noreferrer" className="block p-3 bg-slate-900/50 hover:bg-slate-800 border border-slate-800 rounded transition-colors text-sm text-cyan-400">
+                  Read ResearchGate Publication: Visualization of Fusion Plasmas
+                </a>
+              </div>
+            </div>
+            <div className="relative min-h-[300px] bg-[#0a0f18]">
+              {/* Replace with the actual image uploaded by user / generic fallback */}
+              <img 
+                src="https://euro-fusion.org/wp-content/uploads/2024/02/EPFL_EM_Plus_Tokamak_Particles-1024x576.jpg" 
+                alt="Particle motions in a tokamak" 
+                className="absolute inset-0 w-full h-full object-cover opacity-80"
+                onError={(e) => {
+                  e.target.src = "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=1000&auto=format&fit=crop";
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent lg:from-black lg:via-transparent"></div>
+              <div className="absolute bottom-4 right-4 text-[10px] text-slate-400 bg-black/60 px-2 py-1 rounded">
+                © 2024 EPFL / Laboratory for Experimental Museology (EM+) - CC-BY-SA 4.0
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Footer / Schematics Mockup */}
