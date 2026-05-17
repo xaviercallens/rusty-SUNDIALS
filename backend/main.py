@@ -346,12 +346,21 @@ def health():
     }
 
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8080)), reload=True)
+from fastapi.responses import FileResponse
+from fastapi import Request
 
-# Mount the frontend React app at root — FastAPI API routes registered above
-# take precedence over this catch-all static mount.
+# Mount the frontend React app at root
 FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "mission-control", "dist"))
 if os.path.exists(FRONTEND_DIR):
     app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+
+@app.exception_handler(404)
+async def custom_404_handler(request: Request, exc):
+    if not request.url.path.startswith("/api/") and os.path.exists(os.path.join(FRONTEND_DIR, "index.html")):
+        return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+    from fastapi.responses import JSONResponse
+    return JSONResponse(status_code=404, content={"detail": "Not Found"})
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8080)), reload=True)
