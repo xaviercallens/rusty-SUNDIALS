@@ -1,6 +1,12 @@
 use sundials_core::Real;
 
-/// The IDA Solver orchestrator.
+/// A fixed-step Backward Euler prototype for DAE residuals, NOT a general IDA solver.
+///
+/// It does one fixed-point iteration per step (no Newton-Krylov, no Nordsieck array, no variable
+/// order/step size, no error control beyond the fixed-point residual). It approximates `dF/dy ~ 1`
+/// (see the fixed-point loop in `solve`), which is only valid for mildly stiff residuals. Treat it
+/// as a placeholder for a real IDA port, not as a replacement for it; `CvodeSolver` in the `cvode`
+/// crate is the tested, variable-order solver in this repository.
 pub struct IdaSolver<F> {
     pub t: Real,
     pub y: Vec<Real>,
