@@ -1,0 +1,12 @@
+[package]
+name = "qf-pgpe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Projected Gross-Pitaevskii equation (2D, periodic, IF-RK4) on a doubly-periodic grid — a pure-Rust port of SocrateAI-Scientific-QuantumFluids's pgpe.py, matching numpy's FFT conventions exactly."
+
+[dependencies]
+rustfft = "6.4.1"
+num-complex = "0.4"
+
+[dev-dependencies]
