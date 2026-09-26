@@ -8,8 +8,7 @@ use pyo3::prelude::*;
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::types::PyList;
 
-use cvode::solver::Cvode;
-use cvode::constants::{Method, Task};
+use cvode::{Cvode, Method, Task};
 use nvector::SerialVector;
 use sundials_core::Real;
 
@@ -40,7 +39,7 @@ impl PyCvodeSolver {
     #[pyo3(signature = (rhs_func, t0, y0, t_out))]
     fn solve<'py>(
         &self,
-        py: Python<'py>,
+        _py: Python<'py>,
         rhs_func: PyObject,
         t0: Real,
         y0: Vec<Real>,
