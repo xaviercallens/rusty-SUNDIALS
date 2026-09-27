@@ -4,6 +4,13 @@
 //! allowing `rusty-SUNDIALS` to be used directly from Python without
 //! compromising zero-cost performance.
 
+// pyo3 0.20's `#[pymethods]` expansion trips clippy's `non_local_definitions` lint on current
+// rustc (the macro-generated `impl PyClassImplCollector for PyCvodeSolver` is attributed to a
+// hidden, macro-internal span that a local `#[allow]` on the visible `impl` block does not
+// reach). Fixed upstream in later pyo3 releases; upgrading pyo3 is a separate, larger change
+// (see PR #59's description). Crate-level allow until then.
+#![allow(non_local_definitions)]
+
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
 use pyo3::types::PyList;
