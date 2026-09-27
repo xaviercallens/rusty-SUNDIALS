@@ -118,11 +118,15 @@ fn main() {
     } else if architecture == "DeepONet" {
         println!("  [Auto-Research] Loading Branch-Trunk DeepONet weights...");
     } else {
-        println!("  [Auto-Research] Loading 3-layer MPNN (Message Passing) for sparse local 3D interactions...");
+        println!(
+            "  [Auto-Research] Loading 3-layer MPNN (Message Passing) for sparse local 3D interactions..."
+        );
     }
 
     if gpu_ablation {
-        println!("  [Auto-Research] GPU Ablation Active: Offloading SpMV to H100 Tensor Cores (Target: 157x speedup vs CPU)");
+        println!(
+            "  [Auto-Research] GPU Ablation Active: Offloading SpMV to H100 Tensor Cores (Target: 157x speedup vs CPU)"
+        );
     } else {
         println!("  [Auto-Research] CPU Baseline: cuSPARSE disabled.");
     }
@@ -150,24 +154,30 @@ fn main() {
                 } else {
                     "FP32"
                 };
-                println!("  [Solver] Newton residual proxy ~{:.1e} -> Forcing Preconditioner Precision to {}", res_proxy, prec);
+                println!(
+                    "  [Solver] Newton residual proxy ~{:.1e} -> Forcing Preconditioner Precision to {}",
+                    res_proxy, prec
+                );
             }
-            
+
             // Bypass dense CVODE solve to avoid OOM. Evaluate analytically.
             let mut y_slice = vec![0.0; neq];
             for i in 0..N_PLASMA_3D {
                 let island_width = 0.05 + 0.35 * t_out;
                 let quench_factor = (-3.0 * t_out).exp();
                 let island = island_width * island_shape[i];
-                let te = te_base[i] * quench_factor * (1.0 + island) + TE0 * 0.15 * t_out * edge_shape[i];
+                let te = te_base[i] * quench_factor * (1.0 + island)
+                    + TE0 * 0.15 * t_out * edge_shape[i];
                 y_slice[i] = te;
 
-                let j_phi = j_base[i] * (1.0 - 0.6 * t_out) * (1.0 + 0.4 * t_out * j_redist_shape[i]);
+                let j_phi =
+                    j_base[i] * (1.0 - 0.6 * t_out) * (1.0 + 0.4 * t_out * j_redist_shape[i]);
                 y_slice[N_PLASMA_3D + i] = j_phi;
             }
             let current_quench = 4.0 * t_out * (-2.0 * t_out).exp();
             for i in 0..N_VESSEL {
-                y_slice[2 * N_PLASMA_3D + i] = 3.3e5 * current_quench * poloidal_var[i] * skin_factor[i];
+                y_slice[2 * N_PLASMA_3D + i] =
+                    3.3e5 * current_quench * poloidal_var[i] * skin_factor[i];
             }
             y_slice
         };
@@ -222,9 +232,22 @@ fn main() {
     }
 
     println!("╔══════════════════════════════════════════════════════════════╗");
-    println!("║  3D Toroidal simulation complete in {:?}        ║", start.elapsed());
-    println!("║  Total DOF: {} ({:.2}M)                          ║", neq, neq as f64 / 1e6);
-    println!("║  Toroidal slices: {} | Mode: m=2, n=1               ║", N_PHI);
-    println!("║  Auto-Research: GPU Ablation=ON, AdaptivePrec=ON, Arch={} ║", architecture);
+    println!(
+        "║  3D Toroidal simulation complete in {:?}        ║",
+        start.elapsed()
+    );
+    println!(
+        "║  Total DOF: {} ({:.2}M)                          ║",
+        neq,
+        neq as f64 / 1e6
+    );
+    println!(
+        "║  Toroidal slices: {} | Mode: m=2, n=1               ║",
+        N_PHI
+    );
+    println!(
+        "║  Auto-Research: GPU Ablation=ON, AdaptivePrec=ON, Arch={} ║",
+        architecture
+    );
     println!("╚══════════════════════════════════════════════════════════════╝");
 }
