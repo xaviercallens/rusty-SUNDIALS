@@ -1,0 +1,12 @@
+[package]
+name = "qf-bao-distances"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "BAO distances (D_M/r_d, D_H/r_d, D_V/r_d) for flat LCDM / wCDM / w0waCDM, integrated with this repository's own CVODE (BDF; its Adams path was measured to be stuck at order 1) and cross-checked by adaptive Gauss-Kronrod quadrature, plus a Gaussian chi^2 and flat-LCDM best fit on the real DESI DR2 BAO data vector — a Rust port of AutoevolveAI's results/desi_dr2_bao and results/bao_flcdm numerics."
+
+[dependencies]
+cvode = { path = "../cvode" }
+nvector = { path = "../nvector" }
+
+[dev-dependencies]
