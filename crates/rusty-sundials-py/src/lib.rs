@@ -4,6 +4,10 @@
 //! allowing `rusty-SUNDIALS` to be used directly from Python without
 //! compromising zero-cost performance.
 
+// pyo3 0.20's #[pymethods]/#[pyfunction] expansions define impls inside a const block, which
+// newer rustc reports as `non_local_definitions` (fixed upstream in pyo3 >= 0.21).
+#![allow(non_local_definitions)]
+
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
 use pyo3::types::PyList;
