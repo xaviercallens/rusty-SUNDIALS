@@ -15,7 +15,6 @@
 #![forbid(unsafe_code)]
 
 use std::io::{BufRead, Write};
-use std::os::fd::AsFd;
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
@@ -63,6 +62,31 @@ fn timeout() -> Duration {
     Duration::from_secs(secs.max(1))
 }
 
+/// A duplicate of our stderr, to become the worker's stdout.
+#[cfg(unix)]
+fn dup_stderr() -> std::io::Result<Stdio> {
+    use std::os::fd::AsFd;
+    Ok(Stdio::from(std::io::stderr().as_fd().try_clone_to_owned()?))
+}
+
+/// A duplicate of our stderr, to become the worker's stdout.
+#[cfg(windows)]
+fn dup_stderr() -> std::io::Result<Stdio> {
+    use std::os::windows::io::AsHandle;
+    Ok(Stdio::from(
+        std::io::stderr().as_handle().try_clone_to_owned()?,
+    ))
+}
+
+/// No handle duplication here: refuse rather than silently lose the stdout isolation.
+#[cfg(not(any(unix, windows)))]
+fn dup_stderr() -> std::io::Result<Stdio> {
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Unsupported,
+        "stderr duplication is not supported on this platform",
+    ))
+}
+
 /// Run a solver tool in an isolated worker subprocess.
 fn run_isolated(tool: &str, args: &Value) -> ToolOutcome {
     let exe = match std::env::current_exe() {
@@ -78,8 +102,8 @@ fn run_isolated(tool: &str, args: &Value) -> ToolOutcome {
     let result_path =
         std::env::temp_dir().join(format!("sundials-mcp-{}-{n}.json", std::process::id()));
     // The worker's stdout is a duplicate of our stderr: solver prints go to the log, never to the protocol.
-    let stdout_for_worker = match std::io::stderr().as_fd().try_clone_to_owned() {
-        Ok(fd) => Stdio::from(fd),
+    let stdout_for_worker = match dup_stderr() {
+        Ok(stdio) => stdio,
         Err(e) => {
             return ToolOutcome::Err {
                 ran: false,
