@@ -594,7 +594,9 @@ fn run_and_record(
         p.zeff,
         rp0,
         tr.lp / rp0,
-        s.t_cq.map(|x| format!("{:.4} s", x)).unwrap_or_else(|| "n/a".into()),
+        s.t_cq
+            .map(|x| format!("{:.4} s", x))
+            .unwrap_or_else(|| "n/a".into()),
         iv_peak * 1e-6,
         t_iv_peak,
         s.energy_residual,
@@ -647,7 +649,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         base.ip0 * 1e-6,
         base.volume()
     );
-    println!("L_p = {:.4e} H (l_i={}), L_v = {:.2e} H, M = {:.2e} H, R_v = {:.2e} Ohm, k = {:.3}, tau_v = L_v/R_v = {:.3} s", lp, base.li, base.lv, base.m, base.rv, base.coupling_coefficient(), base.lv / base.rv);
+    println!(
+        "L_p = {:.4e} H (l_i={}), L_v = {:.2e} H, M = {:.2e} H, R_v = {:.2e} Ohm, k = {:.3}, tau_v = L_v/R_v = {:.3} s",
+        lp,
+        base.li,
+        base.lv,
+        base.m,
+        base.rv,
+        base.coupling_coefficient(),
+        base.lv / base.rv
+    );
     println!(
         "Spitzer check: eta_par(25 keV, Zeff=1, lnL=17) = {:.3e} Ohm m (NRL reference 2.26e-10)",
         spitzer_eta_parallel(25.0e3, 1.0, 17.0)
@@ -708,7 +719,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             worst = worst.max((tr_m0.ip[k] - exact).abs() / exact);
         }
     }
-    println!("      ctrl1 analytic exp(-t R/L): max rel err (t<=3 tau) = {:.3e}, t_CQ analytic = {:.5} s vs solver {:.5} s", worst, tau * 4.0_f64.ln() / 0.6, s_m0.t_cq.unwrap_or(f64::NAN));
+    println!(
+        "      ctrl1 analytic exp(-t R/L): max rel err (t<=3 tau) = {:.3e}, t_CQ analytic = {:.5} s vs solver {:.5} s",
+        worst,
+        tau * 4.0_f64.ln() / 0.6,
+        s_m0.t_cq.unwrap_or(f64::NAN)
+    );
     runs.push(s_m0);
 
     let mut p_2r = p_m0.clone();
@@ -731,7 +747,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut p_iw = base.clone();
     p_iw.rv = 0.0;
     let (s_iw, _) = run_and_record("ctrl4_ideal_wall_Rv0", &p_iw, &opts, &out_dir)?;
-    println!("      ctrl4 vessel flux M Ip + Lv Iv drift = {:.3e}; Iv at end = {:.4} MA vs (M/Lv)(Ip0 - Ip_end) = {:.4} MA", s_iw.flux_drift, s_iw.iv_peak * 1e-6, p_iw.m / p_iw.lv * (p_iw.ip0 - s_iw.ip_end) * 1e-6);
+    println!(
+        "      ctrl4 vessel flux M Ip + Lv Iv drift = {:.3e}; Iv at end = {:.4} MA vs (M/Lv)(Ip0 - Ip_end) = {:.4} MA",
+        s_iw.flux_drift,
+        s_iw.iv_peak * 1e-6,
+        p_iw.m / p_iw.lv * (p_iw.ip0 - s_iw.ip_end) * 1e-6
+    );
     runs.push(s_iw);
 
     let mut p_pert = base.clone();
@@ -741,7 +762,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let n = tr_pert.t.len().min(tr_ref.t.len());
     let d0 = tr_pert.ip[0] - tr_ref.ip[0];
     let dend = tr_pert.ip[n - 1] - tr_ref.ip[n - 1];
-    println!("      ctrl6 initial-condition offset: dIp(0) = {:.3e} A -> dIp(t={:.4} s) = {:.3e} A (ratio {:.4}); a prescribed trajectory would keep the offset constant", d0, tr_ref.t[n - 1], dend, dend / d0);
+    println!(
+        "      ctrl6 initial-condition offset: dIp(0) = {:.3e} A -> dIp(t={:.4} s) = {:.3e} A (ratio {:.4}); a prescribed trajectory would keep the offset constant",
+        d0,
+        tr_ref.t[n - 1],
+        dend,
+        dend / d0
+    );
 
     println!("[5] Tolerance refinement of the reference run");
     for &rt in &[1.0e-4, 1.0e-5, 1.0e-6, 1.0e-7] {
@@ -771,7 +798,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         json_num(opts.rtol),
         json_num(opts.atol),
         json_num(opts.dt_out),
-        runs.iter().map(RunSummary::to_json).collect::<Vec<_>>().join(",")
+        runs.iter()
+            .map(RunSummary::to_json)
+            .collect::<Vec<_>>()
+            .join(",")
     );
     let bulk_json = out_dir.join("summary.json");
     fs::write(&bulk_json, &json)?;
@@ -780,7 +810,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!();
     println!("Summary JSON: {}", bulk_json.display());
     println!("Summary JSON: {}", small_json.display());
-    println!("Published ITER current-quench range for comparison: ~50-150 ms (Hender et al. 2007, Nucl. Fusion 47 S128; ITER Physics Basis). Not enforced.");
+    println!(
+        "Published ITER current-quench range for comparison: ~50-150 ms (Hender et al. 2007, Nucl. Fusion 47 S128; ITER Physics Basis). Not enforced."
+    );
     Ok(())
 }
 

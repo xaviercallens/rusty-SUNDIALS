@@ -14,9 +14,9 @@
 //! preconditioning converges, so nothing here says anything about anisotropy.
 
 use std::time::Instant;
-use sundials_core::fogno::FoGNO;
-use sundials_core::gmres::{gmres_preconditioned, GmresConfig, GmresStatus};
 use sundials_core::Real;
+use sundials_core::fogno::FoGNO;
+use sundials_core::gmres::{GmresConfig, GmresStatus, gmres_preconditioned};
 
 fn iters_or_note(status: &GmresStatus) -> String {
     match status {

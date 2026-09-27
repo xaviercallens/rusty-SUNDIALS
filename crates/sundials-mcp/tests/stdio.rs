@@ -7,7 +7,7 @@
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 const BIN: &str = env!("CARGO_BIN_EXE_sundials-mcp");
 
@@ -111,10 +111,12 @@ fn timeout_kills_worker_and_reports_not_run() {
     let r = &resps[1]["result"];
     assert_eq!(r["isError"], true);
     assert_eq!(r["structuredContent"]["ran"], false);
-    assert!(r["structuredContent"]["error"]
-        .as_str()
-        .unwrap()
-        .contains("timed out"));
+    assert!(
+        r["structuredContent"]["error"]
+            .as_str()
+            .unwrap()
+            .contains("timed out")
+    );
 }
 
 #[test]

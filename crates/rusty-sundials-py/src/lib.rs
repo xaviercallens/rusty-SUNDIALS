@@ -4,8 +4,8 @@
 //! allowing `rusty-SUNDIALS` to be used directly from Python without
 //! compromising zero-cost performance.
 
-use pyo3::prelude::*;
 use pyo3::exceptions::PyRuntimeError;
+use pyo3::prelude::*;
 use pyo3::types::PyList;
 
 use cvode::{Cvode, Method, Task};
@@ -29,9 +29,18 @@ impl PyCvodeSolver {
         let method = match method.to_lowercase().as_str() {
             "bdf" => Method::Bdf,
             "adams" => Method::Adams,
-            _ => return Err(PyRuntimeError::new_err("Invalid method. Use 'bdf' or 'adams'.")),
+            _ => {
+                return Err(PyRuntimeError::new_err(
+                    "Invalid method. Use 'bdf' or 'adams'.",
+                ))
+            }
         };
-        Ok(Self { method, rtol, atol, max_steps })
+        Ok(Self {
+            method,
+            rtol,
+            atol,
+            max_steps,
+        })
     }
 
     /// Solves an ODE system.
@@ -78,7 +87,8 @@ impl PyCvodeSolver {
             .build(rhs, t0, initial_state)
             .map_err(|e| PyRuntimeError::new_err(format!("Solver build failed: {}", e)))?;
 
-        let (t_reached, y_reached) = solver.solve(t_out, Task::Normal)
+        let (t_reached, y_reached) = solver
+            .solve(t_out, Task::Normal)
             .map_err(|e| PyRuntimeError::new_err(format!("Solver failed: {}", e)))?;
 
         Ok((t_reached, y_reached.to_vec()))

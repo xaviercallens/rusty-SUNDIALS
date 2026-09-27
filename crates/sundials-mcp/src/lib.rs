@@ -28,7 +28,7 @@ use num_complex::Complex64;
 use nvector::SerialVector;
 use qf_cmb_cascade::{r_bound_2sigma, sigma_cv, sigma_ell};
 use qf_pgpe::ComplexField2D;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 pub const SERVER_NAME: &str = "sundials-mcp";
 pub const SERVER_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -889,11 +889,13 @@ mod tests {
         )
         .unwrap();
         assert_eq!(odd["result"]["protocolVersion"], "2025-11-25");
-        assert!(handle_message(
-            &json!({"jsonrpc": "2.0", "method": "notifications/initialized"}),
-            &exec
-        )
-        .is_none());
+        assert!(
+            handle_message(
+                &json!({"jsonrpc": "2.0", "method": "notifications/initialized"}),
+                &exec
+            )
+            .is_none()
+        );
         let list = handle_message(
             &json!({"jsonrpc": "2.0", "id": 3, "method": "tools/list"}),
             &exec,
