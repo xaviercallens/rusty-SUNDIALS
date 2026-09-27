@@ -1,0 +1,10 @@
+[package]
+name = "qf-cmb-cascade"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Independent reproduction of a published CMB bound on a late-time dark-energy phase transition (Koren-Tsai-Wang, arXiv:2509.07076; Elor et al., arXiv:2311.16222) against real Planck 2018 data — a pure-Rust port of SocrateAI-Scientific-QuantumFluids's exploration/cmb/*.py, built for speed where the Python implementation was documented as too slow to finish a full Fisher-forecast grid."
+
+[dependencies]
+
+[dev-dependencies]
