@@ -104,14 +104,14 @@ pub fn tool_definitions() -> Value {
         },
         {
             "name": "solve",
-            "description": "Solve a named CVODE problem (exponential, robertson, vanderpol, lorenz) and \
+            "description": "Solve a named CVODE problem (exponential, robertson, vanderpol, lorenz, domain_exit) and \
                             return the trajectory at the requested output times plus solver statistics \
                             and known-answer checks. A solver failure is returned as an error with no \
                             partial trajectory.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "problem": {"type": "string", "enum": ["exponential", "robertson", "vanderpol", "lorenz"]},
+                    "problem": {"type": "string", "enum": ["exponential", "robertson", "vanderpol", "lorenz", "domain_exit"]},
                     "t_out": {"type": "array", "items": {"type": "number"},
                               "description": "Increasing positive output times (at most 50). Defaults per problem."},
                     "rtol": {"type": "number", "description": "Relative tolerance, 1e-12..1e-2."},
@@ -380,6 +380,38 @@ fn solve_inner(args: &Value) -> Result<ToolOutcome, ToolOutcome> {
                            "reference": "closed form y(t) = exp(-t)"}
             })))
         }
+        "domain_exit" => {
+            // y' = -sqrt(y), y(0) = 1 has the exact solution (1 - t/2)^2 for t <= 2, where it
+            // reaches y = 0. Past t = 2 an integrator overshoots into y < 0 where the RHS is NaN
+            // (outside its real domain), so the local error test fails repeatedly. This is a
+            // genuine, documented failure case (used by the stdio isolation tests).
+            let times = get_times(args, &[0.5, 1.0, 1.5, 3.0], 100.0)?;
+            let rtol = get_f64(args, "rtol", 1e-6, 1e-12, 1e-2)?;
+            let atol = get_f64(args, "atol", 1e-10, 1e-16, 1e-2)?;
+            let rhs = |_t: f64, y: &[f64], ydot: &mut [f64]| -> Result<(), String> {
+                ydot[0] = -y[0].sqrt();
+                Ok(())
+            };
+            // Past t = 2 the NaN surfaces as a Newton convergence failure (BDF and Adams alike).
+            let solver = Cvode::builder(Method::Bdf)
+                .rtol(rtol)
+                .atol(atol)
+                .max_steps(max_steps)
+                .build(rhs, 0.0, SerialVector::from_slice(&[1.0]))
+                .map_err(|e| cvode_err(e, problem))?;
+            let r = integrate(solver, &times, problem)?;
+            let max_err = r
+                .traj
+                .iter()
+                .map(|(t, y)| (y[0] - (1.0 - t / 2.0).max(0.0).powi(2)).abs())
+                .fold(0.0_f64, f64::max);
+            Ok(ToolOutcome::Ok(json!({
+                "ran": true, "problem": problem, "rtol": rtol, "atol": atol,
+                "trajectory": traj_json(&r.traj), "steps": r.steps, "rhs_evals": r.rhs_evals,
+                "checks": {"max_abs_error_vs_closed_form": max_err,
+                           "reference": "closed form y(t) = (1 - t/2)^2 for t <= 2"}
+            })))
+        }
         "robertson" => {
             let times = get_times(args, &[0.4, 4.0, 40.0, 400.0, 4000.0, 40000.0], 4.0e10)?;
             let rtol = get_f64(args, "rtol", 1e-4, 1e-12, 1e-2)?;
@@ -602,10 +634,7 @@ fn cmb_bound(args: &Value) -> ToolOutcome {
         Ok(v) => v,
         Err(e) => return e,
     };
-    let mode = args
-        .get("mode")
-        .and_then(Value::as_str)
-        .unwrap_or("planck");
+    let mode = args.get("mode").and_then(Value::as_str).unwrap_or("planck");
     if mode != "planck" && mode != "cosmic_variance" {
         return bad_args(format!(
             "mode must be 'planck' or 'cosmic_variance', got {mode:?}"
@@ -906,4 +935,3 @@ mod tests {
         ));
     }
 }
-

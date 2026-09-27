@@ -4,6 +4,8 @@ author: "Xavier Callens"
 date: "May 2026"
 ---
 
+> **⚠ RETRACTED (audit 2026-09-27).** The ~150× speedup, the 0.9 ms FP8 time, the H100 results, C-vs-Rust parity (150 vs 142 ms), the GNN preconditioner (45k parameters, 2.5 GPU-h) and the break-even estimate are hardcoded literals in `backend/main.py`, not measurements. No GPU, FGMRES or GNN code produced them, and `data/gnn_weights/` does not exist. The "168,000 DOF reduced-MHD proxy model" integrates a right-hand side that does not depend on the state (a prescribed closed-form trajectory). At commit af4886f it could not run at that size with the dense solver (audit report B). Figures 5-7 render that closed form. The "Archived JSON benchmarks" are formula output. Theorems 1-2 are not correct as stated (they need ε‖A‖ < α). The text below is kept unchanged as a record. See `docs/audit/fusion-2026-09-27/RETRACTION_NOTICE.md` and `README.md` in the same folder.
+
 # Serverless Neuro-Symbolic MHD: Accelerating 2D Reduced-MHD Proxy Models via Mixed-Precision FP8 Krylov Offloading in Rust
 
 **Authors**: Xavier Callens  

@@ -1,3 +1,23 @@
+/-
+  ==========================================================================
+  AUDIT NOTICE (2026-09-27): THIS FILE IS UNSOUND. IT CERTIFIES NOTHING.
+  ==========================================================================
+  Line 76-79 (line 56-59 before this notice was prepended) declares
+  `axiom flagno_l4_telemetry_oracle`, which states
+  `∀ iters_measured : ℕ, True → iters_measured = 6 ∧ iters_measured ≤ 7`.
+  Instantiating it at `iters_measured := 0` gives `0 = 6`, i.e. `False`, so
+  every proposition becomes provable in any environment containing it.
+  Kernel-checked demonstration: proofs/lean4/audit_unsoundness_demo.lean
+  (`#print axioms` shows `flagno_l4_telemetry_oracle` in the footprint of a
+  proof of `False`).
+  The theorems below are also vacuous: `flagno_o1_weak_scaling` concludes
+  `C_iters ≤ 7` about a witness it picks itself; the other two prove
+  `∃ b : Bool, b = true`. No solver, grid or preconditioner is modelled.
+  The "execution" L4-SERV-88219-FUS it cites is retracted (see
+  docs/audit/fusion-2026-09-27/RETRACTION_NOTICE.md). The certificate
+  CERT-FUS-FLAGNO-002 is withdrawn. Original content kept below unchanged.
+  ==========================================================================
+-/
 import Mathlib.LinearAlgebra.Matrix.Spectrum
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 

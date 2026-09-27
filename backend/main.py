@@ -109,6 +109,9 @@ def get_datasets():
         datasets.append({
             "id": "iter-2d-168k",
             "name": "ITER 2D Proxy Model (168K DOF)",
+            # AUDIT 2026-09-27: examples/iter_disruption.rs integrates a
+            # y-independent RHS (prescribed closed form); not an MHD solve.
+            "provenance": "prescribed analytic trajectory, not a physics simulation",
             "files": len(files_2d),
             "path": "/static/data/fusion/rust_sim_output/",
             "dof": 168000,
@@ -121,6 +124,9 @@ def get_datasets():
         datasets.append({
             "id": "iter-3d-672k",
             "name": "ITER 3D Toroidal (672K DOF)",
+            # AUDIT 2026-09-27: examples/iter_disruption_3d.rs evaluates a
+            # closed form directly; no ODE solve.
+            "provenance": "closed-form evaluation, no solver, not a physics simulation",
             "files": len(files_3d),
             "path": "/static/data/fusion/rust_sim_output_3d/",
             "dof": 672000,
@@ -139,10 +145,40 @@ class AutoResearchResult(BaseModel):
     findings: Optional[dict] = None
     timestamp: Optional[str] = None
 
+# AUDIT 2026-09-27 (docs/audit/fusion-2026-09-27/README.md): the three
+# "auto-research" results below were never measured. Earlier versions of the
+# POST endpoints returned hardcoded dicts / `if step < 8` schedules (H100,
+# cuSPARSE 8.3 ms, FP8 0.9 ms, 157.8x, 45k-param MPNN, 2.5 GPU-h ...) with
+# "status": "completed" and persisted them to storage.json. storage.json is
+# left untouched (data owned by the author); instead, those entries are
+# relabelled when served.
+SIMULATED_AUTO_RESEARCH_IDS = {
+    "gpu-ablation-v1",
+    "adaptive-precision-v1",
+    "arch-comparison-v1",
+}
+NOT_MEASURED_NOTE = (
+    "NOT MEASURED — demo placeholder. These values were hardcoded in "
+    "backend/main.py, not produced by any benchmark run. See "
+    "docs/audit/fusion-2026-09-27/RETRACTION_NOTICE.md."
+)
+
+
+def _relabel_simulated(entry: dict) -> dict:
+    """Mark a stored auto-research entry as not measured if it is one of the
+    hardcoded ones; other entries are returned unchanged."""
+    if entry.get("id") in SIMULATED_AUTO_RESEARCH_IDS:
+        relabelled = dict(entry)
+        relabelled["status"] = "not_measured"
+        relabelled["audit_note"] = NOT_MEASURED_NOTE
+        return relabelled
+    return entry
+
+
 @app.get("/api/auto-research")
 def get_auto_research():
     db = load_db()
-    return db.get("auto_research", [])
+    return [_relabel_simulated(e) for e in db.get("auto_research", [])]
 
 @app.post("/api/auto-research")
 def submit_auto_research(result: AutoResearchResult):
@@ -155,135 +191,103 @@ def submit_auto_research(result: AutoResearchResult):
 
 @app.post("/api/auto-research/run-gpu-ablation")
 def run_gpu_ablation():
-    """Simulate GPU ablation benchmark: GNN-FP8 vs cuSPARSE ILU0 vs CPU ILU."""
-    results = {
+    """GPU ablation (GNN-FP8 vs cuSPARSE ILU0 vs CPU ILU): NOT IMPLEMENTED.
+
+    AUDIT 2026-09-27: this endpoint used to return hardcoded timings
+    (142 / 8.3 / 2.1 / 0.9 ms, 157.8x on an "H100") as "completed" and
+    persist them. No such benchmark exists in the repository. It now returns
+    an explicit not-measured placeholder with the same keys and does not
+    write to storage.json.
+    """
+    methods = [
+        "CPU Sparse ILU-GMRES",
+        "GPU cuSPARSE ILU0-GMRES",
+        "Neural-FGMRES FP16",
+        "Neural-FGMRES FP8 (E4M3)",
+    ]
+    return {
         "id": "gpu-ablation-v1",
         "name": "GPU-Native Baseline Ablation",
-        "status": "completed",
+        "status": "not_measured",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "audit_note": NOT_MEASURED_NOTE,
         "findings": {
-            "description": "Ablation study isolating algorithmic vs hardware speedup contributions",
-            "dof": 168000,
-            "hardware": "NVIDIA H100 SXM5 80GB",
+            "description": "NOT MEASURED — no GPU ablation benchmark exists in this repository.",
+            "dof": None,
+            "hardware": None,
             "benchmarks": [
-                {"method": "CPU Sparse ILU-GMRES", "hardware": "AMD EPYC 7763 (DDR5)", "time_ms": 142.0, "speedup": "1.0x (baseline)"},
-                {"method": "GPU cuSPARSE ILU0-GMRES", "hardware": "H100 (HBM3)", "time_ms": 8.3, "speedup": "17.1x"},
-                {"method": "Neural-FGMRES FP16", "hardware": "H100 Tensor Core", "time_ms": 2.1, "speedup": "67.6x"},
-                {"method": "Neural-FGMRES FP8 (E4M3)", "hardware": "H100 Tensor Core", "time_ms": 0.9, "speedup": "157.8x"}
+                {"method": m, "hardware": None, "time_ms": None, "speedup": "NOT MEASURED"}
+                for m in methods
             ],
             "analysis": {
-                "hardware_contribution": "Moving ILU0 from CPU→GPU (cuSPARSE) gives 17.1x — this is the pure bandwidth gain from HBM3 (3.35 TB/s vs ~50 GB/s DDR5).",
-                "algorithmic_contribution": "Neural-FGMRES FP8 vs cuSPARSE ILU0 on same H100 gives 8.3/0.9 = 9.2x — this is the pure algorithmic gain from the learned GNN preconditioner.",
-                "total_speedup_decomposition": "Total 157.8x = 17.1x (hardware) × 9.2x (algorithm)"
-            }
-        }
+                "hardware_contribution": "NOT MEASURED",
+                "algorithmic_contribution": "NOT MEASURED",
+                "total_speedup_decomposition": "NOT MEASURED — demo placeholder",
+            },
+        },
     }
-    db = load_db()
-    if "auto_research" not in db:
-        db["auto_research"] = []
-    db["auto_research"].append(results)
-    save_db(db)
-    return results
 
 @app.post("/api/auto-research/run-adaptive-precision")
 def run_adaptive_precision():
-    """Simulate Eisenstat-Walker adaptive precision experiment."""
-    # Simulate Newton convergence with fixed vs adaptive precision
-    fixed_iters = []
-    adaptive_iters = []
-    for step in range(20):
-        t = step * 0.05
-        # Fixed FP8: constant inner tolerance
-        fixed_iters.append({
-            "step": step, "time": round(t, 2),
-            "newton_iters": 4 if step < 5 else 3,
-            "inner_tol": 1e-3, "precision": "FP8",
-            "residual": round(1e-3 * math.exp(-0.5 * step), 8)
-        })
-        # Adaptive: FP8 → FP16 → FP32 as Newton converges
-        if step < 8:
-            prec, tol, ni = "FP8", 1e-3, 4
-        elif step < 15:
-            prec, tol, ni = "FP16", 1e-5, 2
-        else:
-            prec, tol, ni = "FP32", 1e-8, 2
-        adaptive_iters.append({
-            "step": step, "time": round(t, 2),
-            "newton_iters": ni, "inner_tol": tol, "precision": prec,
-            "residual": round(tol * math.exp(-0.8 * step), 12)
-        })
+    """Eisenstat-Walker adaptive precision experiment: NOT IMPLEMENTED.
 
-    results = {
+    AUDIT 2026-09-27: this endpoint used to generate its "trajectories" from a
+    hardcoded schedule (`if step < 8: FP8 ... elif step < 15: FP16 ...`, with
+    residuals `tol * exp(-0.8 * step)`) and return them as a "completed"
+    experiment. No Newton solve and no precision switching took place. It now
+    returns an explicit not-measured placeholder with the same keys and does
+    not write to storage.json.
+    """
+    return {
         "id": "adaptive-precision-v1",
         "name": "Adaptive Eisenstat-Walker Precision Forcing",
-        "status": "completed",
+        "status": "not_measured",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "audit_note": NOT_MEASURED_NOTE,
         "findings": {
-            "description": "Dynamic precision switching: FP8→FP16→FP32 as outer Newton converges",
-            "fixed_fp8": {"total_newton_iters": sum(r["newton_iters"] for r in fixed_iters),
-                          "final_residual": fixed_iters[-1]["residual"]},
-            "adaptive": {"total_newton_iters": sum(r["newton_iters"] for r in adaptive_iters),
-                         "final_residual": adaptive_iters[-1]["residual"]},
-            "improvement": "Adaptive reduces total Newton iterations by ~30% and achieves 5 orders of magnitude better final residual",
-            "trajectory_fixed": fixed_iters,
-            "trajectory_adaptive": adaptive_iters
-        }
+            "description": "NOT MEASURED — no adaptive-precision solver run exists in this repository.",
+            "fixed_fp8": {"total_newton_iters": None, "final_residual": None},
+            "adaptive": {"total_newton_iters": None, "final_residual": None},
+            "improvement": "NOT MEASURED — demo placeholder",
+            "trajectory_fixed": [],
+            "trajectory_adaptive": [],
+        },
     }
-    db = load_db()
-    if "auto_research" not in db:
-        db["auto_research"] = []
-    db["auto_research"].append(results)
-    save_db(db)
-    return results
 
 @app.post("/api/auto-research/run-architecture-comparison")
 def run_architecture_comparison():
-    """Simulate neural architecture comparison: MPNN vs FNO vs DeepONet."""
-    results = {
+    """Neural preconditioner comparison (MPNN vs FNO vs DeepONet): NOT IMPLEMENTED.
+
+    AUDIT 2026-09-27: this endpoint used to return a hardcoded table
+    (parameter counts, 0.9/1.2/1.5 ms inference, Krylov iterations, GPU-hours)
+    as a "completed" comparison. No network was trained or evaluated, and
+    data/gnn_weights/ does not exist. It now returns an explicit not-measured
+    placeholder with the same keys and does not write to storage.json.
+    """
+    names = ["MPNN (3-layer)", "FNO (4-mode, 3-layer)", "DeepONet (branch-trunk)"]
+    return {
         "id": "arch-comparison-v1",
         "name": "Alternative Neural Preconditioner Architectures",
-        "status": "completed",
+        "status": "not_measured",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "audit_note": NOT_MEASURED_NOTE,
         "findings": {
-            "description": "Comparison of GNN (MPNN), Fourier Neural Operator (FNO), and DeepONet as learned preconditioners",
+            "description": "NOT MEASURED — no neural preconditioner has been trained or benchmarked in this repository.",
             "architectures": [
                 {
-                    "name": "MPNN (3-layer, current)",
-                    "params": 45000,
-                    "inference_ms": 0.9,
-                    "krylov_iters_to_converge": 12,
-                    "training_gpu_hours": 2.5,
-                    "strengths": "Respects grid topology, sparse message passing",
-                    "weaknesses": "Limited receptive field, O(N) scaling"
-                },
-                {
-                    "name": "FNO (4-mode, 3-layer)",
-                    "params": 62000,
-                    "inference_ms": 1.2,
-                    "krylov_iters_to_converge": 8,
-                    "training_gpu_hours": 4.0,
-                    "strengths": "Global spectral coverage, fewer Krylov iterations",
-                    "weaknesses": "Requires uniform grid, higher memory for FFT"
-                },
-                {
-                    "name": "DeepONet (branch-trunk)",
-                    "params": 85000,
-                    "inference_ms": 1.5,
-                    "krylov_iters_to_converge": 10,
-                    "training_gpu_hours": 6.0,
-                    "strengths": "Operator generalization across parameter ranges",
-                    "weaknesses": "Larger model, slower inference, complex training"
+                    "name": n,
+                    "params": None,
+                    "inference_ms": None,
+                    "krylov_iters_to_converge": None,
+                    "training_gpu_hours": None,
+                    "strengths": None,
+                    "weaknesses": None,
                 }
+                for n in names
             ],
-            "recommendation": "MPNN remains optimal for the current fixed-grid MHD application due to lowest latency. FNO is recommended for multi-scale problems where spectral coverage reduces Krylov iterations enough to offset the higher per-iteration cost."
-        }
+            "recommendation": "NOT MEASURED — demo placeholder",
+        },
     }
-    db = load_db()
-    if "auto_research" not in db:
-        db["auto_research"] = []
-    db["auto_research"].append(results)
-    save_db(db)
-    return results
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -291,28 +295,35 @@ def run_architecture_comparison():
 # ═══════════════════════════════════════════════════════════════
 @app.get("/api/benchmarks")
 def get_benchmarks():
+    """AUDIT 2026-09-27: every value here used to be a literal (C 150 ms,
+    Rust 142 ms, FP8 0.9 ms, 157.8x, relative costs) presented as a benchmark
+    result and quoted as measured in paper/manuscript_v17.md. None was
+    produced by a run. Keys are kept (values nulled) so clients do not break.
+    """
     return {
+        "status": "not_measured",
+        "audit_note": NOT_MEASURED_NOTE,
         "c_vs_rust": {
-            "c_sundials_sparse_ilu_ms": 150.0,
-            "rust_sundials_sparse_ilu_ms": 142.0,
-            "rust_neural_fgmres_fp8_ms": 0.9,
-            "parity_ratio": round(142.0 / 150.0, 3),
-            "speedup_neural": round(142.0 / 0.9, 1)
+            "c_sundials_sparse_ilu_ms": None,
+            "rust_sundials_sparse_ilu_ms": None,
+            "rust_neural_fgmres_fp8_ms": None,
+            "parity_ratio": None,
+            "speedup_neural": None,
         },
         "gpu_ablation": {
-            "cpu_sparse_ilu_ms": 142.0,
-            "gpu_cusparse_ilu0_ms": 8.3,
-            "gpu_neural_fp16_ms": 2.1,
-            "gpu_neural_fp8_ms": 0.9,
-            "hardware_speedup": "17.1x",
-            "algorithmic_speedup": "9.2x",
-            "total_speedup": "157.8x"
+            "cpu_sparse_ilu_ms": None,
+            "gpu_cusparse_ilu0_ms": None,
+            "gpu_neural_fp16_ms": None,
+            "gpu_neural_fp8_ms": None,
+            "hardware_speedup": "NOT MEASURED",
+            "algorithmic_speedup": "NOT MEASURED",
+            "total_speedup": "NOT MEASURED",
         },
         "relative_cost": {
-            "v100_baseline": 1.0,
-            "cloud_build_cpu": 0.086,
-            "h100_tensor_core": 0.013
-        }
+            "v100_baseline": None,
+            "cloud_build_cpu": None,
+            "h100_tensor_core": None,
+        },
     }
 
 
@@ -328,7 +339,19 @@ def trigger_poc():
     poc_file = os.path.join(DATA_DIR, "fusion", "poc_output", "v12_poc_results.json")
     if os.path.exists(poc_file):
         with open(poc_file, "r") as f:
-            return json.load(f)
+            data = json.load(f)
+        # AUDIT 2026-09-27: reproduce_v12_poc.py computes these curves from
+        # closed-form expressions (cpu=(dof/1000)**2*0.05, fp8_res*=0.78 then
+        # *0.95 + sin(i)*1e-4). No solver, PCIe transfer or GPU is involved.
+        # Label the payload (keys kept so the Reproducibility page still renders).
+        data["synthetic"] = True
+        data["status"] = "synthetic_formula_output_not_a_benchmark"
+        data["audit_note"] = (
+            "SYNTHETIC — generated from hand-written formulas in "
+            "scripts/reproduce_v12_poc.py, not measured. See "
+            "docs/audit/fusion-2026-09-27/RETRACTION_NOTICE.md."
+        )
+        return data
     return {"status": "poc_not_available"}
 
 
