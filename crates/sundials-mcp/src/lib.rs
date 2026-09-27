@@ -26,6 +26,7 @@
 use cvode::{Cvode, CvodeError, Method, Task};
 use num_complex::Complex64;
 use nvector::SerialVector;
+use qf_cmb_cascade::{r_bound_2sigma, sigma_cv, sigma_ell};
 use qf_pgpe::ComplexField2D;
 use serde_json::{Value, json};
 
@@ -139,6 +140,37 @@ pub fn tool_definitions() -> Value {
                 },
                 "required": ["initial"]
             }
+        },
+        {
+            "name": "cmb_bound",
+            "description": "Compute the Koren-Tsai-Wang 2-sigma CMB bound on a late-time first-order \
+                            dark-energy phase transition, using the exact bubble-completion-time power \
+                            spectrum from Elor et al. (arXiv:2311.16222) checked against the real \
+                            Planck 2018 TT data. Returns r_2sigma (the bubble nucleation rate per Hubble \
+                            volume per Hubble time at which the model is excluded at 2 sigma) and the \
+                            dominant multipole ell_peak. Each call takes 10-30 seconds at typical \
+                            parameters; a 120-second worker timeout applies.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "beta_over_h": {
+                        "type": "number",
+                        "description": "Bubble nucleation rate normalized to Hubble, beta/H* (1..1000, default 100)."
+                    },
+                    "zpt": {
+                        "type": "number",
+                        "description": "Phase-transition redshift (0.01..0.9, default 0.1)."
+                    },
+                    "mode": {
+                        "type": "string",
+                        "enum": ["planck", "cosmic_variance"],
+                        "description": "Noise model: 'planck' (Planck 2018 TT bars, default) or \
+                                       'cosmic_variance' (cosmic-variance floor — the best any \
+                                       temperature-only CMB experiment could do)."
+                    }
+                },
+                "required": []
+            }
         }
     ])
 }
@@ -150,6 +182,7 @@ pub fn run_tool(name: &str, args: &Value) -> ToolOutcome {
         "list_problems" => ToolOutcome::Ok(list_problems()),
         "solve" => solve(args),
         "pgpe_run" => pgpe_run(args),
+        "cmb_bound" => cmb_bound(args),
         other => bad_args(format!("unknown tool {other:?}")),
     }
 }
@@ -170,10 +203,10 @@ fn about() -> Value {
             "isolation": "solvers run in a worker subprocess whose stdout is routed to stderr, so solver \
                           diagnostics cannot corrupt the protocol stream; the parent enforces a timeout"
         },
-        "not_exposed_yet": {
-            "qf-cmb-cascade": "The CMB dark-energy-transition bound crate is in open PR #57 \
-                               (feat/qf-cmb-cascade-solver), not on main; a cmb tool will be added in a \
-                               follow-up once #57 merges. It is not stubbed here."
+        "exposed": {
+            "qf-cmb-cascade": "cmb_bound tool is live (PR #57 merged). Computes the Koren-Tsai-Wang \
+                               2-sigma CMB bound on late-time dark-energy phase transitions, checked \
+                               against Planck 2018 TT data. Each call typically takes 10-30 seconds."
         }
     })
 }
@@ -557,6 +590,58 @@ fn pgpe_inner(args: &Value) -> Result<ToolOutcome, ToolOutcome> {
 }
 
 // ------------------------------------------------------------------------------------------------
+// CMB dark-energy phase-transition bound
+// ------------------------------------------------------------------------------------------------
+
+fn cmb_bound(args: &Value) -> ToolOutcome {
+    let beta_over_h = match get_f64(args, "beta_over_h", 100.0, 1.0, 1000.0) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let zpt = match get_f64(args, "zpt", 0.1, 0.01, 0.9) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let mode = args
+        .get("mode")
+        .and_then(Value::as_str)
+        .unwrap_or("planck");
+    if mode != "planck" && mode != "cosmic_variance" {
+        return bad_args(format!(
+            "mode must be 'planck' or 'cosmic_variance', got {mode:?}"
+        ));
+    }
+    let (r, ell_peak) = if mode == "cosmic_variance" {
+        r_bound_2sigma(zpt, beta_over_h, 3.84, 0.1, sigma_cv)
+    } else {
+        r_bound_2sigma(zpt, beta_over_h, 3.84, 0.1, sigma_ell)
+    };
+    if r.is_nan() || !r.is_finite() {
+        return ToolOutcome::Err {
+            ran: true,
+            message: "r_bound_2sigma returned non-finite; probe value did not converge".to_string(),
+        };
+    }
+    ToolOutcome::Ok(json!({
+        "ran": true,
+        "r_2sigma": r,
+        "ell_peak": ell_peak,
+        "inputs": {
+            "beta_over_h": beta_over_h,
+            "zpt": zpt,
+            "mode": mode
+        },
+        "reference": "Koren-Tsai-Wang (arXiv:2509.07076), exact spectrum from Elor et al. \
+                      (arXiv:2311.16222), checked against Planck 2018 TT power spectrum. \
+                      See qf-cmb-cascade crate docs for derivation, approximations, and \
+                      agreement caveats.",
+        "note": "This is a 2-sigma chi^2 exclusion bound at fixed (beta/H*, zpt). It does not \
+                 claim the discrete-cascade model is preferred or disfavoured, and it does not \
+                 map any quantum-fluid/PGPE simulation to model parameters."
+    }))
+}
+
+// ------------------------------------------------------------------------------------------------
 // JSON-RPC / MCP dispatch
 // ------------------------------------------------------------------------------------------------
 
@@ -787,7 +872,7 @@ mod tests {
             &exec,
         )
         .unwrap();
-        assert_eq!(list["result"]["tools"].as_array().unwrap().len(), 4);
+        assert_eq!(list["result"]["tools"].as_array().unwrap().len(), 5);
         let unk = handle_message(
             &json!({"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "rm_rf"}}),
             &exec,
@@ -821,3 +906,4 @@ mod tests {
         ));
     }
 }
+
