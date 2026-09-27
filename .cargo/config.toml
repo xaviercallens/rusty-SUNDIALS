@@ -4,3 +4,11 @@
 # is the long-term fix.
 [env]
 PYO3_USE_ABI3_FORWARD_COMPATIBILITY = "1"
+
+# macOS: a pyo3 extension module (rusty-sundials-py is a cdylib) resolves Python symbols
+# at import time, so the linker must allow undefined symbols (pyo3's documented setting).
+[target.x86_64-apple-darwin]
+rustflags = ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup"]
+
+[target.aarch64-apple-darwin]
+rustflags = ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup"]
