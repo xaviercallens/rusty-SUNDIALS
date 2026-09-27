@@ -10,7 +10,7 @@ made explicit. Pure `std` + `serde_json`; `#![forbid(unsafe_code)]`.
 |---|---|---|
 | `about` | server scope, honesty conventions, what is exposed | — |
 | `list_problems` | the named CVODE problems, parameters, bounds | — |
-| `solve` | `exponential`, `robertson`, `vanderpol`, `lorenz` via CVODE (BDF) | exponential: closed form `exp(-t)`; robertson: mass conservation and the LLNL SUNDIALS `cvRoberts_dns` published output at `t = 0.4`; vanderpol, lorenz: no closed form, trajectory and statistics only |
+| `solve` | `exponential`, `robertson`, `vanderpol`, `lorenz`, `domain_exit` via CVODE (BDF) | exponential: closed form `exp(-t)`; robertson: mass conservation and the LLNL SUNDIALS `cvRoberts_dns` published output at `t = 0.4`; vanderpol, lorenz: no closed form, trajectory and statistics only; domain_exit (y' = −√y): closed form `(1 − t/2)²` up to t = 2, and a genuine, documented solver failure for any output time past 2 (the RHS leaves its real domain) — used to test error reporting |
 | `pgpe_run` | `crates/qf-pgpe` projected Gross–Pitaevskii solver on a 16/32/64 grid, ≤ 4000 steps | plane wave: exact solution `exp(i(kx − ωt))`, `ω = k²/2 + g`; norm and momentum conservation |
 | `cmb_bound` | Koren-Tsai-Wang 2σ CMB bound on late-time dark-energy phase transitions via `crates/qf-cmb-cascade`; takes `beta_over_h` (1–1000), `zpt` (0.01–0.9), `mode` (`planck` or `cosmic_variance`); each call ≈10–30 s | Planck 2018 TT power spectrum (`mode=planck`) or cosmic-variance floor (`mode=cosmic_variance`); exact bubble spectrum from Elor et al. (arXiv:2311.16222) |
 

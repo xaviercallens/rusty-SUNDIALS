@@ -1,11 +1,22 @@
+"""SYNTHETIC illustration curves for the v12 peer review — NOT a benchmark.
+
+AUDIT NOTE 2026-09-27 (docs/audit/fusion-2026-09-27/README.md, reports A §2/§6,
+C §3): the reviewer asked for a PCIe-latency-vs-CPU-SpMV benchmark and an
+FP64-vs-FP8 FGMRES residual plot. This script does not measure either. It
+evaluates hand-written formulas (cpu=(dof/1000)**2*0.05; fp8_res*=0.78, then
+*0.95 + sin(i)*1e-4 "noise"). No solver, PCIe transfer or GPU is involved.
+Its output data/fusion/poc_output/v12_poc_results.json was cited in
+paper/manuscript_v17.md as "Archived JSON benchmarks"; that citation is
+retracted. The output now carries "synthetic": true.
+"""
+
 import json
 import os
 import time
 import math
-import argparse
 
-def generate_poc_data():
-    print("Generating v12 Peer Review Proof of Concepts...")
+def generate_poc_data() -> None:
+    print("Generating SYNTHETIC v12 illustration curves (formulas, not measurements)...")
     
     # 1. PCIe Transfer Overhead POC
     # Simulate DOF scale vs Transfer Latency vs CPU SpMV Time
@@ -54,6 +65,9 @@ def generate_poc_data():
         })
 
     output = {
+        "synthetic": True,
+        "status": "synthetic_formula_output_not_a_benchmark",
+        "note": "Generated from closed-form expressions in scripts/reproduce_v12_poc.py; no solver or GPU was run.",
         "timestamp": time.time(),
         "pcie_benchmark": pcie_data,
         "residual_convergence": residual_data
@@ -63,7 +77,7 @@ def generate_poc_data():
     with open("data/fusion/poc_output/v12_poc_results.json", "w") as f:
         json.dump(output, f, indent=2)
 
-    print("POC data successfully generated at data/fusion/poc_output/v12_poc_results.json")
+    print("SYNTHETIC curves written to data/fusion/poc_output/v12_poc_results.json (not measured)")
 
 if __name__ == "__main__":
     generate_poc_data()

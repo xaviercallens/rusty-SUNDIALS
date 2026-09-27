@@ -1,3 +1,28 @@
+//! "ITER disruption" — PRESCRIBED-TRAJECTORY DEMO, NOT A PHYSICS MODEL.
+//!
+//! AUDIT NOTE 2026-09-27 (docs/audit/fusion-2026-09-27/README.md; reports A §0.1,
+//! B §2, C §3):
+//!   * The RHS closure below never reads the state `y`. It returns the analytic
+//!     time-derivative of a hand-written closed-form trajectory
+//!     (Te ∝ e^{-3t}(1 + island(t)) + edge term, j ∝ (1-0.6t)(1+0.4t·redist),
+//!     vessel ∝ d/dt[4t e^{-2t}]). ∂f/∂y ≡ 0, so CVODE only performs quadrature
+//!     of dy/dt = g(t). There is no MHD, no Ohm's law, no L/R circuit, no spatial
+//!     coupling and no tearing dynamics. Time t ∈ [0,1] has no physical units.
+//!   * The core temperature only falls to ~5% of Te0 by t=1, the edge heats
+//!     during the "quench", and the vessel current is not coupled to dIp/dt
+//!     (report B §2).
+//!   * No linear solver other than cvode's dense default is configured. At
+//!     n = 168,000 the dense Jacobian allocation failed at commit af4886f
+//!     (report B §1: rc=134 under an 8 GB cap, SIGKILL uncapped), so the
+//!     example did not run to completion on commodity hardware.
+//!   * Earlier versions printed "Injecting AI-preconditioned FGMRES (FLAGNO)",
+//!     "Offloading to Tensor Cores", "FP8 Mixed-Precision Neuro-Symbolic
+//!     Preconditioner" and "traversed extreme gradients successfully". None of
+//!     those components exists; the prints were removed.
+//!
+//! For a state-dependent model (a 0-D current-quench circuit whose RHS depends
+//! on y) see examples/iter_current_quench_0d.rs.
+
 use cvode::{Cvode, Method, Task};
 use nvector::SerialVector;
 use std::fs::File;
@@ -17,8 +42,9 @@ const TE0: f64 = 25000.0;
 
 fn main() {
     println!("============================================================");
-    println!(" rusty-SUNDIALS: ITER Disruption Simulation");
-    println!(" Executing 2D MHD & Vessel Eddy Currents via CVODE");
+    println!(" rusty-SUNDIALS: ITER disruption PRESCRIBED-TRAJECTORY demo");
+    println!(" RHS depends on t only (not on y): quadrature of a closed form,");
+    println!(" not an MHD or eddy-current simulation. See file header.");
     println!("============================================================");
 
     // Precompute spatial profiles for Plasma
@@ -68,11 +94,12 @@ fn main() {
         }
     }
 
-    // We will solve an ODE system for the exact same trajectories.
-    // To prove SUNDIALS integration, we define:
-    // dTe/dt = -3.0 * Te + Forcing(t)
-    // dj/dt = Forcing(t)
-    // dj_vessel/dt = Forcing(t)
+    // AUDIT: every component below is dy/dt = g(t) with g independent of y
+    // (the earlier comment "dTe/dt = -3.0 * Te + Forcing(t)" did not match the
+    // code: the -3 factor multiplies the prescribed te_base*e^{-3t}, not Te).
+    // dTe/dt = g_Te(t)
+    // dj/dt = g_j(t)
+    // dj_vessel/dt = g_v(t)
     //
     // State vector layout:
     // [0 .. N_PLASMA] : Te
@@ -131,9 +158,9 @@ fn main() {
         Ok(())
     };
 
-    println!("  [Solver Setup] Explicitly bypassing dense Jacobian memory allocation.");
     println!(
-        "  [Solver Setup] Injecting AI-preconditioned FGMRES Krylov linear solver (FLAGNO)..."
+        "  [Solver Setup] cvode BDF, default dense linear solver (n = {}); no FGMRES/FLAGNO/GPU path exists.",
+        neq
     );
 
     let mut cvode = Cvode::builder(Method::Bdf)
@@ -147,11 +174,6 @@ fn main() {
     // Output times matching the python script
     let out_times = vec![0.0, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0];
     std::fs::create_dir_all("data/fusion/rust_sim_output").unwrap();
-
-    println!("  [Neural-FGMRES] Intercepting dense SpMV operations. Offloading to Tensor Cores...");
-    println!(
-        "  [Neural-FGMRES] Krylov solver utilizing FP8 Mixed-Precision Neuro-Symbolic Preconditioner..."
-    );
 
     for &t_out in &out_times {
         let y_curr = if t_out == 0.0 {
@@ -206,7 +228,10 @@ fn main() {
     }
 
     println!("============================================================");
-    println!(" Simulation complete in {:?}", start.elapsed());
-    println!(" SUNDIALS BDF Solver traversed extreme gradients successfully.");
+    println!(
+        " Prescribed-trajectory quadrature complete in {:?}",
+        start.elapsed()
+    );
+    println!(" (No physics was simulated; output equals the closed form up to rtol.)");
     println!("============================================================");
 }

@@ -26,16 +26,25 @@ async function request(path, options = {}) {
   }
   if (path === '/api/sop/execute') {
     const { protocol_id } = options.body ? JSON.parse(options.body) : {};
-    let result = { metric_achieved: "1.1e-15", validation: "PASSED", deviance: "0.00%", execution_time: "40.5s" };
-    if (protocol_id === 'SOP-2') result = { metric_achieved: "6 Iterations", validation: "PASSED", deviance: "0.00%", execution_time: "72.1s" };
-    if (protocol_id === 'SOP-3') result = { metric_achieved: "$0.021", validation: "PASSED", deviance: "+5.0%", execution_time: "18.2s" };
-    if (protocol_id === 'Fusion') result = { metric_achieved: "$0.04996 Total, div(B)=1.12e-15, FLAGNO=6", validation: "REPRODUCED", deviance: "0.00%", execution_time: "24m 55s" };
+    // AUDIT 2026-09-27: nothing is executed here; these used to be canned
+    // "PASSED" results (div(B)=1.1e-15, "6 Iterations", "$0.021") generated at
+    // click time. Labelled as not executed (their logs were not audited).
+    const notExecuted = { metric_achieved: "NOT EXECUTED — canned client response, no run performed", validation: "NOT EXECUTED", deviance: "n/a", execution_time: "n/a" };
+    let result = notExecuted;
+    if (protocol_id === 'SOP-2') result = notExecuted;
+    if (protocol_id === 'SOP-3') result = notExecuted;
+    // AUDIT 2026-09-27: the Fusion SOP result used to be a canned "REPRODUCED"
+    // with fixed numbers; no execution happens here. Retracted, see
+    // docs/audit/fusion-2026-09-27/RETRACTION_NOTICE.md.
+    if (protocol_id === 'Fusion') result = { metric_achieved: "NOT MEASURED — demo placeholder (the Fusion SOP run L4-SERV-88219-FUS is retracted)", validation: "RETRACTED", deviance: "n/a", execution_time: "n/a" };
     if (protocol_id === 'PSC') result = { metric_achieved: "72,000 t CO₂/km²/yr | kLa=310/h | M-77 kcat=8.2 Sco=210 | Cost=$0.148", validation: "REPRODUCED", deviance: "0.00%", execution_time: "1m 32.1s" };
     return {
       execution_id: `EXEC-${Math.floor(Math.random()*1000)}`,
       protocol_id,
       timestamp: new Date().toISOString(),
-      status: "success",
+      // AUDIT 2026-09-27: no execution happens client-side; PSC keeps its
+      // original canned result (outside the fusion audit), others are not executed.
+      status: protocol_id === 'PSC' ? "success" : "not_executed",
       result
     };
   }

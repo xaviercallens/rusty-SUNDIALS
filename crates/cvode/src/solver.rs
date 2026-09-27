@@ -19,8 +19,8 @@ use sundials_core::Real;
 
 use crate::builder::CvodeBuilder;
 use crate::constants::{
-    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS, Method,
-    NLS_CRDOWN, NLS_TOL, Task,
+    Method, Task, DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS,
+    MAX_NLS_ITERS, NLS_CRDOWN, NLS_TOL,
 };
 #[cfg(feature = "experimental-nls-v2")]
 use crate::constants::{NLS_COEF, NLS_MIN_TOL};
@@ -291,8 +291,10 @@ where
             if direction * (self.t + self.h - tout) > 0.0 {
                 let eta = (tout - self.t) / self.h;
                 self.h = tout - self.t;
-                // Important: Rescale Nordsieck history for the truncated step size
-                self.zn.rescale_with_interpolation(eta, self.q);
+                // Rescale the Nordsieck history for the truncated step:
+                // z[i] *= eta^i (LLNL cvRescale). A step-size change keeps the
+                // expansion point t_n, so no binomial shift is allowed here.
+                self.zn.rescale(eta, self.q);
             }
             self.step()?;
         }
@@ -703,7 +705,7 @@ where
                 ));
             }
             self.qwait = self.q + 1; // reset wait after failure
-            // Cap growth at ETA_MAX_FAIL=0.2 after error failure (LLNL ETAMXF).
+                                     // Cap growth at ETA_MAX_FAIL=0.2 after error failure (LLNL ETAMXF).
             let eta = step::compute_eta(err_norm, self.q).min(ETA_MAX_FAIL);
             self.h *= eta;
             self.zn.rescale(eta, self.q);
