@@ -10,7 +10,11 @@ name = "rusty_sundials"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.20", features = ["extension-module"] }
 cvode = { path = "../cvode" }
 nvector = { path = "../nvector" }
 sundials-core = { path = "../sundials-core" }
+
+# Python bindings cannot target wasm32 (pyo3 cannot cross-compile there); on wasm32 the
+# crate compiles to an empty library (see the crate-level cfg in src/lib.rs).
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+pyo3 = { version = "0.20", features = ["extension-module"] }
