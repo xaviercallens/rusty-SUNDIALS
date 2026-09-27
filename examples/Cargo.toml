@@ -151,3 +151,10 @@ path = "iter_disruption.rs"
 [[example]]
 name = "iter_disruption_3d"
 path = "iter_disruption_3d.rs"
+
+# 0-D coupled plasma/vessel current-quench model with its controls as unit
+# tests (test = true makes `cargo test -p examples` run them).
+[[example]]
+name = "iter_current_quench_0d"
+path = "iter_current_quench_0d.rs"
+test = true

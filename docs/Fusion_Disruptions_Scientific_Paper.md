@@ -1,3 +1,5 @@
+> **⚠ RETRACTED (audit 2026-09-27).** The numerical results in this paper (Tables 1-6 and the conclusion table) are not produced by any code or data in this repository. The code examples with matching names solve unrelated toy problems. B = 6.37 T and γ ~ 10³ s⁻¹ contradict the repository's own ITER data (5.3 T, 10.57 s⁻¹). The inline Lean blocks contain `sorry`, `True := trivial` and a false lemma (`cos(π/4) < 0.707`). The `/fusion/` API does not exist. The text below is kept unchanged as a record. See `docs/audit/fusion-2026-09-27/RETRACTION_NOTICE.md` and `README.md` in the same folder.
+
 # Fusion Disruptions: Four Paradigm Shifts in Plasma Numerical Simulation via rusty-SUNDIALS
 
 **Xavier Callens** | SymbioticFactory Research | May 2026

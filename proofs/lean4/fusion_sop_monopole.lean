@@ -1,3 +1,27 @@
+/-
+  ==========================================================================
+  AUDIT NOTICE (2026-09-27): THIS FILE IS UNSOUND. IT CERTIFIES NOTHING.
+  ==========================================================================
+  Line 121-124 (line 97-100 before this notice was prepended) declares
+  `axiom gcp_l4_telemetry_oracle`, which states
+  `∀ div_B_sim ε, True → ∀ x, |div_B_sim x| ≤ ε` for EVERY ε, including
+  ε = -1. On any inhabited Ω this gives `|0| ≤ -1`, i.e. `False`.
+  Kernel-checked demonstration: proofs/lean4/audit_unsoundness_demo.lean
+  (`#print axioms` shows `gcp_l4_telemetry_oracle` in the footprint of a
+  proof of `False`).
+  Further problems (report C §1.2-1.3):
+  * line 51-52 (orig. 27-28) use `constant`, which is Lean 3 syntax; the
+    file does not parse under Lean 4, so it has never compiled as written;
+  * line 58 (orig. 34) `axiom div_curl_eq_zero` assumes div∘curl = 0 for opaque
+    operators instead of proving it on a concrete Yee grid (not on the
+    whitelist {propext, Classical.choice, Quot.sound});
+  * `gauge_invariant_latent_bijection` never uses `h_coulomb`;
+    `monopole_suppression_bound` restates its own hypothesis.
+  The "execution" L4-SERV-88219-FUS it cites is retracted (see
+  docs/audit/fusion-2026-09-27/RETRACTION_NOTICE.md). The certificate
+  CERT-FUS-MONO-001 is withdrawn. Original content kept below unchanged.
+  ==========================================================================
+-/
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Topology.Algebra.Module.Basic
 

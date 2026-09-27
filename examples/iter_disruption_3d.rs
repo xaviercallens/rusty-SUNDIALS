@@ -1,5 +1,28 @@
-use cvode::{Cvode, Method, Task};
-use nvector::SerialVector;
+//! "3D toroidal ITER disruption" — CLOSED-FORM EVALUATION, NOT A SIMULATION.
+//!
+//! AUDIT NOTE 2026-09-27 (docs/audit/fusion-2026-09-27/README.md; reports A §0.2,
+//! B §2, C §3):
+//!   * No ODE is solved. The state at each output time is the prescribed closed
+//!     form (Te ∝ e^{-3t}(1 + island(t)) + edge term, j ∝ (1-0.6t)(1+0.4t·redist),
+//!     vessel ∝ 4t e^{-2t}) evaluated directly; the same prescribed trajectory
+//!     the 2-D example feeds to CVODE as a y-independent RHS. It is not a
+//!     physics model: no MHD, no circuit equations, no toroidal coupling
+//!     beyond the cos(2θ-φ) factor in the prescribed island shape.
+//!   * The earlier version imported cvode but never constructed a solver, and
+//!     printed "Injecting Neural-FGMRES", "Loading FNO/DeepONet/MPNN weights",
+//!     "Offloading SpMV to H100 Tensor Cores (Target: 157x speedup)" and a
+//!     "Newton residual proxy -> FP8/FP16/FP32" schedule computed from
+//!     exp(-5t). The environment knobs RUSTY_SUNDIALS_GPU_ABLATION,
+//!     _ADAPTIVE_PRECISION and _ARCHITECTURE had no effect on the output
+//!     (report B: all 119 CSV md5 sums identical with the flags flipped), and
+//!     the closing banner hardcoded "GPU Ablation=ON, AdaptivePrec=ON". Those
+//!     prints were removed; the knobs are still read and echoed, with a note
+//!     that they do nothing.
+//!   * "DOF" below counts output values, not unknowns of a solved system.
+//!
+//! For a state-dependent model (a 0-D current-quench circuit whose RHS depends
+//! on y) see examples/iter_current_quench_0d.rs.
+
 use std::fs::File;
 use std::io::Write;
 use std::time::Instant;
@@ -8,9 +31,9 @@ use sundials_core::Real;
 // ═══════════════════════════════════════════════════════════════
 // 3D Toroidal Grid Parameters
 // ═══════════════════════════════════════════════════════════════
-const N_RHO: usize = 100;       // radial
-const N_THETA: usize = 200;     // poloidal
-const N_PHI: usize = 16;        // toroidal slices
+const N_RHO: usize = 100; // radial
+const N_THETA: usize = 200; // poloidal
+const N_PHI: usize = 16; // toroidal slices
 const N_PLASMA_2D: usize = N_RHO * N_THETA;
 const N_PLASMA_3D: usize = N_RHO * N_THETA * N_PHI;
 
@@ -23,9 +46,16 @@ const TE0: f64 = 25000.0;
 
 fn main() {
     println!("╔══════════════════════════════════════════════════════════════╗");
-    println!("║  rusty-SUNDIALS: 3D Toroidal ITER Disruption Simulation    ║");
-    println!("║  Grid: {}×{}×{} = {} plasma DOF               ║", N_RHO, N_THETA, N_PHI, N_PLASMA_3D);
-    println!("║  Total system DOF: {}                              ║", N_PLASMA_3D * 2 + N_VESSEL);
+    println!("║  rusty-SUNDIALS: 3D ITER disruption CLOSED-FORM evaluation  ║");
+    println!("║  (no ODE solve, no physics model; see file header)          ║");
+    println!(
+        "║  Grid: {}×{}×{} = {} plasma DOF               ║",
+        N_RHO, N_THETA, N_PHI, N_PLASMA_3D
+    );
+    println!(
+        "║  Total system DOF: {}                              ║",
+        N_PLASMA_3D * 2 + N_VESSEL
+    );
     println!("╚══════════════════════════════════════════════════════════════╝");
 
     let start_setup = Instant::now();
@@ -101,66 +131,36 @@ fn main() {
         y0_vec[2 * N_PLASMA_3D + i] = 1.4e-8;
     }
 
-    let initial_state = SerialVector::from_slice(&y0_vec);
+    println!("  [Solver] None. States are evaluated from the prescribed closed form.");
 
-    println!("  [Solver] Injecting Neural-FGMRES with n=1 toroidal coupling... (Bypassed inner solver to analytical proxy)");
-
-    let gpu_ablation = std::env::var("RUSTY_SUNDIALS_GPU_ABLATION").unwrap_or_else(|_| "1".to_string()) == "1";
-    let adaptive_precision = std::env::var("RUSTY_SUNDIALS_ADAPTIVE_PRECISION").unwrap_or_else(|_| "1".to_string()) == "1";
-    let architecture = std::env::var("RUSTY_SUNDIALS_ARCHITECTURE").unwrap_or_else(|_| "MPNN".to_string());
+    let gpu_ablation =
+        std::env::var("RUSTY_SUNDIALS_GPU_ABLATION").unwrap_or_else(|_| "1".to_string()) == "1";
+    let adaptive_precision = std::env::var("RUSTY_SUNDIALS_ADAPTIVE_PRECISION")
+        .unwrap_or_else(|_| "1".to_string())
+        == "1";
+    let architecture =
+        std::env::var("RUSTY_SUNDIALS_ARCHITECTURE").unwrap_or_else(|_| "MPNN".to_string());
 
     println!("  [Setup] Grid initialization: {:?}", start_setup.elapsed());
-    
-    // Auto-Research Implementations
-    println!("  [Auto-Research] Architecture Selected: {}", architecture);
-    if architecture == "FNO" {
-        println!("  [Auto-Research] Loading 4-mode Fourier Neural Operator (FNO) weights for global 3D spectral coverage...");
-    } else if architecture == "DeepONet" {
-        println!("  [Auto-Research] Loading Branch-Trunk DeepONet weights...");
-    } else {
-        println!(
-            "  [Auto-Research] Loading 3-layer MPNN (Message Passing) for sparse local 3D interactions..."
-        );
-    }
 
-    if gpu_ablation {
-        println!(
-            "  [Auto-Research] GPU Ablation Active: Offloading SpMV to H100 Tensor Cores (Target: 157x speedup vs CPU)"
-        );
-    } else {
-        println!("  [Auto-Research] CPU Baseline: cuSPARSE disabled.");
-    }
-
-    if adaptive_precision {
-        println!("  [Auto-Research] Adaptive Eisenstat-Walker Precision Forcing Enabled.");
-    }
+    // AUDIT: these knobs never changed the computation. They are echoed so that
+    // scripts which set them still see them, but no weights are loaded, no GPU
+    // is used and no precision schedule is applied.
+    println!(
+        "  [Env knobs] ARCHITECTURE={}, GPU_ABLATION={}, ADAPTIVE_PRECISION={} (no effect: no neural net, GPU or precision control exists here)",
+        architecture, gpu_ablation, adaptive_precision
+    );
 
     let start = Instant::now();
 
-    let out_times = vec![0.0, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0];
+    let out_times: Vec<Real> = vec![0.0, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0];
     std::fs::create_dir_all("data/fusion/rust_sim_output_3d").unwrap();
 
     for &t_out in &out_times {
         let y_curr = if t_out == 0.0 {
             y0_vec.clone()
         } else {
-            // Simulate Adaptive Precision during the solve step
-            if adaptive_precision {
-                let res_proxy = (-5.0_f64 * t_out).exp();
-                let prec = if res_proxy > 1e-2 {
-                    "FP8 (E4M3)"
-                } else if res_proxy > 1e-6 {
-                    "FP16"
-                } else {
-                    "FP32"
-                };
-                println!(
-                    "  [Solver] Newton residual proxy ~{:.1e} -> Forcing Preconditioner Precision to {}",
-                    res_proxy, prec
-                );
-            }
-
-            // Bypass dense CVODE solve to avoid OOM. Evaluate analytically.
+            // Closed-form evaluation (no solver; see file header).
             let mut y_slice = vec![0.0; neq];
             for i in 0..N_PLASMA_3D {
                 let island_width = 0.05 + 0.35 * t_out;
@@ -233,7 +233,7 @@ fn main() {
 
     println!("╔══════════════════════════════════════════════════════════════╗");
     println!(
-        "║  3D Toroidal simulation complete in {:?}        ║",
+        "║  3D closed-form evaluation + CSV write complete in {:?}  ║",
         start.elapsed()
     );
     println!(
@@ -246,8 +246,8 @@ fn main() {
         N_PHI
     );
     println!(
-        "║  Auto-Research: GPU Ablation=ON, AdaptivePrec=ON, Arch={} ║",
-        architecture
+        "║  Env knobs (no effect): GPU_ABLATION={}, ADAPTIVE_PRECISION={}, ARCH={} ║",
+        gpu_ablation, adaptive_precision, architecture
     );
     println!("╚══════════════════════════════════════════════════════════════╝");
 }

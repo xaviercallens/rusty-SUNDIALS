@@ -291,8 +291,10 @@ where
             if direction * (self.t + self.h - tout) > 0.0 {
                 let eta = (tout - self.t) / self.h;
                 self.h = tout - self.t;
-                // Important: Rescale Nordsieck history for the truncated step size
-                self.zn.rescale_with_interpolation(eta, self.q);
+                // Rescale the Nordsieck history for the truncated step:
+                // z[i] *= eta^i (LLNL cvRescale). A step-size change keeps the
+                // expansion point t_n, so no binomial shift is allowed here.
+                self.zn.rescale(eta, self.q);
             }
             self.step()?;
         }
