@@ -8,9 +8,9 @@ use sundials_core::Real;
 // ═══════════════════════════════════════════════════════════════
 // 3D Toroidal Grid Parameters
 // ═══════════════════════════════════════════════════════════════
-const N_RHO: usize = 100;       // radial
-const N_THETA: usize = 200;     // poloidal
-const N_PHI: usize = 16;        // toroidal slices
+const N_RHO: usize = 100; // radial
+const N_THETA: usize = 200; // poloidal
+const N_PHI: usize = 16; // toroidal slices
 const N_PLASMA_2D: usize = N_RHO * N_THETA;
 const N_PLASMA_3D: usize = N_RHO * N_THETA * N_PHI;
 
@@ -24,8 +24,14 @@ const TE0: f64 = 25000.0;
 fn main() {
     println!("╔══════════════════════════════════════════════════════════════╗");
     println!("║  rusty-SUNDIALS: 3D Toroidal ITER Disruption Simulation    ║");
-    println!("║  Grid: {}×{}×{} = {} plasma DOF               ║", N_RHO, N_THETA, N_PHI, N_PLASMA_3D);
-    println!("║  Total system DOF: {}                              ║", N_PLASMA_3D * 2 + N_VESSEL);
+    println!(
+        "║  Grid: {}×{}×{} = {} plasma DOF               ║",
+        N_RHO, N_THETA, N_PHI, N_PLASMA_3D
+    );
+    println!(
+        "║  Total system DOF: {}                              ║",
+        N_PLASMA_3D * 2 + N_VESSEL
+    );
     println!("╚══════════════════════════════════════════════════════════════╝");
 
     let start_setup = Instant::now();
@@ -103,18 +109,26 @@ fn main() {
 
     let initial_state = SerialVector::from_slice(&y0_vec);
 
-    println!("  [Solver] Injecting Neural-FGMRES with n=1 toroidal coupling... (Bypassed inner solver to analytical proxy)");
+    println!(
+        "  [Solver] Injecting Neural-FGMRES with n=1 toroidal coupling... (Bypassed inner solver to analytical proxy)"
+    );
 
-    let gpu_ablation = std::env::var("RUSTY_SUNDIALS_GPU_ABLATION").unwrap_or_else(|_| "1".to_string()) == "1";
-    let adaptive_precision = std::env::var("RUSTY_SUNDIALS_ADAPTIVE_PRECISION").unwrap_or_else(|_| "1".to_string()) == "1";
-    let architecture = std::env::var("RUSTY_SUNDIALS_ARCHITECTURE").unwrap_or_else(|_| "MPNN".to_string());
+    let gpu_ablation =
+        std::env::var("RUSTY_SUNDIALS_GPU_ABLATION").unwrap_or_else(|_| "1".to_string()) == "1";
+    let adaptive_precision = std::env::var("RUSTY_SUNDIALS_ADAPTIVE_PRECISION")
+        .unwrap_or_else(|_| "1".to_string())
+        == "1";
+    let architecture =
+        std::env::var("RUSTY_SUNDIALS_ARCHITECTURE").unwrap_or_else(|_| "MPNN".to_string());
 
     println!("  [Setup] Grid initialization: {:?}", start_setup.elapsed());
-    
+
     // Auto-Research Implementations
     println!("  [Auto-Research] Architecture Selected: {}", architecture);
     if architecture == "FNO" {
-        println!("  [Auto-Research] Loading 4-mode Fourier Neural Operator (FNO) weights for global 3D spectral coverage...");
+        println!(
+            "  [Auto-Research] Loading 4-mode Fourier Neural Operator (FNO) weights for global 3D spectral coverage..."
+        );
     } else if architecture == "DeepONet" {
         println!("  [Auto-Research] Loading Branch-Trunk DeepONet weights...");
     } else {

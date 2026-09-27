@@ -251,7 +251,9 @@ pub fn idt(hat_k: f64, zpt: f64, beta_over_h: f64, vw: f64, n_r: usize) -> f64 {
                 .iter()
                 .zip(mu_w.iter())
                 .map(|(&m, &w)| {
-                    let s = (hat_k * hat_k + r * r - 2.0 * hat_k * r * m).max(1e-12).sqrt();
+                    let s = (hat_k * hat_k + r * r - 2.0 * hat_k * r * m)
+                        .max(1e-12)
+                        .sqrt();
                     w * pdt_hatk_exact(s, zpt, beta_over_h, vw) / s.powi(3)
                 })
                 .sum();
@@ -354,7 +356,10 @@ fn planck_table() -> &'static (Vec<f64>, Vec<f64>, Vec<f64>) {
             if line.is_empty() || line.starts_with('#') {
                 continue;
             }
-            let cols: Vec<f64> = line.split_whitespace().filter_map(|s| s.parse().ok()).collect();
+            let cols: Vec<f64> = line
+                .split_whitespace()
+                .filter_map(|s| s.parse().ok())
+                .collect();
             if cols.len() < 4 {
                 continue;
             }
@@ -486,8 +491,14 @@ mod tests {
             }
             k += 0.01;
         }
-        assert!((best_k - 0.493).abs() < 0.03, "peak at k={best_k}, expected ~0.493");
-        assert!((best_v - 1.077).abs() < 0.05, "peak value={best_v}, expected ~1.077");
+        assert!(
+            (best_k - 0.493).abs() < 0.03,
+            "peak at k={best_k}, expected ~0.493"
+        );
+        assert!(
+            (best_v - 1.077).abs() < 0.05,
+            "peak value={best_v}, expected ~1.077"
+        );
     }
 
     /// K3: reproduces two landmark points of `CMB_CASCADE_REPRODUCTION.md`'s exact-spectrum

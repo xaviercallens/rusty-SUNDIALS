@@ -602,10 +602,7 @@ fn cmb_bound(args: &Value) -> ToolOutcome {
         Ok(v) => v,
         Err(e) => return e,
     };
-    let mode = args
-        .get("mode")
-        .and_then(Value::as_str)
-        .unwrap_or("planck");
+    let mode = args.get("mode").and_then(Value::as_str).unwrap_or("planck");
     if mode != "planck" && mode != "cosmic_variance" {
         return bad_args(format!(
             "mode must be 'planck' or 'cosmic_variance', got {mode:?}"
@@ -906,4 +903,3 @@ mod tests {
         ));
     }
 }
-

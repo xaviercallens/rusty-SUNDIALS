@@ -15,7 +15,6 @@
 #![forbid(unsafe_code)]
 
 use std::io::{BufRead, Write};
-use std::os::fd::AsFd;
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
@@ -78,8 +77,8 @@ fn run_isolated(tool: &str, args: &Value) -> ToolOutcome {
     let result_path =
         std::env::temp_dir().join(format!("sundials-mcp-{}-{n}.json", std::process::id()));
     // The worker's stdout is a duplicate of our stderr: solver prints go to the log, never to the protocol.
-    let stdout_for_worker = match std::io::stderr().as_fd().try_clone_to_owned() {
-        Ok(fd) => Stdio::from(fd),
+    let stdout_for_worker = match stderr_duplicate() {
+        Ok(stdio) => stdio,
         Err(e) => {
             return ToolOutcome::Err {
                 ran: false,
@@ -175,4 +174,29 @@ fn serve() {
             }
         }
     }
+}
+
+/// A duplicate of this process's stderr, to become the worker's stdout (so solver prints can never
+/// reach the protocol stream). Unix duplicates the file descriptor, Windows the handle; a target with
+/// no process model (e.g. `wasm32-unknown-unknown`) gets an honest error, reported as `ran: false`.
+#[cfg(unix)]
+fn stderr_duplicate() -> std::io::Result<Stdio> {
+    use std::os::fd::AsFd;
+    Ok(Stdio::from(std::io::stderr().as_fd().try_clone_to_owned()?))
+}
+
+#[cfg(windows)]
+fn stderr_duplicate() -> std::io::Result<Stdio> {
+    use std::os::windows::io::AsHandle;
+    Ok(Stdio::from(
+        std::io::stderr().as_handle().try_clone_to_owned()?,
+    ))
+}
+
+#[cfg(not(any(unix, windows)))]
+fn stderr_duplicate() -> std::io::Result<Stdio> {
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Unsupported,
+        "no process isolation on this target: solver workers need a subprocess",
+    ))
 }
