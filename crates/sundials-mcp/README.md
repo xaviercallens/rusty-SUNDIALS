@@ -13,6 +13,7 @@ made explicit. Pure `std` + `serde_json`; `#![forbid(unsafe_code)]`.
 | `solve` | `exponential`, `robertson`, `vanderpol`, `lorenz`, `domain_exit` via CVODE (BDF) | exponential: closed form `exp(-t)`; robertson: mass conservation and the LLNL SUNDIALS `cvRoberts_dns` published output at `t = 0.4`; vanderpol, lorenz: no closed form, trajectory and statistics only; domain_exit (y' = −√y): closed form `(1 − t/2)²` up to t = 2, and a genuine, documented solver failure for any output time past 2 (the RHS leaves its real domain) — used to test error reporting |
 | `pgpe_run` | `crates/qf-pgpe` projected Gross–Pitaevskii solver on a 16/32/64 grid, ≤ 4000 steps | plane wave: exact solution `exp(i(kx − ωt))`, `ω = k²/2 + g`; norm and momentum conservation |
 | `cmb_bound` | Koren-Tsai-Wang 2σ CMB bound on late-time dark-energy phase transitions via `crates/qf-cmb-cascade`; takes `beta_over_h` (1–1000), `zpt` (0.01–0.9), `mode` (`planck` or `cosmic_variance`); each call ≈10–30 s | Planck 2018 TT power spectrum (`mode=planck`) or cosmic-variance floor (`mode=cosmic_variance`); exact bubble spectrum from Elor et al. (arXiv:2311.16222) |
+| `bao_distances` | `D_M/r_d`, `D_H/r_d`, `D_V/r_d` via `crates/qf-bao-distances` for flat `lcdm` / `wcdm` / `w0wacdm` (radiation off); takes `model`, `Om` (0.01–1), `w` or `w0`+`wa`, `h_rd` (50–200 Mpc, default 101.54 with `h_rd_default_used: true`), `z` (1–50 values in (0, 10]), `chi2_dr2` (bool); line-of-sight integral solved by CVODE (BDF, rtol 1e-7) | every call returns `max_rel_diff_cvode_vs_quadrature` against an independent adaptive Gauss–Kronrod evaluation; optional Gaussian χ² on the real DESI DR2 BAO data vector (13 points, arXiv:2503.14738), or `available: false` with the reason if the files are absent. The crate tests also check the Einstein–de Sitter closed form and astropy |
 
 ## Honesty conventions
 
@@ -43,12 +44,16 @@ test-only) shows the corruption, so the test can fail.
 2. `robertson` with the LLNL configuration fails the same way at `rtol = 1e-9, atol = 1e-12`, and exhausts
    500 000 steps by `t ≈ 0.014` at `atol = 1e-2` (inappropriate for `y2 ~ 1e-5`). Both are reported as
    errors, never partial results.
+3. `Method::Adams` never leaves order 1 (`compute_l` is a placeholder), and its error on a smooth
+   quadrature ODE scales like `√rtol` (2.1e-4 relative at `rtol = 1e-7`). Many `tout`s from one BDF run
+   also degrade accuracy (4e-6 vs 6e-7 with a fresh solve per output). `bao_distances` therefore uses
+   BDF with one solve per redshift. Measurements are in `crates/qf-bao-distances/README.md`.
 
 ## Build, test, register
 
 ```bash
 cargo build --release -p sundials-mcp
-cargo test --release -p sundials-mcp     # 10 unit + 4 stdio end-to-end tests
+cargo test --release -p sundials-mcp     # 13 unit + 4 stdio end-to-end tests
 claude mcp add sundials -- /path/to/rusty-SUNDIALS/target/release/sundials-mcp
 ```
 

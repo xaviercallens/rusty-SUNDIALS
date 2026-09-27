@@ -3,7 +3,7 @@ name = "sundials-mcp"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Model Context Protocol (stdio) server exposing rusty-SUNDIALS solvers (CVODE named problems, qf-pgpe, qf-cmb-cascade CMB bound) to AI agents, with honest ran/error reporting and solver isolation in worker subprocesses."
+description = "Model Context Protocol (stdio) server exposing rusty-SUNDIALS solvers (CVODE named problems, qf-pgpe, qf-cmb-cascade CMB bound, qf-bao-distances BAO distances / DESI DR2 chi^2) to AI agents, with honest ran/error reporting and solver isolation in worker subprocesses."
 
 [[bin]]
 name = "sundials-mcp"
@@ -14,5 +14,6 @@ cvode = { path = "../cvode" }
 nvector = { path = "../nvector" }
 qf-pgpe = { path = "../qf-pgpe" }
 qf-cmb-cascade = { path = "../qf-cmb-cascade" }
+qf-bao-distances = { path = "../qf-bao-distances" }
 num-complex = "0.4"
 serde_json = "1"
