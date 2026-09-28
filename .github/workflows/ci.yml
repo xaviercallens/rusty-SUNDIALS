@@ -27,6 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python (pyo3 0.20.3 supports up to 3.12; runner defaults have moved past that)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -108,8 +113,9 @@ jobs:
 
       - name: Build WASM
         # Exclude 'examples' crate: it has platform-specific deps (tokio, rayon)
-        # incompatible with wasm32-unknown-unknown target.
-        run: cargo build --workspace --exclude examples --target wasm32-unknown-unknown
+        # incompatible with wasm32-unknown-unknown target. Exclude 'rusty-sundials-py':
+        # pyo3's build script cannot target wasm32-unknown-unknown (a CPython extension).
+        run: cargo build --workspace --exclude examples --exclude rusty-sundials-py --target wasm32-unknown-unknown
 
   lean_proofs:
     name: Verify Lean 4 Proofs
