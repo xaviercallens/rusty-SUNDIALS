@@ -14,13 +14,15 @@
 //!
 //! # Process isolation (why the solver never shares the protocol stream)
 //!
-//! `cvode/src/solver.rs` prints diagnostics to **stdout** on some failure paths
-//! (`println!("ERROR FAIL …")`). On a stdio protocol that corrupts the stream. Rather than
-//! redirecting file descriptors (which needs `unsafe`, and this repository has none), the protocol
-//! process never calls solver code: each tool call runs in a worker subprocess
+//! `cvode/src/solver.rs` used to print diagnostics to **stdout** on some failure paths
+//! (`println!("ERROR FAIL …")`), which on a stdio protocol corrupts the stream. Those diagnostics
+//! now go to stderr (docs/CVODE_ADAMS_FIX.md, part B; proven by
+//! `crates/cvode/tests/diagnostics_stderr.rs`). The isolation is kept as defense in depth: the
+//! protocol process never calls solver code; each tool call runs in a worker subprocess
 //! (`sundials-mcp --worker`) whose stdout is a duplicate of the parent's *stderr* handle and whose
 //! result comes back through a temporary file. The parent can therefore also enforce a wall-clock
-//! timeout by killing the worker. All of this uses safe `std` APIs only.
+//! timeout by killing the worker. All of this uses safe `std` APIs only (no file-descriptor
+//! redirection, which would need `unsafe`).
 #![forbid(unsafe_code)]
 
 use cvode::{Cvode, CvodeError, Method, Task};
@@ -232,7 +234,9 @@ fn about() -> Value {
             "errors": "a solver failure is an MCP tool error (isError: true) with no partial trajectory",
             "known_answers": "checks compare with an independent reference named in each result",
             "isolation": "solvers run in a worker subprocess whose stdout is routed to stderr, so solver \
-                          diagnostics cannot corrupt the protocol stream; the parent enforces a timeout"
+                          diagnostics cannot corrupt the protocol stream (defense in depth: cvode \
+                          itself now writes its diagnostics to stderr only); the parent enforces a \
+                          timeout"
         },
         "exposed": {
             "qf-cmb-cascade": "cmb_bound tool is live (PR #57 merged). Computes the Koren-Tsai-Wang \
