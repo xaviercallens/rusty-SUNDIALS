@@ -33,11 +33,15 @@ when the files are absent.
 ## Solver findings (measured on `crates/cvode`, not changed here)
 
 1. **The CVODE path uses BDF, not Adams.** Adams was the intended method, since the problem is
-   non-stiff. But `Method::Adams` never leaves order 1: `compute_l` in `crates/cvode/src/solver.rs`
-   is a placeholder with all coefficients set to 1. On `χ' = (1+z)^{-3/2}` its error scales like
-   `√rtol`: 2.1e-4 relative at `rtol = 1e-7` after about 7,000 steps, and 6.9e-5 at `rtol = 1e-8`
-   after about 21,000 steps. cvode's own Adams test only asserts `|y − 5| < 3.5` on `y' = 1`.
-   BDF reaches order 5.
+   non-stiff. But at the time of writing `Method::Adams` never left order 1: `compute_l` in
+   `crates/cvode/src/solver.rs` was a placeholder with all coefficients set to 1. On
+   `χ' = (1+z)^{-3/2}` its error scaled like `√rtol`: 2.1e-4 relative at `rtol = 1e-7` after about
+   7,000 steps, and 6.9e-5 at `rtol = 1e-8` after about 21,000 steps. cvode's own Adams test only
+   asserted `|y − 5| < 3.5` on `y' = 1`. BDF reaches order 5.
+   *Update (docs/CVODE_ADAMS_FIX.md):* Adams now implements LLNL's `cvSetAdams` with order
+   selection; on the EdS integrand at `rtol = 1e-7` (one fresh solve per redshift, z ≤ 4) it gives
+   1.3e-8 worst relative error in 57 steps (`crates/cvode/tests/adams_order.rs`). `chi_cvode` has
+   not been switched over in that change; doing so is a separate decision for this crate.
 2. **Many outputs from one BDF run lose accuracy.** Forty `tout`s from one run gave 4e-6 worst
    relative error at `rtol = 1e-7`. A fresh solve per redshift gives about 6e-7, so `chi_cvode`
    uses one fresh solve per distinct redshift.

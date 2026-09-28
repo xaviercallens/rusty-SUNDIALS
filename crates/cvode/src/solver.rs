@@ -2,7 +2,8 @@
 //!
 //! Implements the BDF and Adams multistep methods with:
 //! - Nordsieck array representation
-//! - Adaptive step size and order selection (BDF orders 1-5)
+//! - Adaptive step size and order selection (BDF orders 1-5, Adams-Moulton
+//!   orders 1-12 via the LLNL `cvSetAdams` / `cvPrepareNextStep` algorithm)
 //! - Newton iteration with cached Jacobian for implicit methods
 //! - Error estimation and step rejection
 //!
@@ -19,8 +20,8 @@ use sundials_core::Real;
 
 use crate::builder::CvodeBuilder;
 use crate::constants::{
-    DGMAX_LSETUP, ETA_MAX_FAIL, JAC_RECOMPUTE_INTERVAL, MAX_ERR_TEST_FAILS, MAX_NLS_ITERS, Method,
-    NLS_CRDOWN, NLS_TOL, Task,
+    DGMAX_LSETUP, ETA_MAX, ETA_MAX_FAIL, ETA_MAX_FIRST, ETA_MIN, JAC_RECOMPUTE_INTERVAL,
+    MAX_ERR_TEST_FAILS, MAX_NLS_ITERS, Method, NLS_CRDOWN, NLS_TOL, NORDSIECK_SIZE, Task,
 };
 #[cfg(feature = "experimental-nls-v2")]
 use crate::constants::{NLS_COEF, NLS_MIN_TOL};
@@ -56,6 +57,29 @@ const BDF_ERR_COEFF: [f64; 6] = [0.0, 0.5, 1.0 / 3.0, 0.25, 0.2, 1.0 / 6.0];
 /// Maximum Newton iterations per step (increased for better convergence).
 const MAX_NEWTON_ITERS: usize = 7;
 
+// --- LLNL CVODE step/order-selection constants used by the Adams path ---
+// (cvode_impl.h / cvode.c; the BDF path keeps this crate's older heuristic.)
+/// Size of the past-step-size history `tau` (LLNL `L_MAX + 1`).
+const TAU_LEN: usize = NORDSIECK_SIZE + 1;
+/// Bias in the order q-1 step-size estimate (LLNL BIAS1).
+const BIAS1: Real = 6.0;
+/// Bias in the order q step-size estimate (LLNL BIAS2).
+const BIAS2: Real = 6.0;
+/// Bias in the order q+1 step-size estimate (LLNL BIAS3).
+const BIAS3: Real = 10.0;
+/// Guard against division by zero in the eta formulas (LLNL ADDON).
+const ADDON: Real = 1.0e-6;
+/// Step-size changes smaller than this ratio are not made (LLNL THRESH).
+const THRESH: Real = 1.5;
+/// Error-test failures before a forced order reduction (LLNL MXNEF1).
+const MXNEF1: usize = 3;
+/// From this failure count on, eta is capped at ETAMXF (LLNL SMALL_NEF).
+const SMALL_NEF: usize = 2;
+/// Order-change wait after an order-1 restart (LLNL LONG_WAIT).
+const LONG_WAIT: usize = 10;
+/// Nonlinear convergence coefficient (LLNL NLSCOEF default 0.1); tq[4] = NLSCOEF / tq[2].
+const NLSCOEF: Real = 0.1;
+
 /// The CVODE solver.
 pub struct Cvode<F> {
     // --- Configuration ---
@@ -74,6 +98,8 @@ pub struct Cvode<F> {
     n: usize,
     nst: usize,
     nfe: usize,
+    /// Highest order used by an accepted step.
+    qmax_reached: usize,
 
     // --- Nordsieck array ---
     zn: NordsieckArray,
@@ -91,6 +117,18 @@ pub struct Cvode<F> {
     jac_age: usize,   // steps since last Jacobian computation
     last_gamma: Real, // gamma used for last M = I - γJ
     qwait: usize,     // countdown until next step/order change
+
+    // --- Adams (LLNL cvSetAdams / cvPrepareNextStep state) ---
+    /// Past step sizes: tau[1] is the last accepted step, tau[2] the one before, ...
+    tau: [Real; TAU_LEN],
+    /// Test quantities: tq[1] (order q-1 error), tq[2] (local error test), tq[3]
+    /// (order q+1 error), tq[4] (nonlinear convergence), tq[5] (used in the q+1 estimate).
+    tq: [Real; 6],
+    /// tq[5] saved with the correction vector when qwait hit 1 (LLNL saved_tq5).
+    saved_tq5: Real,
+    /// Cap on the step growth for the coming step (LLNL etamax: 10^4 first step, 10 after,
+    /// 1 right after a failure).
+    etamax: Real,
 
     // --- RHS function ---
     rhs: F,
@@ -167,6 +205,7 @@ where
             n,
             nst: 0,
             nfe: 0,
+            qmax_reached: 1,
             zn,
             ewt,
             acor: SerialVector::new(n),
@@ -178,6 +217,10 @@ where
             jac_age: JAC_RECOMPUTE_INTERVAL + 1, // force initial computation
             last_gamma: 0.0,
             qwait: 2, // wait q+1 steps before changing h or order
+            tau: [0.0; TAU_LEN],
+            tq: [0.0; 6],
+            saved_tq5: 0.0,
+            etamax: ETA_MAX_FIRST,
             rhs,
             jac,
             initialized: false,
@@ -218,6 +261,10 @@ where
     }
     pub fn order(&self) -> usize {
         self.q
+    }
+    /// Highest method order used by any accepted step so far (read-only statistic).
+    pub fn max_order_reached(&self) -> usize {
+        self.qmax_reached
     }
     /// Total Newton iterations across all steps (H8 instrumentation).
     /// Only available with feature `experimental-nls-v2`.
@@ -402,7 +449,7 @@ where
             self.zn.predict(self.q, &mut y_pred);
             let t_new = self.t + self.h;
 
-            let l = self.compute_l();
+            let l = self.set_coefficients();
             let l_0 = l[0];
             let gamma = self.h * l_0;
 
@@ -601,6 +648,7 @@ where
 
             if !newton_converged {
                 self.zn.restore(self.q);
+                self.etamax = 1.0; // LLNL cvHandleNFlag: no growth right after a failure
                 // Force Jacobian recompute on next attempt
                 self.jac_age = JAC_RECOMPUTE_INTERVAL + 1;
                 // H7: Reset persistent crate on convergence failure
@@ -628,10 +676,13 @@ where
                 acor_s[i] = acor_vec[i];
             }
 
-            let err_coeff = if self.method == Method::Bdf && self.q <= 5 {
-                BDF_ERR_COEFF[self.q]
-            } else {
-                1.0 / (self.q as Real + 1.0)
+            // BDF: this crate's C(q) applied to the correction in the l[1] = 1 normalisation.
+            // Adams: LLNL dsm = tq[2] * ||Delta_n||, where Delta_n = l_0 * acor in that
+            // normalisation (y_n = y_pred + l_0 * acor), so the coefficient is tq[2] * l_0.
+            let err_coeff = match self.method {
+                Method::Bdf if self.q <= 5 => BDF_ERR_COEFF[self.q],
+                Method::Bdf => 1.0 / (self.q as Real + 1.0),
+                Method::Adams => self.tq[2] * l_0,
             };
 
             let err_norm = step::error_estimate_norm(acor_s, self.ewt.as_slice(), err_coeff);
@@ -656,6 +707,7 @@ where
                 self.zn.correct(&l, &self.acor, self.q);
                 self.t += self.h;
                 self.nst += 1;
+                self.qmax_reached = self.qmax_reached.max(self.q);
 
                 step::compute_ewt(
                     self.zn.solution().as_slice(),
@@ -663,6 +715,11 @@ where
                     self.atol,
                     self.ewt.as_mut_slice(),
                 );
+
+                if self.method == Method::Adams {
+                    self.adams_complete_step(err_norm, l_0);
+                    return Ok(());
+                }
 
                 if self.qwait > 0 {
                     self.qwait -= 1;
@@ -697,12 +754,17 @@ where
 
             // Step rejected
             self.zn.restore(self.q);
+            self.etamax = 1.0;
             err_fails += 1;
             if err_fails >= MAX_ERR_TEST_FAILS {
                 println!("ERROR FAIL 3: local error test failed > max times");
                 return Err(CvodeError::Solver(
                     sundials_core::SundialsError::ErrTestFailure,
                 ));
+            }
+            if self.method == Method::Adams {
+                self.adams_error_test_failure(err_fails, err_norm)?;
+                continue;
             }
             self.qwait = self.q + 1; // reset wait after failure
             // Cap growth at ETA_MAX_FAIL=0.2 after error failure (LLNL ETAMXF).
@@ -734,24 +796,280 @@ where
         }
     }
 
-    /// Get the l coefficients for the current method and order.
-    fn compute_l(&self) -> Vec<Real> {
+    /// Method coefficients for the current order, in this crate's normalisation l[1] = 1
+    /// (so gamma = h * l[0] and y_n = y_pred + l[0] * acor).
+    ///
+    /// BDF: the fixed table above (unchanged). Adams: LLNL `cvSetAdams`, which also sets
+    /// `tq[1..=5]`; LLNL normalises l[0] = 1, so the result is divided by its l[1].
+    fn set_coefficients(&mut self) -> Vec<Real> {
         match self.method {
             Method::Bdf => {
                 let q = self.q.min(5);
                 BDF_L[q][..=q].to_vec()
             }
             Method::Adams => {
-                // Adams-Moulton order 1 (trapezoidal implicit)
-                let mut l = vec![0.0; self.q + 1];
-                l[0] = 1.0;
-                for i in 1..=self.q {
-                    l[i] = 1.0;
-                }
-                l
+                let l = self.set_adams();
+                let l1 = l[1];
+                l.iter().map(|v| v / l1).collect()
             }
         }
     }
+
+    /// LLNL `cvSetAdams`: l polynomial (l[0] = 1) and tq[1..=5] for the current q, h and
+    /// past step sizes `tau`. tq[1] and tq[3] are only needed when an order change is due
+    /// (qwait == 1), exactly as in `cvAdamsStart` / `cvAdamsFinish`.
+    fn set_adams(&mut self) -> Vec<Real> {
+        let q = self.q;
+        let mut l = vec![0.0; q + 1];
+        if q == 1 {
+            l[0] = 1.0;
+            l[1] = 1.0;
+            self.tq[1] = 1.0;
+            self.tq[5] = 1.0;
+            self.tq[2] = 0.5;
+            self.tq[3] = 1.0 / 12.0;
+            self.tq[4] = NLSCOEF / self.tq[2];
+            return l;
+        }
+
+        // cvAdamsStart: m = coefficients of prod_{j=1}^{q-1} (1 + x / xi_j).
+        let mut m = vec![0.0; q + 1];
+        m[0] = 1.0;
+        let mut hsum = self.h;
+        for j in 1..q {
+            if j == q - 1 && self.qwait == 1 {
+                let sum = alt_sum(q - 2, &m, 2);
+                self.tq[1] = q as Real * sum / m[q - 2];
+            }
+            let xi_inv = self.h / hsum;
+            for i in (1..=j).rev() {
+                m[i] += m[i - 1] * xi_inv;
+            }
+            hsum += self.tau[j];
+        }
+        let m0 = alt_sum(q - 1, &m, 1);
+        let m1 = alt_sum(q - 1, &m, 2);
+
+        // cvAdamsFinish
+        let m0_inv = 1.0 / m0;
+        l[0] = 1.0;
+        for (i, li) in l.iter_mut().enumerate().skip(1) {
+            *li = m0_inv * (m[i - 1] / i as Real);
+        }
+        let xi = hsum / self.h;
+        let xi_inv = 1.0 / xi;
+        self.tq[2] = m1 * m0_inv / xi;
+        self.tq[5] = xi / l[q];
+        if self.qwait == 1 {
+            for i in (1..=q).rev() {
+                m[i] += m[i - 1] * xi_inv;
+            }
+            let m2 = alt_sum(q, &m, 2);
+            self.tq[3] = m2 * m0_inv / (q + 1) as Real;
+        }
+        self.tq[4] = NLSCOEF / self.tq[2];
+        l
+    }
+
+    /// WRMS norm of `v` with the current error weights.
+    fn wrms(&self, v: &[Real]) -> Real {
+        let s: Real = v
+            .iter()
+            .zip(self.ewt.as_slice())
+            .map(|(a, w)| (a * w).powi(2))
+            .sum();
+        (s / self.n as Real).sqrt()
+    }
+
+    /// Adams bookkeeping after an accepted step (LLNL `cvCompleteStep` tail,
+    /// `cvPrepareNextStep`, `cvAdjustParams`, `cvRescale`). `dsm` is the error-test value of the
+    /// step and `l0` the l[0] of the l[1] = 1 normalisation, so `l0 * acor` is LLNL's Delta_n.
+    fn adams_complete_step(&mut self, dsm: Real, l0: Real) {
+        let q = self.q;
+        let qmax = self.max_order;
+
+        // Shift the step-size history.
+        for i in (2..=q).rev() {
+            self.tau[i] = self.tau[i - 1];
+        }
+        if q == 1 && self.nst > 1 {
+            self.tau[2] = self.tau[1];
+        }
+        self.tau[1] = self.h;
+
+        self.qwait = self.qwait.saturating_sub(1);
+        if self.qwait == 1 && q != qmax {
+            // Keep Delta_n for the order q+1 error estimate on the next step.
+            let acor = self.acor.as_slice();
+            let store = self.zn.get_mut(qmax).as_mut_slice();
+            for (s, a) in store.iter_mut().zip(acor) {
+                *s = l0 * a;
+            }
+            self.saved_tq5 = self.tq[5];
+        }
+
+        // cvPrepareNextStep
+        let big_l = (q + 1) as Real;
+        let (mut eta, qprime) = if self.etamax == 1.0 {
+            self.qwait = self.qwait.max(2);
+            (1.0, q)
+        } else {
+            let etaq = 1.0 / ((BIAS2 * dsm).powf(1.0 / big_l) + ADDON);
+            if self.qwait != 0 {
+                (etaq, q)
+            } else {
+                self.qwait = 2;
+                let etaqm1 = self.adams_etaqm1();
+                let etaqp1 = self.adams_etaqp1(l0);
+                // cvChooseEta
+                let etam = etaqm1.max(etaq).max(etaqp1);
+                if etam < THRESH {
+                    (1.0, q)
+                } else if etam == etaq {
+                    (etaq, q)
+                } else if etam == etaqm1 {
+                    (etaqm1, q - 1)
+                } else {
+                    (etaqp1, q + 1)
+                }
+            }
+        };
+
+        // cvSetEta
+        if eta < THRESH {
+            eta = 1.0;
+        } else {
+            eta = eta.min(self.etamax);
+            eta /= (self.h.abs() * eta / self.max_step).max(1.0);
+        }
+        self.etamax = ETA_MAX;
+
+        // cvAdjustParams + cvRescale
+        if qprime != q {
+            self.adams_adjust_order(qprime as isize - q as isize);
+            self.q = qprime;
+            self.qwait = self.q + 1;
+        }
+        if eta != 1.0 {
+            self.h *= eta;
+            self.zn.rescale(eta, self.q);
+        }
+    }
+
+    /// LLNL `cvComputeEtaqm1`: step ratio if the order were lowered to q-1.
+    fn adams_etaqm1(&self) -> Real {
+        if self.q <= 1 {
+            return 0.0;
+        }
+        let ddn = self.wrms(self.zn.get(self.q).as_slice()) * self.tq[1];
+        1.0 / ((BIAS1 * ddn).powf(1.0 / self.q as Real) + ADDON)
+    }
+
+    /// LLNL `cvComputeEtaqp1`: step ratio if the order were raised to q+1.
+    fn adams_etaqp1(&self, l0: Real) -> Real {
+        let q = self.q;
+        if q == self.max_order || self.saved_tq5 == 0.0 || self.tau[2] == 0.0 {
+            return 0.0;
+        }
+        let big_l = (q + 1) as i32;
+        let cquot = (self.tq[5] / self.saved_tq5) * (self.h / self.tau[2]).powi(big_l);
+        let saved = self.zn.get(self.max_order).as_slice();
+        let tempv: Vec<Real> = self
+            .acor
+            .as_slice()
+            .iter()
+            .zip(saved)
+            .map(|(a, s)| l0 * a - cquot * s)
+            .collect();
+        let dup = self.wrms(&tempv) * self.tq[3];
+        1.0 / ((BIAS3 * dup).powf(1.0 / (big_l + 1) as Real) + ADDON)
+    }
+
+    /// LLNL `cvAdjustAdams`: history adjustment for an order change of `deltaq` (+1 or -1).
+    fn adams_adjust_order(&mut self, deltaq: isize) {
+        let q = self.q;
+        if deltaq == 1 {
+            self.zn.get_mut(q + 1).set_const(0.0);
+            return;
+        }
+        // Order decrease: zn[j] -= l[j] * zn[q] for j = 2..q, with l the coefficients of
+        // x * q * INT { u (u + xi_1) ... (u + xi_{q-2}) }.
+        let mut lt = vec![0.0; q + 1];
+        lt[1] = 1.0;
+        let mut hsum = 0.0;
+        for j in 1..=q.saturating_sub(2) {
+            hsum += self.tau[j];
+            let xi = hsum / self.h;
+            for i in (1..=j + 1).rev() {
+                lt[i] = lt[i] * xi + lt[i - 1];
+            }
+        }
+        for j in 1..=q.saturating_sub(2) {
+            lt[j + 1] = q as Real * (lt[j] / (j + 1) as Real);
+        }
+        let zq = self.zn.get(q).as_slice().to_vec();
+        for (j, &lj) in lt.iter().enumerate().take(q).skip(2) {
+            let zj = self.zn.get_mut(j).as_mut_slice();
+            for (z, s) in zj.iter_mut().zip(&zq) {
+                *z -= lj * s;
+            }
+        }
+    }
+
+    /// LLNL `cvDoErrorTest` failure branch for Adams: the Nordsieck array has already been
+    /// restored and `nef` counted. Shrinks the step, and after MXNEF1 failures lowers the
+    /// order or, at order 1, restarts from a fresh derivative.
+    fn adams_error_test_failure(&mut self, nef: usize, dsm: Real) -> Result<(), CvodeError> {
+        let hmin_ratio = if self.h != 0.0 {
+            self.min_step / self.h.abs()
+        } else {
+            0.0
+        };
+        if nef <= MXNEF1 {
+            let big_l = (self.q + 1) as Real;
+            let mut eta = 1.0 / ((BIAS2 * dsm).powf(1.0 / big_l) + ADDON);
+            eta = ETA_MIN.max(eta.max(hmin_ratio));
+            if nef >= SMALL_NEF {
+                eta = eta.min(ETA_MAX_FAIL);
+            }
+            self.h *= eta;
+            self.zn.rescale(eta, self.q);
+            return Ok(());
+        }
+        let eta = ETA_MIN.max(hmin_ratio);
+        if self.q > 1 {
+            self.adams_adjust_order(-1);
+            self.q -= 1;
+            self.qwait = self.q + 1;
+            self.h *= eta;
+            self.zn.rescale(eta, self.q);
+            return Ok(());
+        }
+        // Already at order 1: shrink h and reload zn[1] = h * f(t_n, y_n).
+        self.h *= eta;
+        self.qwait = LONG_WAIT;
+        let y = self.zn.solution().as_slice().to_vec();
+        let f = self.ftemp.as_mut_slice();
+        (self.rhs)(self.t, &y, f).map_err(|msg| CvodeError::RhsError { t: self.t, msg })?;
+        self.nfe += 1;
+        let h = self.h;
+        let z1 = self.zn.get_mut(1).as_mut_slice();
+        for (z, fi) in z1.iter_mut().zip(self.ftemp.as_slice()) {
+            *z = h * fi;
+        }
+        Ok(())
+    }
+}
+
+/// LLNL `cvAltSum`: sum_{i=0}^{iend} (-1)^i a[i] / (i + k).
+fn alt_sum(iend: usize, a: &[Real], k: usize) -> Real {
+    let mut sum = 0.0;
+    let mut sign = 1.0;
+    for (i, ai) in a.iter().enumerate().take(iend + 1) {
+        sum += sign * ai / (i + k) as Real;
+        sign = -sign;
+    }
+    sum
 }
 
 impl Cvode<()> {
@@ -806,11 +1124,9 @@ mod tests {
 
         let (t, y) = solver.solve(5.0, Task::Normal).unwrap();
         assert!((t - 5.0).abs() < 1e-10);
-        assert!(
-            (y[0] - 5.0).abs() < 3.5,
-            "y = {} (order-1 Adams on t=[0,5])",
-            y[0]
-        );
+        // y' = 1 is integrated exactly by every Adams order; only rounding remains.
+        // (Before the Adams fix this bound was 3.5.)
+        assert!((y[0] - 5.0).abs() < 1e-9, "y = {}", y[0]);
     }
 
     #[test]
