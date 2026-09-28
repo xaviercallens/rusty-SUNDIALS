@@ -176,10 +176,12 @@ export const MOCK_VERIFICATION = {
       lean4: "theorem earth_twin_drawdown_bounds (planet : Earth) :\\n  carbon_flow (planet.atmosphere) < 0 := by\\n  apply navier_stokes_drawdown\\n  exact coastal_desert_optima"
     },
     {
+      // AUDIT 2026-09-27: no such theorem or file exists in the repository
+      // (report C §1.5). Status changed from "proved"; certificate withdrawn.
       theorem: "theorem iter_gyrokinetic_stability (plasma : Fusion)",
-      module: "iter_phase3.lean",
-      status: "proved",
-      evidence: "Verified Tensor-Train Phase-Space bounds",
+      module: "iter_phase3.lean (DOES NOT EXIST)",
+      status: "retracted",
+      evidence: "RETRACTED — no such theorem or .lean file exists; never checked by Lean",
       certificate: "CERT-FUS-110",
       time_ms: 3100,
       lean4: "theorem iter_gyrokinetic_stability (plasma : Fusion) :\\n  is_stable (tensor_train plasma) := by\\n  apply lyapunov_stability\\n  exact mhd_bounds"
@@ -254,17 +256,21 @@ export const MOCK_SOP_DATA = {
       ]
     },
     {
+      // AUDIT 2026-09-27: this execution log is retracted. The benchmark
+      // binaries it reports do not exist, the log was committed before its own
+      // end timestamp, and its Lean "certificates" rest on inconsistent axioms.
+      // See docs/audit/fusion-2026-09-27/RETRACTION_NOTICE.md.
       execution_id: "L4-SERV-88219-FUS",
       protocol_id: "Fusion",
       reviewer: "peer-reviewer-anon",
       git_commit: "9712004",
       timestamp: "2026-05-14T16:45:12Z",
-      status: "success",
+      status: "retracted",
       result: {
-        metric_achieved: "$0.04996 Total, div(B)=1.12e-15, FLAGNO=6 iters, HDC=38.5ns",
-        validation: "REPRODUCED",
-        deviance: "0.00%",
-        execution_time: "24m 55s"
+        metric_achieved: "RETRACTED — not measured (originally claimed: $0.04996 Total, div(B)=1.12e-15, FLAGNO=6 iters, HDC=38.5ns)",
+        validation: "RETRACTED",
+        deviance: "n/a",
+        execution_time: "n/a"
       },
       artifacts: [
         {

@@ -4,12 +4,12 @@
 //! allowing `rusty-SUNDIALS` to be used directly from Python without
 //! compromising zero-cost performance.
 
-// pyo3 0.20's `#[pymethods]` expansion trips clippy's `non_local_definitions` lint on current
-// rustc (the macro-generated `impl PyClassImplCollector for PyCvodeSolver` is attributed to a
-// hidden, macro-internal span that a local `#[allow]` on the visible `impl` block does not
-// reach). Fixed upstream in later pyo3 releases; upgrading pyo3 is a separate, larger change
-// (see PR #59's description). Crate-level allow until then.
+// pyo3 0.20's #[pymethods]/#[pyfunction] expansions define impls inside a const block, which
+// newer rustc reports as `non_local_definitions` (fixed upstream in pyo3 >= 0.21).
 #![allow(non_local_definitions)]
+// Python bindings do not exist on wasm32 (pyo3 cannot target it); the crate is empty there so
+// `cargo build --workspace --target wasm32-unknown-unknown` still succeeds.
+#![cfg(not(target_arch = "wasm32"))]
 
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
