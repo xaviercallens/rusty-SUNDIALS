@@ -1,0 +1,12 @@
+[package]
+name = "qf-vlasov1d"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "1D1V electrostatic Vlasov-Poisson (Strang splitting: exact Fourier x-advection, cubic-spline semi-Lagrangian v-advection) — a pure-Rust port of SocrateAI-Scientific-QuantumFluids's src/quantumfluids/kinetic/vlasov.py, used for its Landau-damping and plasma-echo pre-registration (K1-K3)."
+
+[dependencies]
+rustfft = "6.4.1"
+num-complex = "0.4"
+
+[dev-dependencies]
