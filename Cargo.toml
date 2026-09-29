@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/sundials-core", "crates/cvode", "crates/nvector", "examples", "crates/ida", "crates/benchmarks", "crates/rusty-sundials-py", "crates/qf-pgpe", "crates/qf-cmb-cascade", "crates/qf-bao-distances", "crates/sundials-mcp"]
+members = ["crates/sundials-core", "crates/cvode", "crates/nvector", "examples", "crates/ida", "crates/benchmarks", "crates/rusty-sundials-py", "crates/qf-pgpe", "crates/qf-cmb-cascade", "crates/qf-bao-distances", "crates/qf-gpe2d", "crates/sundials-mcp"]
 resolver = "2"
 
 [workspace.package]
