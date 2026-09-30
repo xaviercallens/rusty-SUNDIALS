@@ -1,0 +1,11 @@
+[package]
+name = "qf-shell-cascade"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "The complexified dyadic shell cascade (Katz-Pavlovic / Desnyansky-Novikov with a dispersive quantum-pressure regulator) — a pure-Rust port of SocrateAI-Scientific-QuantumFluids's src/quantumfluids/w4_shell_model/{shell_dynamics,integrate}.py, whose reference numerics (D=0, real data) are themselves a bit-for-bit cross-check against MechanicaFluidorum's independently written exploration/dyadic_cascade.py — ported here so both repos, and any future one, can share one implementation instead of maintaining parallel copies."
+
+[dependencies]
+num-complex = "0.4"
+
+[dev-dependencies]
