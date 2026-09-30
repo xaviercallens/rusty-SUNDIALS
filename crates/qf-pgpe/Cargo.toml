@@ -10,3 +10,4 @@ rustfft = "6.4.1"
 num-complex = "0.4"
 
 [dev-dependencies]
+rayon = { workspace = true }
