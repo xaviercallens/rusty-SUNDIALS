@@ -1,0 +1,12 @@
+[package]
+name = "qf-gpe2d"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Split-step Fourier solver for the 2D Gross-Pitaevskii equation on a periodic box — a pure-Rust port of SocrateAI-Scientific-QuantumFluids's src/quantumfluids/gpe/solver2d.py, distinct from this repository's qf-pgpe (which ports the BKT-specific projected-GPE model): this one is the general split-step workhorse used across the project's PGPE rounds and TDA vortex-detection work (17 Python call sites)."
+
+[dependencies]
+rustfft = "6.4.1"
+num-complex = "0.4"
+
+[dev-dependencies]
