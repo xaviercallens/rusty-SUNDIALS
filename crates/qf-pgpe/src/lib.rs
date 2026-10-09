@@ -49,6 +49,10 @@ pub struct ComplexField2D {
     pub mask: Vec<bool>,
     e1: Vec<Complex64>,
     e2: Vec<Complex64>,
+    /// Rows `i` (first axis) / columns `j` (second axis) containing at least one mode inside the projector: the
+    /// other lines are identically zero in a projected field, so their 1D FFTs are skipped (exact, not approximate).
+    rows_active: Vec<bool>,
+    cols_active: Vec<bool>,
     fft_fwd: Arc<dyn Fft<f64>>,
     fft_inv: Arc<dyn Fft<f64>>,
 }
@@ -82,30 +86,62 @@ fn transpose_square(data: &mut [Complex64], n: usize) {
     }
 }
 
+/// One pass of 1D FFTs over the rows of `data` that are flagged in `active` (all rows if `None`). With the `parallel`
+/// feature and `n >= PAR_MIN_N` the rows are distributed over the rayon thread pool.
+fn row_pass(fft: &Arc<dyn Fft<f64>>, data: &mut [Complex64], n: usize, active: Option<&[bool]>) {
+    let scratch_len = fft.get_inplace_scratch_len();
+    #[cfg(feature = "parallel")]
+    if n >= PAR_MIN_N {
+        use rayon::prelude::*;
+        data.par_chunks_mut(n).enumerate().for_each_init(
+            || vec![Complex64::new(0.0, 0.0); scratch_len],
+            |scratch, (i, row)| {
+                if active.is_none_or(|a| a[i]) {
+                    fft.process_with_scratch(row, scratch);
+                }
+            },
+        );
+        return;
+    }
+    let mut scratch = vec![Complex64::new(0.0, 0.0); scratch_len];
+    for (i, row) in data.chunks_mut(n).enumerate() {
+        if active.is_none_or(|a| a[i]) {
+            fft.process_with_scratch(row, &mut scratch);
+        }
+    }
+}
+
+/// Smallest grid for which the `parallel` feature distributes the 1D FFTs over threads.
+#[cfg(feature = "parallel")]
+const PAR_MIN_N: usize = 256;
+
 /// Rows, transpose, rows, transpose: the 2D DFT is separable, so this equals `numpy.fft.fft2` (forward, unnormalized)
 /// or `ifft2` before normalization, with unit-stride access in both passes (the column pass of the previous
-/// implementation copied every column through a scratch vector).
-fn fft2_in_place(fft: &Arc<dyn Fft<f64>>, data: &mut [Complex64], n: usize) {
-    let mut scratch = vec![Complex64::new(0.0, 0.0); fft.get_inplace_scratch_len()];
-    for row in data.chunks_mut(n) {
-        fft.process_with_scratch(row, &mut scratch);
-    }
+/// implementation copied every column through a scratch vector). `first`/`second` optionally restrict the lines
+/// transformed in each pass to those that can be nonzero (inputs) or are needed (outputs): lines skipped are zero, so
+/// the result is bit-identical to the full transform at the entries that are kept.
+fn fft2_pruned(
+    fft: &Arc<dyn Fft<f64>>,
+    data: &mut [Complex64],
+    n: usize,
+    first: Option<&[bool]>,
+    second: Option<&[bool]>,
+) {
+    row_pass(fft, data, n, first);
     transpose_square(data, n);
-    for row in data.chunks_mut(n) {
-        fft.process_with_scratch(row, &mut scratch);
-    }
+    row_pass(fft, data, n, second);
     transpose_square(data, n);
 }
 
 /// In-place 2D FFT of an `n x n` row-major buffer, matching `numpy.fft.fft2` (unnormalized forward transform).
 fn fft2_forward(fft: &Arc<dyn Fft<f64>>, data: &mut [Complex64], n: usize) {
-    fft2_in_place(fft, data, n);
+    fft2_pruned(fft, data, n, None, None);
 }
 
 /// In-place 2D inverse FFT matching `numpy.fft.ifft2` (rustfft's own inverse plan is unnormalized; this divides by
 /// `n*n` at the end to match numpy's normalized convention).
 fn fft2_inverse(ifft: &Arc<dyn Fft<f64>>, data: &mut [Complex64], n: usize) {
-    fft2_in_place(ifft, data, n);
+    fft2_pruned(ifft, data, n, None, None);
     let scale = 1.0 / (n * n) as f64;
     for v in data.iter_mut() {
         *v *= scale;
@@ -182,6 +218,8 @@ impl ComplexField2D {
                 }
             })
             .collect();
+        let rows_active: Vec<bool> = (0..n).map(|i| (0..n).any(|j| mask[i * n + j])).collect();
+        let cols_active: Vec<bool> = (0..n).map(|j| (0..n).any(|i| mask[i * n + j])).collect();
         let mut planner = FftPlanner::new();
         let fft_fwd = planner.plan_fft_forward(n);
         let fft_inv = planner.plan_fft_inverse(n);
@@ -199,6 +237,8 @@ impl ComplexField2D {
             mask,
             e1,
             e2,
+            rows_active,
+            cols_active,
             fft_fwd,
             fft_inv,
         }
@@ -273,12 +313,17 @@ impl ComplexField2D {
 
     /// `N(c) = -i g P[ fft2( |psi|^2 psi ) ]`, written into `out` (`psi` is a scratch buffer).
     fn nonlin_into(&self, c: &[Complex64], out: &mut [Complex64], psi: &mut [Complex64]) {
+        // `c` is a projected field: rows without any mode inside the projector are zero and are not transformed;
+        // of the forward transform only the lines that contain modes inside the projector are kept (the rest is
+        // zeroed by the mask below), so they are the only ones computed.
         psi.copy_from_slice(c);
-        fft2_inverse(&self.fft_inv, psi, self.n);
+        fft2_pruned(&self.fft_inv, psi, self.n, Some(&self.rows_active), None);
+        let scale = 1.0 / (self.n * self.n) as f64;
         for (o, p) in out.iter_mut().zip(psi.iter()) {
+            let p = p * scale;
             *o = p * p.norm_sqr();
         }
-        fft2_forward(&self.fft_fwd, out, self.n);
+        fft2_pruned(&self.fft_fwd, out, self.n, None, Some(&self.cols_active));
         let ig = Complex64::new(0.0, -self.g);
         out.iter_mut()
             .zip(&self.mask)
@@ -476,5 +521,49 @@ mod tests {
             drift <= 1e-6,
             "energy drift = {drift:e}, K2's own dt=0.005 bound 1e-6"
         );
+    }
+
+    /// The pruned transforms (zero rows skipped on the way in, unneeded lines skipped on the way out) are exact: the
+    /// nonlinear term equals, bit for bit, the one computed with full 2D FFTs, for several cutoffs.
+    #[test]
+    fn pruned_ffts_are_bit_identical_to_full_ffts() {
+        for frac in [0.5, 1.0 / 3.0, 0.4] {
+            let f = ComplexField2D::with_kcut_frac(32, 16.0, 1.0, 0.01, frac);
+            let n = f.n;
+            let mut state = 0x1234_5678_9abc_def0u64;
+            let mut next = || {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                (state >> 11) as f64 / (1u64 << 53) as f64 - 0.5
+            };
+            let c: Vec<Complex64> = (0..n * n)
+                .map(|i| {
+                    if f.mask[i] {
+                        Complex64::new(next(), next())
+                    } else {
+                        Complex64::new(0.0, 0.0)
+                    }
+                })
+                .collect();
+            let pruned = f.nonlin(&c);
+            // reference: full inverse FFT, product, full forward FFT, mask
+            let mut psi = c.clone();
+            fft2_inverse(&f.fft_inv, &mut psi, n);
+            let mut out: Vec<Complex64> = psi.iter().map(|p| p * p.norm_sqr()).collect();
+            fft2_forward(&f.fft_fwd, &mut out, n);
+            let ig = Complex64::new(0.0, -f.g);
+            for (v, &m) in out.iter_mut().zip(&f.mask) {
+                *v = if m { ig * *v } else { Complex64::new(0.0, 0.0) };
+            }
+            assert!(
+                pruned.iter().zip(&out).all(|(a, b)| a == b),
+                "kcut_frac = {frac}: pruned nonlinear term differs"
+            );
+            assert!(
+                f.rows_active.iter().filter(|&&r| r).count() < n,
+                "pruning must skip some rows at frac {frac}"
+            );
+        }
     }
 }
