@@ -13,3 +13,4 @@ num-complex = "0.4"
 rayon = { workspace = true }
 cvode = { path = "../cvode" }
 nvector = { path = "../nvector" }
+serde_json = "1"
