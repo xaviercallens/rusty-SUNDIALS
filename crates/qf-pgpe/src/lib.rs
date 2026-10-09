@@ -25,6 +25,9 @@
 use rustfft::{Fft, FftPlanner, num_complex::Complex64};
 use std::sync::Arc;
 
+pub mod flow;
+pub mod npy;
+pub mod rect;
 pub mod scattering;
 pub mod thermal;
 pub mod transport;
