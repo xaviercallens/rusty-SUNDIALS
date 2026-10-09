@@ -6,7 +6,7 @@ scattering). Every module is a port of a Python original **with a direct numeric
 (listed at the end), and one of them was in the Python programme itself.
 
 ```
-cargo test --release -p qf-pgpe                       # 30 tests, ~40 s
+cargo test --release -p qf-pgpe                       # 27 tests (+2 slow ones behind --ignored), ~40 s
 cargo run --release -p qf-pgpe --example vortex_transport -- validate   # the G1 known answers of the campaign
 ```
 
