@@ -41,7 +41,12 @@ Three PRs merged in this session:
 - Also adds `docs/PROPOSED_STRUCTURE.md` — a documentation-only proposal for reorganizing `crates/`
   into `core/`, `bindings/`, and `physics/` subdirectories (no files moved in this PR).
 
-**qf-pgpe external reproduction (this PR)**
+**qf-pgpe reproduction and threading (v11.6.0)**
+- `FlowSolver::ground_state` and example `kwon_shin_ground`: the reference's imaginary-time preparation reproduces the stored Kwon & Shin initial field to 2.8e-8; `kwon_shin --snap-dir` writes snapshots; run to t = 50: vortex counts equal at 9 of 10 times, force 0.19 % of the maximum after the wake forms (documented disagreements in the programme's `PGPE_EXTERNAL_REPRODUCTION.md`).
+- `tests/kwon_shin_reference.rs` + checksummed `fetch_kwon_shin.sh` + `reproduction.yml` (weekly/on demand, outside the required CI).
+- Optional cargo feature `parallel`: `ComplexField2D::with_threads(t)` (row FFT passes, transposes, element-wise loops), bit-identical for any thread count; `bench_step` takes a threads argument. First measurements on a loaded machine: 2.4x at N = 512, 1.6x at N = 256, slower than serial at N = 128.
+
+**qf-pgpe external reproduction (v11.5.0)**
 - `rect` (rectangular periodic grids, numpy-convention FFTs), `npy` (numpy file I/O), `flow` (obstacle-flow solver with moving frame and absorbing layers, independent RK4 scheme) and the `kwon_shin` example: the force on the obstacle of an external published run (Kwon & Shin, Zenodo 10.5281/zenodo.20068724) is reproduced to 6e-6 relative from the reference's own initial field; honest note that the Rust engine is not faster than numpy at 1000 x 500.
 
 **qf-pgpe reference engine (branch `feat/qf-pgpe-reference`, supersedes #68)**

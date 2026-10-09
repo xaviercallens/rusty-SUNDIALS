@@ -1,4 +1,5 @@
-//! Micro-benchmark of the IF-RK4 step: `cargo run --release -p qf-pgpe --example bench_step -- [N] [steps] [reps]`.
+//! Micro-benchmark of the IF-RK4 step: `cargo run --release -p qf-pgpe --example bench_step -- [N] [steps] [reps] [threads]`
+//! (`threads > 1` needs `--features parallel`).
 //!
 //! Prints one JSON line: the best and the median time per step over `reps` repetitions of `steps` steps (best-of-n is
 //! the right statistic on a shared machine), the thread count (always 1: the step is single-threaded) and a checksum `sum |Re c| + |Im c|` of the final state, so that optimisations can be checked for
@@ -16,7 +17,8 @@ fn main() {
     let n: usize = a.get(1).map_or(128, |s| s.parse().unwrap());
     let steps: usize = a.get(2).map_or(200, |s| s.parse().unwrap());
     let reps: usize = a.get(3).map_or(3, |s| s.parse().unwrap());
-    let f = ComplexField2D::new(n, n as f64 / 2.0, 1.0, 0.01);
+    let threads: usize = a.get(4).map_or(1, |s| s.parse().unwrap());
+    let f = ComplexField2D::new(n, n as f64 / 2.0, 1.0, 0.01).with_threads(threads);
     let mut c0 = vec![Complex64::new(0.0, 0.0); n * n];
     c0[0] = Complex64::new((n * n) as f64, 0.0);
     c0[1] = Complex64::new(0.3 * n as f64, 0.1 * n as f64);
@@ -31,7 +33,7 @@ fn main() {
     }
     times.sort_by(|x, y| x.partial_cmp(y).unwrap());
     let sum: f64 = last.iter().map(|v| v.re.abs() + v.im.abs()).sum();
-    let threads = 1;
+    let threads = f.threads();
     println!(
         "{{\"engine\":\"qf-pgpe\",\"n\":{n},\"steps\":{steps},\"reps\":{reps},\"us_per_step_best\":{:.1},\"us_per_step_median\":{:.1},\"threads\":{threads},\"checksum\":{sum:.12e},\"norm\":{:.12e}}}",
         1e6 * times[0],

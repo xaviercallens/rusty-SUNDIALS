@@ -1,0 +1,37 @@
+name: external reproduction (Kwon & Shin)
+
+# Reproduces numbers of an external, published reference run (Zenodo 10.5281/zenodo.20068724, CC-BY-4.0) with qf-pgpe.
+# Kept out of the required CI: it depends on an external download (the Zenodo gateway returns 502/504 routinely), so it runs
+# on demand, weekly, and on pull requests that touch the crate; the files are cached by checksum.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"
+  pull_request:
+    paths:
+      - "crates/qf-pgpe/**"
+      - ".github/workflows/reproduction.yml"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  kwon-shin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Cache the reference files
+        id: ref
+        uses: actions/cache@v4
+        with:
+          path: kwon-shin-reference
+          key: kwon-shin-69a58532fc01
+      - name: Fetch the reference files (retries, SHA-256 verified)
+        if: steps.ref.outputs.cache-hit != 'true'
+        run: crates/qf-pgpe/tests/fetch_kwon_shin.sh kwon-shin-reference
+      - name: Reproduce (ground state exactly; force to 5e-6 for t <= 0.3)
+        env:
+          QF_KWON_SHIN_DIR: ${{ github.workspace }}/kwon-shin-reference
+        run: cargo test --release -p qf-pgpe --test kwon_shin_reference -- --nocapture

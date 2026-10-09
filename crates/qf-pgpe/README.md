@@ -60,7 +60,11 @@ cargo run --release -p qf-pgpe --example kwon_shin -- --ref-dir DIR --t-end 0.3 
 * force on the obstacle, t ≤ 0.3: max |F − F_ref| = 1.1×10⁻⁶ (6×10⁻⁶ relative); the numpy implementation of the same scheme gives the same number;
 * **the reference holds the frame velocity at the end of each step**; reading the ramp at RK4 stage times instead produces a constant offset of 3.5×10⁻³ (5×10⁻³ relative) that is created in the 0.1 τ ramp — an O(dt) artefact of the reference (Σ v(iΔt)Δt overshoots ∫v dt by 0.00275 ξ), reproduced as `Ramp::StepEnd`;
 * **performance is not a win on this geometry**: 1000 × 500 (non-power-of-two lengths) costs ≈ 0.8 s per RK4 step single-threaded in `qf-pgpe`, against ≈ 0.9 s for numpy — the advantage of the square power-of-two engine does not carry over; this size is the natural first target for the GPU phase.
-* longer comparisons (ψ snapshots at t = 10 … 50, vortex counts) are tracked in the programme's `PGPE_EXTERNAL_REPRODUCTION.md`.
+* **ground state:** `FlowSolver::ground_state` (the reference's imaginary-time preparation; example `kwon_shin_ground`) reproduces the stored `psi_time_0.0.npy` to 2.8×10⁻⁸ once the reference's seeded noise is added (float32 round-off); with the reference's tolerance the loop stops at the **first** step, i.e. the stored field is the Thomas–Fermi field after one step plus noise;
+* **to t = 50** (`kwon_shin --t-end 50 --snap-dir OUT`, 5000 steps, 2741 s): ψ relative L² distance 2.2×10⁻⁴ / 5.8×10⁻⁴ / 1.3×10⁻³ / 2.5×10⁻³ / 4.1×10⁻³ at t = 10…50 (density 2–4×10⁻⁴), force difference 2.2×10⁻⁴ up to t = 10 and ≈ 1.7×10⁻² (0.19 % of the maximum) after the wake forms, vortex counts (reference's own rule, Python port in the programme repository) equal at 9 of 10 times (7 against 6 at t = 45); our time-stepping error is 3×10⁻¹⁰ (stage-times ramp, dt halved);
+* **reference test:** `QF_KWON_SHIN_DIR=DIR cargo test --release -p qf-pgpe --test kwon_shin_reference` (`tests/fetch_kwon_shin.sh DIR` downloads and SHA-256-verifies the files); the workflow `reproduction.yml` runs it weekly and on demand, outside the required checks;
+* **threading:** `cargo build --features parallel`, `ComplexField2D::with_threads(t)` — bit-identical for any t (unit test); first measurements on a loaded machine: 2.4× at N = 512 with 8 threads, 1.6× at N = 256, slower than serial at N = 128;
+* full numbers, including what does not agree, in the programme's `PGPE_EXTERNAL_REPRODUCTION.md`.
 
 ## What porting found
 
