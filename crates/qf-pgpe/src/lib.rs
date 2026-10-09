@@ -25,6 +25,11 @@
 use rustfft::{Fft, FftPlanner, num_complex::Complex64};
 use std::sync::Arc;
 
+pub mod scattering;
+pub mod thermal;
+pub mod transport;
+pub mod vortex;
+
 /// The field state, invariants, and the one IF-RK4 step, on an `n x n` doubly-periodic grid of
 /// side `l`, nonlinearity strength `g`, time step `dt`, cutoff fraction `kcut_frac` of `k_max`.
 pub struct ComplexField2D {
@@ -46,6 +51,10 @@ pub struct ComplexField2D {
     e2: Vec<Complex64>,
     fft_fwd: Arc<dyn Fft<f64>>,
     fft_inv: Arc<dyn Fft<f64>>,
+}
+
+fn c_len(n: usize) -> usize {
+    n * n
 }
 
 /// `2*pi*fftfreq(n, d)[k]`, numpy's convention: `k` for `k < ceil(n/2)`, else `k - n`, all
@@ -185,6 +194,54 @@ impl ComplexField2D {
             }
         }
         buf
+    }
+
+    /// Full right-hand side `dc/dt = -i k^2/2 c + N(c)` on the projected modes, for external integrators
+    /// (rusty-SUNDIALS CVODE in `tests/cvode_crosscheck.rs`).
+    pub fn rhs(&self, c: &[Complex64]) -> Vec<Complex64> {
+        let nl = self.nonlin(c);
+        (0..c.len())
+            .map(|i| {
+                if self.mask[i] {
+                    Complex64::new(0.0, -0.5 * self.k2[i]) * c[i] + nl[i]
+                } else {
+                    Complex64::new(0.0, 0.0)
+                }
+            })
+            .collect()
+    }
+
+    /// Number of modes inside the projector (half the length of the real state vector of [`Self::pack`]).
+    pub fn n_modes(&self) -> usize {
+        self.mask.iter().filter(|&&m| m).count()
+    }
+
+    /// Real state vector `[Re c_k..., Im c_k...]` over the modes inside the projector, in grid order.
+    pub fn pack(&self, c: &[Complex64]) -> Vec<f64> {
+        let sel: Vec<Complex64> = c
+            .iter()
+            .zip(&self.mask)
+            .filter(|(_, m)| **m)
+            .map(|(v, _)| *v)
+            .collect();
+        sel.iter()
+            .map(|v| v.re)
+            .chain(sel.iter().map(|v| v.im))
+            .collect()
+    }
+
+    /// Inverse of [`Self::pack`].
+    pub fn unpack(&self, y: &[f64]) -> Vec<Complex64> {
+        let m = self.n_modes();
+        let mut out = vec![Complex64::new(0.0, 0.0); c_len(self.n)];
+        let mut k = 0;
+        for (i, &on) in self.mask.iter().enumerate() {
+            if on {
+                out[i] = Complex64::new(y[k], y[m + k]);
+                k += 1;
+            }
+        }
+        out
     }
 
     /// `N(c) = -i g P[ fft2( |psi|^2 psi ) ]`.
