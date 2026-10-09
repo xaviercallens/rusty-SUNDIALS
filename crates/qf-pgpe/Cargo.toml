@@ -11,3 +11,5 @@ num-complex = "0.4"
 
 [dev-dependencies]
 rayon = { workspace = true }
+cvode = { path = "../cvode" }
+nvector = { path = "../nvector" }
