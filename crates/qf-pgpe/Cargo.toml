@@ -5,15 +5,9 @@ edition.workspace = true
 license.workspace = true
 description = "Projected Gross-Pitaevskii equation (2D, periodic, IF-RK4) on a doubly-periodic grid — a pure-Rust port of SocrateAI-Scientific-QuantumFluids's pgpe.py, matching numpy's FFT conventions exactly."
 
-[features]
-# Distribute the 1D FFTs of a step over the rayon thread pool for grids with n >= 256 (one big simulation on many cores).
-# Off by default: independent runs scale better across processes/threads, and results are bit-identical either way.
-parallel = ["dep:rayon"]
-
 [dependencies]
 rustfft = "6.4.1"
 num-complex = "0.4"
-rayon = { workspace = true, optional = true }
 
 [dev-dependencies]
 rayon = { workspace = true }

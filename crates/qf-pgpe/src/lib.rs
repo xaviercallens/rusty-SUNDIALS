@@ -86,23 +86,13 @@ fn transpose_square(data: &mut [Complex64], n: usize) {
     }
 }
 
-/// One pass of 1D FFTs over the rows of `data` that are flagged in `active` (all rows if `None`). With the `parallel`
-/// feature and `n >= PAR_MIN_N` the rows are distributed over the rayon thread pool.
+/// One pass of 1D FFTs over the rows of `data` that are flagged in `active` (all rows if `None`).
+///
+/// (A rayon-parallel version of this pass was tried and removed: on the 4-core/8-thread test machine the step did not
+/// get faster with 2-4 threads at n = 512 and 1024 (cause not investigated), so independent runs, not threads inside a
+/// run, are the unit of parallelism.)
 fn row_pass(fft: &Arc<dyn Fft<f64>>, data: &mut [Complex64], n: usize, active: Option<&[bool]>) {
     let scratch_len = fft.get_inplace_scratch_len();
-    #[cfg(feature = "parallel")]
-    if n >= PAR_MIN_N {
-        use rayon::prelude::*;
-        data.par_chunks_mut(n).enumerate().for_each_init(
-            || vec![Complex64::new(0.0, 0.0); scratch_len],
-            |scratch, (i, row)| {
-                if active.is_none_or(|a| a[i]) {
-                    fft.process_with_scratch(row, scratch);
-                }
-            },
-        );
-        return;
-    }
     let mut scratch = vec![Complex64::new(0.0, 0.0); scratch_len];
     for (i, row) in data.chunks_mut(n).enumerate() {
         if active.is_none_or(|a| a[i]) {
@@ -110,10 +100,6 @@ fn row_pass(fft: &Arc<dyn Fft<f64>>, data: &mut [Complex64], n: usize, active: O
         }
     }
 }
-
-/// Smallest grid for which the `parallel` feature distributes the 1D FFTs over threads.
-#[cfg(feature = "parallel")]
-const PAR_MIN_N: usize = 256;
 
 /// Rows, transpose, rows, transpose: the 2D DFT is separable, so this equals `numpy.fft.fft2` (forward, unnormalized)
 /// or `ifft2` before normalization, with unit-stride access in both passes (the column pass of the previous
