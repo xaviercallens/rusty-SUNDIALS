@@ -2,11 +2,13 @@
 //! penetrable Gaussian obstacle with absorbing layers, started from the reference's own `psi_time_0.0.npy`.
 //!
 //!     cargo run --release -p qf-pgpe --example kwon_shin -- --ref-dir DIR [--t-end 10] [--dt 0.01] [--ramp step-end|stage-times]
-//!         [--workers 1]
+//!         [--snap-dir OUT --snap-every 5]
 //!
 //! `DIR` holds the reference case files (`psi_time_{0.0,10.0,...}.npy`, `force_dt=0.02.txt`; extract them from the Zenodo zip).
 //! Prints, every `0.1 tau`, the force on the obstacle against the reference, and at `t = 10, 20, ...` the relative L2
 //! distance of the wave function to the reference snapshot (complex64 in the reference); writes `kwon_shin_force.csv`.
+//! With `--snap-dir OUT` it also writes `psi_time_<t>.npy` (complex128) every `--snap-every` tau (default 5), so that the
+//! vortex counts can be compared with the reference's `vortex.txt` (the counting is done in Python on the snapshots).
 use num_complex::Complex64;
 use qf_pgpe::flow::{FlowParams, FlowSolver, FlowWorkspace, Ramp};
 use qf_pgpe::npy::read_complex;
@@ -28,6 +30,8 @@ fn main() {
         Some("stage-times") => Ramp::StageTimes,
         _ => Ramp::StepEnd,
     };
+    let snap_dir = arg(&a, "--snap-dir").map(PathBuf::from);
+    let snap_every: f64 = arg(&a, "--snap-every").map_or(5.0, |s| s.parse().unwrap());
     let (nx, ny, rx, ry) = (1000usize, 500usize, 250.0, 125.0);
     let solver = FlowSolver::new(nx, ny, rx, ry, FlowParams::default());
     let (shape, mut psi) = read_complex(&dir.join("psi_time_0.0.npy")).expect("psi_time_0.0.npy");
@@ -87,6 +91,18 @@ fn main() {
                 "t = {t:6.1}: relative L2 distance of psi to the reference snapshot {:.3e}",
                 (num / den).sqrt()
             );
+        }
+        if let Some(d) = &snap_dir {
+            let k = (t / snap_every).round();
+            if t > 0.0 && (t - k * snap_every).abs() < 1e-9 {
+                std::fs::create_dir_all(d).unwrap();
+                qf_pgpe::npy::write_complex(
+                    &d.join(format!("psi_time_{t:.1}.npy")),
+                    &[ny, nx],
+                    &psi,
+                )
+                .unwrap();
+            }
         }
         if i < n {
             solver.step(&mut psi, t, dt, ramp, &mut ws);

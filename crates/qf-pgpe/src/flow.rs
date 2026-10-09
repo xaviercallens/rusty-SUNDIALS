@@ -230,6 +230,86 @@ impl FlowSolver {
         ws.rhs = r;
     }
 
+    /// Imaginary-time preparation of the stationary state in the frame moving at `v_init`, as in the reference run: start from
+    /// the Thomas-Fermi field `sqrt(1 - V)` (zero where `V >= 1`), then repeat the split step
+    ///
+    /// ```text
+    /// psi <- IFFT[ exp((-k^2/2 + k_x v_init) dtau) FFT[psi] ]
+    /// psi <- psi exp(-V' dtau) / sqrt(1 + |psi|^2 (1 - exp(-2 V' dtau)) / V'),   V' = V - 1
+    /// ```
+    ///
+    /// (the second line is the exact solution of `d psi/d tau = -(V' + |psi|^2) psi`), until `gamma = int |psi_new - psi_old|^2`
+    /// (trapezoid rule in x then y) falls below `eps * dtau` or increases, or `max_steps` is reached. The reference uses
+    /// `dtau = 0.04`, `eps = Nx Ny 1e-9`, `max_steps = 25000`; with that `eps` the criterion is met at the *first* step
+    /// (`gamma = 1.4e-5 < 2e-5`), which is what its stored `psi_time_0.0.npy` shows (see `PGPE_EXTERNAL_REPRODUCTION.md`).
+    pub fn ground_state(&self, v_init: f64, dtau: f64, eps: f64, max_steps: usize) -> GroundState {
+        let g = &self.grid;
+        let n = g.len();
+        let vp: Vec<f64> = self.potential.iter().map(|v| v - 1.0).collect();
+        let mut psi: Vec<Complex64> = vp
+            .iter()
+            .map(|&u| Complex64::new(if u < 0.0 { (-u).sqrt() } else { 0.0 }, 0.0))
+            .collect();
+        let heat: Vec<f64> = (0..n)
+            .map(|i| ((-0.5 * self.k2[i] + g.kx[i % g.nx] * v_init) * dtau).exp())
+            .collect();
+        let damp: Vec<f64> = vp.iter().map(|&u| (-u * dtau).exp()).collect();
+        let temp: Vec<f64> = vp
+            .iter()
+            .map(|&u| {
+                if u.abs() < 1e-14 {
+                    2.0 * dtau
+                } else {
+                    (1.0 - (-2.0 * u * dtau).exp()) / u
+                }
+            })
+            .collect();
+        let mut tmp = vec![Complex64::new(0.0, 0.0); n];
+        let mut old = psi.clone();
+        let (mut gamma, mut prev) = (f64::INFINITY, 1e10);
+        let mut steps = 0;
+        let mut converged = false;
+        while steps < max_steps {
+            old.copy_from_slice(&psi);
+            g.fft2(&mut psi, &mut tmp);
+            for (p, h) in psi.iter_mut().zip(&heat) {
+                *p *= *h;
+            }
+            g.ifft2(&mut psi, &mut tmp);
+            for i in 0..n {
+                let p = psi[i];
+                psi[i] = p * (damp[i] / (1.0 + p.norm_sqr() * temp[i]).sqrt());
+            }
+            steps += 1;
+            let row = |iy: usize| -> f64 {
+                (0..g.nx - 1)
+                    .map(|ix| {
+                        let a = iy * g.nx + ix;
+                        0.5 * ((psi[a] - old[a]).norm_sqr() + (psi[a + 1] - old[a + 1]).norm_sqr())
+                            * g.dx
+                    })
+                    .sum()
+            };
+            gamma = (0..g.ny - 1)
+                .map(|iy| 0.5 * (row(iy) + row(iy + 1)) * g.dy)
+                .sum();
+            if gamma > prev {
+                break;
+            }
+            if gamma < eps * dtau {
+                converged = true;
+                break;
+            }
+            prev = gamma;
+        }
+        GroundState {
+            psi,
+            steps,
+            gamma,
+            converged,
+        }
+    }
+
     /// `F_x = int dV/dx |psi|^2` over the interior of the absorbing layers (trapezoid in x then y, as the reference).
     pub fn force_x(&self, psi: &[Complex64]) -> f64 {
         let (x0, x1, y0, y1) = self.crop;
@@ -247,6 +327,16 @@ impl FlowSolver {
         };
         trap(&row, cy, self.grid.dy)
     }
+}
+
+/// Outcome of [`FlowSolver::ground_state`].
+pub struct GroundState {
+    pub psi: Vec<Complex64>,
+    pub steps: usize,
+    /// last value of `int |psi_new - psi_old|^2`
+    pub gamma: f64,
+    /// `gamma < eps dtau` was reached (otherwise the loop ended on an increase of gamma or on `max_steps`)
+    pub converged: bool,
 }
 
 /// The four scratch arrays of one RHS evaluation (split out so that `step` can borrow the RK stages separately).
@@ -369,6 +459,35 @@ mod tests {
             "{} -> {}",
             before,
             psi[idx].norm()
+        );
+    }
+
+    /// The fixed point of the first-order split step differs from the stationary state by O(dtau): the residual of
+    /// (-1/2 lap + V + |psi|^2 - 1) psi shrinks in proportion to dtau and is small against the chemical-potential scale 1.
+    #[test]
+    fn ground_state_residual_is_first_order_in_dtau() {
+        let residual = |dtau: f64| {
+            let s = small();
+            let gs = s.ground_state(0.0, dtau, 1e-14, 40000);
+            assert!(
+                gs.converged || gs.gamma < 1e-12,
+                "gamma = {:e} after {} steps",
+                gs.gamma,
+                gs.steps
+            );
+            let mut ws = FlowWorkspaceRhs::new(s.grid.len());
+            let mut out = vec![Complex64::new(0.0, 0.0); s.grid.len()];
+            let mut s0 = small();
+            s0.gamma.iter_mut().for_each(|v| *v = 0.0);
+            s0.rhs(&gs.psi, 0.0, &mut out, &mut ws);
+            // d psi/dt = -i H psi: for a real stationary state |rhs| is the residual of the stationary equation
+            out.iter().map(|r| r.norm()).fold(0.0, f64::max)
+        };
+        let (r4, r1) = (residual(0.04), residual(0.01));
+        assert!(r4 < 5e-3, "residual at dtau = 0.04: {r4:e}");
+        assert!(
+            r1 < r4 / 3.0,
+            "residuals {r4:e} -> {r1:e} for dtau 0.04 -> 0.01"
         );
     }
 }
