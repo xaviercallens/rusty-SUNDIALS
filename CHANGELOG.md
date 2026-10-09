@@ -41,6 +41,11 @@ Three PRs merged in this session:
 - Also adds `docs/PROPOSED_STRUCTURE.md` — a documentation-only proposal for reorganizing `crates/`
   into `core/`, `bindings/`, and `physics/` subdirectories (no files moved in this PR).
 
+**qf-pgpe reference engine (branch `feat/qf-pgpe-reference`, supersedes #68)**
+- Vortex instrument moved into the library (`vortex`), `transport` estimators (bit-identical to Python on real tracks, 2e-14), `thermal` toolkit, `scattering` instrument and a parallel resumable `wave_scan`; `rhs`/`pack`/`unpack`; allocation-free step and unit-stride FFT (bit-identical, ~1.7x).
+- CVODE cross-check of the PGPE engine (IF-RK4 error vs CVODE falls as dt^4); requires the Adams-order fix of #63 (365 RHS evaluations vs MaxSteps after ~10^6 without it).
+- Found by the cross-checks: a grid-node imprint defect (fixed) and an estimator bias in the Python programme (energy estimator of alpha low by diffusion). See `crates/qf-pgpe/README.md`.
+
 **PR #58 — `sundials-mcp`: Model Context Protocol server**
 - New crate `crates/sundials-mcp`: a **Model Context Protocol** stdio server (hand-rolled JSON-RPC
   2.0, `serde_json` only, `#![forbid(unsafe_code)]`) that lets AI agents and scientists run

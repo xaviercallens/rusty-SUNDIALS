@@ -24,7 +24,7 @@
 //! `ndarray.sum()` is numpy's pairwise summation ([`np_sum`]), `cumsum` and the block sums are sequential, `np.round`
 //! is round-half-to-even, `%` is the floored modulus ([`f64::rem_euclid`]), `np.polyfit(x, y, 1)` is an ordinary
 //! least-squares line ([`polyfit1`]; numpy solves the same problem by an SVD of the column-scaled Vandermonde matrix)
-//! and `np.linalg.solve` of the 2x2 normal equations is an LU solve with partial pivoting ([`solve2`]). What cannot be
+//! and `np.linalg.solve` of the 2x2 normal equations is an LU solve with partial pivoting (`solve2`). What cannot be
 //! identical is the libm vs numpy SIMD `sinh/cosh/sin/cos/log`: differences of a few ulps in the pair function, which
 //! the regression propagates to a relative `~1e-13` on the estimates (see `tests/transport_crosscheck.rs`).
 use crate::vortex::{self, Lcg, min_opposite_distance};
