@@ -6,7 +6,7 @@ license.workspace = true
 description = "Python extension (pyo3 + numpy) exposing the qf-pgpe quantum-fluids engine: PGPE stepping, vortex imprint/detection and the registered transport estimators on numpy arrays."
 
 [lib]
-name = "qf_pgpe"
+name = "qf_pgpe_py"  # the Python module is still `qf_pgpe` (#[pyo3(name)]); a distinct crate name avoids a rustdoc output collision with `qf-pgpe`
 crate-type = ["cdylib"]
 
 [dependencies]

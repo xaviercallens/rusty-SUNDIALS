@@ -245,7 +245,8 @@ fn analyse_tracks(
 }
 
 #[pymodule]
-fn qf_pgpe(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+#[pyo3(name = "qf_pgpe")]
+fn qf_pgpe_module(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyPgpe>()?;
     m.add_function(wrap_pyfunction!(analyse_tracks, m)?)?;
     Ok(())

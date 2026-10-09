@@ -1,5 +1,5 @@
 """Smoke/known-answer test of the `qf_pgpe` extension (no dependency beyond numpy):
-    cargo build --release -p qf-pgpe-py && cp target/release/libqf_pgpe.so /tmp/ext/qf_pgpe.so && PYTHONPATH=/tmp/ext python3 crates/qf-pgpe-py/tests/smoke.py
+    cargo build --release -p qf-pgpe-py && cp target/release/libqf_pgpe_py.so /tmp/ext/qf_pgpe.so && PYTHONPATH=/tmp/ext python3 crates/qf-pgpe-py/tests/smoke.py
 Checks: K4 (exact plane wave), norm/momentum conservation, imprint + detection of a neutral pair, run == repeated step, input validation."""
 import numpy as np
 import qf_pgpe

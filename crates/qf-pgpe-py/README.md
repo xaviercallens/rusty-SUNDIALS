@@ -19,10 +19,10 @@ the SocrateAI-Scientific-QuantumFluids programme swaps the engine with one line 
 
 ```
 cargo build --release -p qf-pgpe-py
-mkdir -p /tmp/ext && cp target/release/libqf_pgpe.so /tmp/ext/qf_pgpe.so      # .dylib / .pyd on macOS / Windows
+mkdir -p /tmp/ext && cp target/release/libqf_pgpe_py.so /tmp/ext/qf_pgpe.so      # .dylib / .pyd on macOS / Windows
 PYTHONPATH=/tmp/ext python3 crates/qf-pgpe-py/tests/smoke.py
 ```
-(`maturin develop` also works; the crate is a plain pyo3 `cdylib`.) Not built on `wasm32`.
+(The library file is `libqf_pgpe_py.so`; the Python module it provides is `qf_pgpe`, so the copy is renamed. `maturin develop` also works; the crate is a plain pyo3 `cdylib`.) Not built on `wasm32`.
 
 ## Validated against the numpy engine (same inputs)
 
