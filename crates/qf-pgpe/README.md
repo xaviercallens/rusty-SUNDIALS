@@ -19,6 +19,7 @@ cargo run --release -p qf-pgpe --example vortex_transport -- validate   # the G1
 | `transport` | the registered estimators of `alpha` (energy, regression), `1 − alpha'`, `eta` (residual MSD), block jackknife, point-vortex velocity/energy on the torus, synthetic Langevin generator and gate G0 | `transport_estimators.py` | four real tracks: max relative difference **2e-14**, `alpha_regression` and `alpha_energy` bit-identical |
 | `thermal` | seeded RNG, `random_state`, `heat`, thermometer, condensate fraction, current correlators (`n_s/n`), raw vortex count, Fourier `resample`, `run_blocks`, `make_base` | `observables.py`, `round2.py`, `make_*_bases.py` | on a shared field: ≤ 3e-14 (T, `n_s/n`, energy, norm); vortex count exact; statistical check of `make_base` below |
 | `scattering` | Bogoliubov-wave dressing of a vortex pair, wave momentum flux, drift slopes, `sigma_par(k)`, `sigma_perp(k)` | `vortex_wave_scattering.py`, `analyze_wave_scan*.py` | positions 7e-14, momentum 8e-13; full probe `sigma_par = 2.03913`, `sigma_perp = 1.58133` identical to 6 digits; 31-run matrix: **4.6e-11** |
+| `rect`, `npy`, `flow` | rectangular periodic grids with numpy-convention 2D FFTs; `.npy` I/O; the flow-past-an-obstacle solver (moving frame `v∂ₓψ`, Gaussian obstacle, absorbing layers `Γ(x,y)`) with an independent explicit-RK4 scheme | the reference code of Kwon & Shin (Zenodo 10.5281/zenodo.20068724) | **external**: force on the obstacle reproduced to 6×10⁻⁶ relative (t ≤ 0.3) from the reference's own initial field, identical to an independent numpy implementation (1.127×10⁻⁶ max); see below |
 | `examples/` | `vortex_transport`, `transport_estimate`, `thermal_base`, `wave_scattering`, `wave_scan` (parallel over runs, resumable), `round3_finite_size`, `g0_scan`, `bench_step` | the campaign scripts | see each header |
 | `tests/cvode_crosscheck.rs` | the same PGPE right-hand side integrated by **rusty-SUNDIALS CVODE** (Adams, rtol 1e-10) as an independent reference | — | IF-RK4 error vs CVODE: 1.2e-4, 7.3e-6, 4.6e-7 at `dt` = 0.04, 0.02, 0.01 (order 4.0); CVODE needs 365 RHS evaluations |
 
@@ -48,6 +49,18 @@ layout, so the existing analysis (`analyze_transport.summarise`, `analyse_tracks
 | friction follows the temperature, not the normal density; Born rival refuted | doi:10.5281/zenodo.23262132 |
 | software bundle: Lean library, pre-registrations, scripts, ledger | doi:10.5281/zenodo.23262524 (v1.18.0) |
 | BKT classical-field thermometer, finite-size runs (`round3_finite_size`) | doi:10.5281/zenodo.23144587 |
+
+## External reproduction: Kwon & Shin vortex shedding (first target of the reproduction suite)
+
+The reference run of *Dynamic similarity of vortex shedding in a superfluid flowing past a penetrable obstacle* (Phys. Rev. Research 2026; data and GPU code CC-BY-4.0, Zenodo 10.5281/zenodo.20068724) uses a pseudo-spectral split-step scheme in single precision. `flow` solves the same model with a **different** scheme (explicit RK4 on the full right-hand side, spectral derivatives, double precision), starting from the reference's own `psi_time_0.0.npy`, so agreement is a statement about the physics:
+
+```
+cargo run --release -p qf-pgpe --example kwon_shin -- --ref-dir DIR --t-end 0.3     # DIR: files extracted from the Zenodo zip
+```
+* force on the obstacle, t ≤ 0.3: max |F − F_ref| = 1.1×10⁻⁶ (6×10⁻⁶ relative); the numpy implementation of the same scheme gives the same number;
+* **the reference holds the frame velocity at the end of each step**; reading the ramp at RK4 stage times instead produces a constant offset of 3.5×10⁻³ (5×10⁻³ relative) that is created in the 0.1 τ ramp — an O(dt) artefact of the reference (Σ v(iΔt)Δt overshoots ∫v dt by 0.00275 ξ), reproduced as `Ramp::StepEnd`;
+* **performance is not a win on this geometry**: 1000 × 500 (non-power-of-two lengths) costs ≈ 0.8 s per RK4 step single-threaded in `qf-pgpe`, against ≈ 0.9 s for numpy — the advantage of the square power-of-two engine does not carry over; this size is the natural first target for the GPU phase.
+* longer comparisons (ψ snapshots at t = 10 … 50, vortex counts) are tracked in the programme's `PGPE_EXTERNAL_REPRODUCTION.md`.
 
 ## What porting found
 

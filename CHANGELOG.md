@@ -41,6 +41,9 @@ Three PRs merged in this session:
 - Also adds `docs/PROPOSED_STRUCTURE.md` — a documentation-only proposal for reorganizing `crates/`
   into `core/`, `bindings/`, and `physics/` subdirectories (no files moved in this PR).
 
+**qf-pgpe external reproduction (this PR)**
+- `rect` (rectangular periodic grids, numpy-convention FFTs), `npy` (numpy file I/O), `flow` (obstacle-flow solver with moving frame and absorbing layers, independent RK4 scheme) and the `kwon_shin` example: the force on the obstacle of an external published run (Kwon & Shin, Zenodo 10.5281/zenodo.20068724) is reproduced to 6e-6 relative from the reference's own initial field; honest note that the Rust engine is not faster than numpy at 1000 x 500.
+
 **qf-pgpe reference engine (branch `feat/qf-pgpe-reference`, supersedes #68)**
 - Vortex instrument moved into the library (`vortex`), `transport` estimators (bit-identical to Python on real tracks, 2e-14), `thermal` toolkit, `scattering` instrument and a parallel resumable `wave_scan`; `rhs`/`pack`/`unpack`; allocation-free step and unit-stride FFT (bit-identical, ~1.7x).
 - CVODE cross-check of the PGPE engine (IF-RK4 error vs CVODE falls as dt^4); requires the Adams-order fix of #63 (365 RHS evaluations vs MaxSteps after ~10^6 without it).

@@ -73,19 +73,20 @@ fn main() {
             );
         }
         let ts = (t / 10.0).round() * 10.0;
-        if t > 0.0 && (t - ts).abs() < 1e-9 {
-            if let Ok((_, snap)) = read_complex(&dir.join(format!("psi_time_{ts:.1}.npy"))) {
-                let (num, den): (f64, f64) = psi.iter().zip(&snap).fold(
-                    (0.0, 0.0),
-                    |(n, d), (p, s): (&Complex64, &Complex64)| {
-                        (n + (p - s).norm_sqr(), d + s.norm_sqr())
-                    },
-                );
-                println!(
-                    "t = {t:6.1}: relative L2 distance of psi to the reference snapshot {:.3e}",
-                    (num / den).sqrt()
-                );
-            }
+        if t > 0.0
+            && (t - ts).abs() < 1e-9
+            && let Ok((_, snap)) = read_complex(&dir.join(format!("psi_time_{ts:.1}.npy")))
+        {
+            let (num, den): (f64, f64) = psi.iter().zip(&snap).fold(
+                (0.0, 0.0),
+                |(n, d), (p, s): (&Complex64, &Complex64)| {
+                    (n + (p - s).norm_sqr(), d + s.norm_sqr())
+                },
+            );
+            println!(
+                "t = {t:6.1}: relative L2 distance of psi to the reference snapshot {:.3e}",
+                (num / den).sqrt()
+            );
         }
         if i < n {
             solver.step(&mut psi, t, dt, ramp, &mut ws);
