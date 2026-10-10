@@ -25,35 +25,41 @@ made explicit. Pure `std` + `serde_json`; `#![forbid(unsafe_code)]`.
 
 ## Why solvers run in a worker subprocess
 
-`crates/cvode/src/solver.rs` prints diagnostics to **stdout** on some failure paths
-(`println!("ERROR FAIL 3: local error test failed > max times")`). On a stdio protocol that corrupts the
-stream. Redirecting file descriptors would need `unsafe`, which this repository does not use. Instead the
-protocol process never calls solver code: every `solve`/`pgpe_run` call runs in
-`sundials-mcp --worker …`, whose stdout is a duplicate of the parent's *stderr* handle
-(`AsFd::try_clone_to_owned`, safe std) and whose result returns through a temporary file. A bonus: the
+`crates/cvode/src/solver.rs` used to print diagnostics to **stdout** on some failure paths
+(`println!("ERROR FAIL 3: local error test failed > max times")`), which on a stdio protocol corrupts the
+stream. Since docs/CVODE_ADAMS_FIX.md (part B) those diagnostics go to stderr, and
+`crates/cvode/tests/diagnostics_stderr.rs` proves it by capturing a child process that reaches that path.
+The isolation is kept as defense in depth: the protocol process never calls solver code; every
+`solve`/`pgpe_run` call runs in `sundials-mcp --worker …`, whose stdout is a duplicate of the parent's
+*stderr* handle (`AsFd::try_clone_to_owned`, safe std; redirecting file descriptors would need `unsafe`,
+which this repository does not use) and whose result returns through a temporary file. A bonus: the
 parent enforces a wall-clock timeout (`SUNDIALS_MCP_TIMEOUT_SECS`, default 120) by killing the worker.
 
-`tests/stdio.rs` reproduces the pitfall end-to-end: with isolation the protocol stream stays pure
-JSON-RPC while the solver's `ERROR FAIL 3` appears on stderr; the control (`SUNDIALS_MCP_NO_ISOLATION=1`,
-test-only) shows the corruption, so the test can fail.
+`tests/stdio.rs` checks the property end-to-end: the worker binary run directly writes nothing to stdout
+during a failing solve, and a session with isolation disabled (`SUNDIALS_MCP_NO_ISOLATION=1`, test-only)
+keeps the protocol stream pure JSON-RPC. The earlier pair of tests, which needed a solve that printed to
+stdout and had a control showing the corruption, was retired when the solver went silent on stdout.
 
-## Observations recorded while building (upstream, not changed here)
+## Observations recorded while building (upstream)
 
-1. `exponential` (`y' = -y`) at `rtol = 1e-9, atol = 1e-12` fails with "too many error test failures at
-   one step" and prints `ERROR FAIL 3`; the default `1e-6 / 1e-10` works.
-2. `robertson` with the LLNL configuration fails the same way at `rtol = 1e-9, atol = 1e-12`, and exhausts
-   500 000 steps by `t ≈ 0.014` at `atol = 1e-2` (inappropriate for `y2 ~ 1e-5`). Both are reported as
-   errors, never partial results.
-3. `Method::Adams` never leaves order 1 (`compute_l` is a placeholder), and its error on a smooth
-   quadrature ODE scales like `√rtol` (2.1e-4 relative at `rtol = 1e-7`). Many `tout`s from one BDF run
-   also degrade accuracy (4e-6 vs 6e-7 with a fresh solve per output). `bao_distances` therefore uses
-   BDF with one solve per redshift. Measurements are in `crates/qf-bao-distances/README.md`.
+1. `exponential` (`y' = -y`) at `rtol = 1e-9, atol = 1e-12` used to fail with "too many error test
+   failures at one step" and print `ERROR FAIL 3`. Fixed upstream by docs/CVODE_TIGHT_TOLERANCE_FIX.md;
+   re-measured after that fix: 432 steps, max abs error 1.1e-9.
+2. `robertson` with the LLNL configuration used to fail the same way at `rtol = 1e-9, atol = 1e-12`
+   (same fix; re-measured: 837 steps, mass conservation 1.8e-15), and exhausts 500 000 steps by
+   `t ≈ 0.014` at `atol = 1e-2` (inappropriate for `y2 ~ 1e-5`). Failures are reported as errors, never
+   partial results.
+3. `Method::Adams` never left order 1 (`compute_l` was a placeholder), and its error on a smooth
+   quadrature ODE scaled like `√rtol` (2.1e-4 relative at `rtol = 1e-7`). Fixed by
+   docs/CVODE_ADAMS_FIX.md (1.3e-8 on the same integrand). Many `tout`s from one BDF run also degrade
+   accuracy (4e-6 vs 6e-7 with a fresh solve per output). `bao_distances` still uses BDF with one solve
+   per redshift; measurements are in `crates/qf-bao-distances/README.md`.
 
 ## Build, test, register
 
 ```bash
 cargo build --release -p sundials-mcp
-cargo test --release -p sundials-mcp     # 13 unit + 4 stdio end-to-end tests
+cargo test --release -p sundials-mcp     # 13 unit + 5 stdio end-to-end tests
 claude mcp add sundials -- /path/to/rusty-SUNDIALS/target/release/sundials-mcp
 ```
 
