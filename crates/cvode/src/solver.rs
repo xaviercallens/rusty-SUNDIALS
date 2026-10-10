@@ -383,8 +383,20 @@ where
                 let mut y_pert = y_pred.as_slice().to_vec();
                 y_pert[j] += eps;
                 let mut f_pert = vec![0.0; n];
-                (self.rhs)(t_new, &y_pert, &mut f_pert)
-                    .map_err(|msg| CvodeError::RhsError { t: t_new, msg })?;
+                
+                if let Err(_msg) = (self.rhs)(t_new, &y_pert, &mut f_pert) {
+                    // Forward difference failed, try backward difference!
+                    y_pert[j] -= 2.0 * eps;
+                    if let Err(_msg2) = (self.rhs)(t_new, &y_pert, &mut f_pert) {
+                        return Err(CvodeError::RhsError { t: t_new, msg: _msg2 });
+                    }
+                    self.nfe += 1;
+                    for i in 0..n {
+                        j_mat.cols[j][i] = (f_pred[i] - f_pert[i]) / eps;
+                    }
+                    continue;
+                }
+                
                 self.nfe += 1;
                 for i in 0..n {
                     j_mat.cols[j][i] = (f_pert[i] - f_pred[i]) / eps;
@@ -455,12 +467,21 @@ where
 
             // Evaluate f at predicted point
             let mut f_pred = vec![0.0; self.n];
-            (self.rhs)(t_new, y_pred.as_slice(), &mut f_pred).map_err(|msg| {
-                CvodeError::RhsError {
-                    t: t_new,
-                    msg: msg.clone(),
+            if let Err(_msg) = (self.rhs)(t_new, y_pred.as_slice(), &mut f_pred) {
+                self.zn.restore(self.q);
+                err_fails += 1;
+                if err_fails >= MAX_ERR_TEST_FAILS {
+                    println!("ERROR FAIL 4: rhs failed at predicted point");
+                    return Err(CvodeError::RhsError {
+                        t: t_new,
+                        msg: _msg,
+                    });
                 }
-            })?;
+                self.qwait = self.q + 1;
+                self.h *= 0.25;
+                self.zn.rescale(0.25, self.q);
+                continue;
+            }
             self.nfe += 1;
 
             // --- Jacobian management: recompute or reuse ---
@@ -542,10 +563,10 @@ where
                 }
 
                 let mut f_new = vec![0.0; self.n];
-                (self.rhs)(t_new, &y_new, &mut f_new).map_err(|msg| CvodeError::RhsError {
-                    t: t_new,
-                    msg: msg.clone(),
-                })?;
+                if let Err(_msg) = (self.rhs)(t_new, &y_new, &mut f_new) {
+                    // RHS unphysical/error: treat as convergence failure to trigger step retraction
+                    break;
+                }
                 self.nfe += 1;
 
                 // H8: count Newton iterations for paper instrumentation

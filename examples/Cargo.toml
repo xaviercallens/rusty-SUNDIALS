@@ -158,3 +158,15 @@ path = "iter_disruption_3d.rs"
 name = "iter_current_quench_0d"
 path = "iter_current_quench_0d.rs"
 test = true
+
+[[example]]
+name = "cosmology_quintessence"
+path = "cosmology_quintessence.rs"
+
+[[example]]
+name = "symmetron_screening"
+path = "symmetron_screening.rs"
+
+[[example]]
+name = "weatherbench_climate"
+path = "weatherbench_climate.rs"
