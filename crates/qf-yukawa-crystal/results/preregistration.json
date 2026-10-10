@@ -1,0 +1,28 @@
+{
+  "id": "YUK-TRI-1",
+  "date": "2026-10-10",
+  "stage": "preregistration, committed before the solver code of crates/qf-yukawa-crystal is written",
+  "question": "Numerical physics check of the planar universal-optimality claim (openai/math OAI.AtomicTriangular.universal_energy_minimum; Lean corollaries in AutoevolveAI formal_cert/Triangular) for the 2D Yukawa (screened Coulomb) interaction V(r) = exp(-kappa r)/r, using this repository's CVODE.",
+  "why_yukawa_is_in_scope": "With t = r^2, V = exp(-kappa sqrt t)/sqrt t is completely monotone in t (product of the completely monotone t^{-1/2} and exp(-kappa sqrt t), the latter completely monotone because sqrt is a Bernstein function), so the theorem predicts that no density-1 configuration has lower energy per particle than the triangular lattice.",
+  "setup": {
+    "system": "N = 288 particles, periodic rectangle Lx = 16 a, Ly = 9 sqrt(3) a (holds the triangular lattice 16 x 18 exactly), a = sqrt(2/sqrt(3)) so density = 1",
+    "potential": "Yukawa with shifted-force truncation at r_c = 8 (minimum image; r_c < min(Lx, Ly)/2); kappa = 2 primary (truncation size ~1e-8), kappa = 1 secondary (~4e-5). Truncation makes the potential not exactly completely monotone beyond r_c; this is a disclosed approximation.",
+    "dynamics": "overdamped gradient flow dx/dt = -grad E at T = 0, integrated with rusty-SUNDIALS CVODE (BDF, analytic Jacobian = -Hessian) until max |F| < 1e-9",
+    "minimum_check": "Hessian eigenvalues by cyclic Jacobi: a local minimum has 2 zero translation modes and all other eigenvalues > 0 (KINSOL is not available in this repository; IDA here is a fixed-step prototype and is not used)",
+    "annealing": "overdamped Langevin (Euler-Maruyama, geometric temperature schedule) outside SUNDIALS, followed by a CVODE quench; stochastic dynamics are not an ODE",
+    "initial_conditions": "(a) 20 configurations derived from the Hugging Face dataset colabfit/OC20_IS2RES_val_id (CC-BY-4.0, doi:10.60732/b4005525), shard co/co_10.parquet: atomic positions of randomly chosen structures, randomly rotated in 3D, projected to 2D, rescaled, accepted with a minimum separation 0.5 a until N points; (b) 20 uniform random configurations with the same minimum separation. Whether (a) is more 'realistic' than (b) is not claimed.",
+    "observables": "energy per particle e = E/N; gap e - e_tri; number of particles with coordination != 6 (neighbours within 1.4 a); global and mean local |psi6|"
+  },
+  "predictions": {
+    "P1_no_undercut": "Over all runs (T = 0 quenches and annealed runs, all initial conditions), no relaxed configuration has e < e_tri - 1e-9 * |e_tri| (kappa = 2). A violation would contradict the theorem (or reveal a truncation artefact, to be checked at kappa = 1 and with larger r_c).",
+    "P2_annealed_reaches_lattice": "At least one annealed run per initial-condition family reaches the perfect lattice: zero defects and |e - e_tri| < 1e-8 |e_tri|. Expected but not guaranteed (annealing is heuristic); failure is reported, not hidden.",
+    "P3_quench_glassy": "T = 0 quenches from disordered starts mostly end in defected local minima (e > e_tri, defects > 0). This is a property of gradient flow, not evidence against the theorem."
+  },
+  "controls": {
+    "positive": ["perfect triangular start stays put (|e - e_tri| < 1e-12, 0 defects)", "triangular + Gaussian noise 0.1 a relaxes back to the lattice"],
+    "negative": ["square lattice (17 x 17 = 289 in a square box) is a stationary point but not a minimum: Hessian has a negative eigenvalue, and relaxing square + noise lowers e below e_square", "incommensurate box (square box, N = 289): relaxed states keep defects and stay above e_tri, showing the pipeline can report 'not triangular'"],
+    "reference": "e_tri and e_square at density 1 by direct lattice sums with the same truncated potential; e_tri < e_square expected"
+  },
+  "secondary_disk_study": "Open disk (harmonic bowl) vs closed disk (steep soft wall U = eps ((r - R)_+)^4), N = 300, CVODE quench + annealing; report defect counts in the interior (r < R - 2a) and the edge. Descriptive only: this tests finite-size edge effects, not the open/closed-disk convention in the Lean energy definition, which is a measure-zero counting question.",
+  "not_done": "No machine-learned interatomic potential (MACE, NequIP, ALIGNN): they model real atomic chemistry, not a completely monotone pair potential, so they cannot test this theorem."
+}
