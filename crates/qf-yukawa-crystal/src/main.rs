@@ -12,22 +12,41 @@ const TMAX: f64 = 1e7;
 
 fn tri_box(kappa: f64) -> System {
     let a = spacing_density_one();
-    System { kappa, rc: 8.0, geometry: Geometry::Periodic { lx: 16.0 * a, ly: 9.0 * 3.0_f64.sqrt() * a } }
+    System {
+        kappa,
+        rc: 8.0,
+        geometry: Geometry::Periodic {
+            lx: 16.0 * a,
+            ly: 9.0 * 3.0_f64.sqrt() * a,
+        },
+    }
 }
 
 fn square_box(kappa: f64) -> System {
     let l = 289.0_f64.sqrt();
-    System { kappa, rc: 8.0, geometry: Geometry::Periodic { lx: l, ly: l } }
+    System {
+        kappa,
+        rc: 8.0,
+        geometry: Geometry::Periodic { lx: l, ly: l },
+    }
 }
 
 fn e_tri(kappa: f64) -> f64 {
     let a = spacing_density_one();
-    let sys = System { kappa, rc: 8.0, geometry: Geometry::Bowl { k: 0.0 } };
+    let sys = System {
+        kappa,
+        rc: 8.0,
+        geometry: Geometry::Bowl { k: 0.0 },
+    };
     lattice_energy(&sys, [[a, 0.0], [0.5 * a, 0.5 * 3.0_f64.sqrt() * a]])
 }
 
 fn e_square(kappa: f64) -> f64 {
-    let sys = System { kappa, rc: 8.0, geometry: Geometry::Bowl { k: 0.0 } };
+    let sys = System {
+        kappa,
+        rc: 8.0,
+        geometry: Geometry::Bowl { k: 0.0 },
+    };
     lattice_energy(&sys, [[1.0, 0.0], [0.0, 1.0]])
 }
 
@@ -35,7 +54,11 @@ fn read_csv(p: &Path) -> Vec<f64> {
     fs::read_to_string(p)
         .unwrap_or_else(|e| panic!("read {p:?}: {e}"))
         .lines()
-        .flat_map(|l| l.split(',').map(|v| v.trim().parse::<f64>().unwrap()).collect::<Vec<_>>())
+        .flat_map(|l| {
+            l.split(',')
+                .map(|v| v.trim().parse::<f64>().unwrap())
+                .collect::<Vec<_>>()
+        })
         .collect()
 }
 
@@ -53,7 +76,16 @@ struct RunOut {
 }
 
 #[allow(clippy::too_many_arguments)]
-fn one_run(label: &str, family: &str, sys: &System, x0: &[f64], eref: f64, anneal_it: bool, seed: u64, hess: bool) -> RunOut {
+fn one_run(
+    label: &str,
+    family: &str,
+    sys: &System,
+    x0: &[f64],
+    eref: f64,
+    anneal_it: bool,
+    seed: u64,
+    hess: bool,
+) -> RunOut {
     let n = x0.len() / 2;
     let mut s = String::new();
     let quench = relax(sys, x0, FTOL, TMAX);
@@ -69,12 +101,19 @@ fn one_run(label: &str, family: &str, sys: &System, x0: &[f64], eref: f64, annea
             );
             if hess {
                 let (l0, l1, l2, neg) = hessian_summary(sys, &r.x);
-                let _ = write!(fields, ",\"hess_lowest\":[{l0:.3e},{l1:.3e},{l2:.3e}],\"hess_negative\":{neg}");
+                let _ = write!(
+                    fields,
+                    ",\"hess_lowest\":[{l0:.3e},{l1:.3e},{l2:.3e}],\"hess_negative\":{neg}"
+                );
             }
             fields.push('}');
         }
         Err(e) => {
-            let _ = write!(fields, ",\"{tag}\":{{\"error\":\"{}\"}}", e.replace('"', "'"));
+            let _ = write!(
+                fields,
+                ",\"{tag}\":{{\"error\":\"{}\"}}",
+                e.replace('"', "'")
+            );
         }
     };
     record("quench", &quench, &mut fields);
@@ -124,7 +163,11 @@ fn main() {
     let res = crate_dir.join("results");
     let init = crate_dir.join("data/initial");
     // Worker threads: YUKAWA_THREADS if set, else 2 (the machine is shared; the owner asked for 2 cores overnight).
-    let threads = std::env::var("YUKAWA_THREADS").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&t| t > 0).unwrap_or(2);
+    let threads = std::env::var("YUKAWA_THREADS")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .filter(|&t| t > 0)
+        .unwrap_or(2);
     let a = spacing_density_one();
     match cmd {
         "refs" => {
@@ -145,14 +188,34 @@ fn main() {
             for kappa in [2.0, 1.0] {
                 jobs.push(Box::new(move || {
                     let sys = tri_box(kappa);
-                    one_run("ctl_pos_perfect", "control", &sys, &triangular(16, 18, a), e_tri(kappa), false, 0, true).json
+                    one_run(
+                        "ctl_pos_perfect",
+                        "control",
+                        &sys,
+                        &triangular(16, 18, a),
+                        e_tri(kappa),
+                        false,
+                        0,
+                        true,
+                    )
+                    .json
                 }));
                 jobs.push(Box::new(move || {
                     let sys = tri_box(kappa);
                     let mut x = triangular(16, 18, a);
                     let mut rng = Rng::new(3);
                     x.iter_mut().for_each(|v| *v += 0.1 * a * rng.gauss());
-                    one_run("ctl_pos_noisy", "control", &sys, &x, e_tri(kappa), false, 0, true).json
+                    one_run(
+                        "ctl_pos_noisy",
+                        "control",
+                        &sys,
+                        &x,
+                        e_tri(kappa),
+                        false,
+                        0,
+                        true,
+                    )
+                    .json
                 }));
                 jobs.push(Box::new(move || {
                     let sys = square_box(kappa);
@@ -184,12 +247,32 @@ fn main() {
                 jobs.push(Box::new(move || {
                     let sys = tri_box(kappa);
                     let x0 = read_csv(&p);
-                    one_run(&format!("oc20_{k:02}"), "hf_oc20", &sys, &x0, e_tri(kappa), true, 100 + k as u64, true).json
+                    one_run(
+                        &format!("oc20_{k:02}"),
+                        "hf_oc20",
+                        &sys,
+                        &x0,
+                        e_tri(kappa),
+                        true,
+                        100 + k as u64,
+                        true,
+                    )
+                    .json
                 }));
                 jobs.push(Box::new(move || {
                     let sys = tri_box(kappa);
                     let x0 = uniform_config(&sys, 288, 0.5 * a, None, 500 + k as u64);
-                    one_run(&format!("uniform_{k:02}"), "uniform", &sys, &x0, e_tri(kappa), true, 900 + k as u64, true).json
+                    one_run(
+                        &format!("uniform_{k:02}"),
+                        "uniform",
+                        &sys,
+                        &x0,
+                        e_tri(kappa),
+                        true,
+                        900 + k as u64,
+                        true,
+                    )
+                    .json
                 }));
             }
             for k in 0..(nrun / 2).max(1) {
@@ -197,7 +280,17 @@ fn main() {
                 jobs.push(Box::new(move || {
                     let sys = square_box(kappa);
                     let x0 = read_csv(&p);
-                    one_run(&format!("incommensurate_{k:02}"), "ctl_neg_incommensurate_box", &sys, &x0, e_tri(kappa), true, 700 + k as u64, false).json
+                    one_run(
+                        &format!("incommensurate_{k:02}"),
+                        "ctl_neg_incommensurate_box",
+                        &sys,
+                        &x0,
+                        e_tri(kappa),
+                        true,
+                        700 + k as u64,
+                        false,
+                    )
+                    .json
                 }));
             }
             let lines = parallel(jobs, threads);
@@ -208,7 +301,16 @@ fn main() {
             let rdisk = (300.0 / std::f64::consts::PI).sqrt();
             let mut jobs: Vec<Box<dyn FnOnce() -> String + Send>> = Vec::new();
             for k in 0..10usize {
-                for (gname, geom) in [("open_bowl", Geometry::Bowl { k: 0.02 }), ("closed_wall", Geometry::Wall { radius: rdisk, eps: 100.0 })] {
+                for (gname, geom) in [
+                    ("open_bowl", Geometry::Bowl { k: 0.02 }),
+                    (
+                        "closed_wall",
+                        Geometry::Wall {
+                            radius: rdisk,
+                            eps: 100.0,
+                        },
+                    ),
+                ] {
                     let p = init.join(format!("oc20_disk_{k:02}.csv"));
                     jobs.push(Box::new(move || {
                         let sys = System { kappa, rc: 8.0, geometry: geom };

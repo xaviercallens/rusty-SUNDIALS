@@ -53,7 +53,11 @@ impl System {
             return (0.0, 0.0, 0.0);
         }
         let (vc, dvc) = (self.v(self.rc), self.dv(self.rc));
-        (self.v(r) - vc - (r - self.rc) * dvc, self.dv(r) - dvc, self.d2v(r))
+        (
+            self.v(r) - vc - (r - self.rc) * dvc,
+            self.dv(r) - dvc,
+            self.d2v(r),
+        )
     }
 
     fn delta(&self, xi: f64, yi: f64, xj: f64, yj: f64) -> (f64, f64) {
@@ -165,7 +169,11 @@ impl System {
                     for a in 0..2 {
                         for b in 0..2 {
                             let id = if a == b { 1.0 } else { 0.0 };
-                            add(2 * i + a, 2 * i + b, d2u * u[a] * u[b] + du / r * (id - u[a] * u[b]));
+                            add(
+                                2 * i + a,
+                                2 * i + b,
+                                d2u * u[a] * u[b] + du / r * (id - u[a] * u[b]),
+                            );
                         }
                     }
                 }
@@ -267,14 +275,23 @@ pub fn relax(sys: &System, x0: &[f64], ftol: f64, tmax: f64) -> Result<Relaxed, 
     let mut f = vec![0.0; x0.len()];
     let mut tout = 1.0;
     loop {
-        let (t, y) = solver.solve(tout, Task::Normal).map_err(|e| format!("CVODE failed at t = {tout}: {e}"))?;
+        let (t, y) = solver
+            .solve(tout, Task::Normal)
+            .map_err(|e| format!("CVODE failed at t = {tout}: {e}"))?;
         let y = y.to_vec();
         sys.force(&y, &mut f);
         let fmax = f.iter().fold(0.0_f64, |a, &b| a.max(b.abs()));
         if fmax < ftol || t >= tmax {
             let mut x = y;
             sys.wrap(&mut x);
-            return Ok(Relaxed { x, t, max_force: fmax, steps: solver.num_steps(), rhs_evals: solver.num_rhs_evals(), converged: fmax < ftol });
+            return Ok(Relaxed {
+                x,
+                t,
+                max_force: fmax,
+                steps: solver.num_steps(),
+                rhs_evals: solver.num_rhs_evals(),
+                converged: fmax < ftol,
+            });
         }
         tout *= 2.0;
     }
@@ -284,7 +301,10 @@ pub fn relax(sys: &System, x0: &[f64], ftol: f64, tmax: f64) -> Result<Relaxed, 
 pub fn symmetric_eigenvalues(a: &[f64], m: usize) -> Vec<f64> {
     let mut a = a.to_vec();
     for _sweep in 0..100 {
-        let off: f64 = (0..m).flat_map(|i| (0..m).filter(move |&j| j != i).map(move |j| (i, j))).map(|(i, j)| a[i * m + j] * a[i * m + j]).sum();
+        let off: f64 = (0..m)
+            .flat_map(|i| (0..m).filter(move |&j| j != i).map(move |j| (i, j)))
+            .map(|(i, j)| a[i * m + j] * a[i * m + j])
+            .sum();
         let diag: f64 = (0..m).map(|i| a[i * m + i] * a[i * m + i]).sum();
         if off <= 1e-26 * diag.max(1e-300) {
             break;
@@ -352,7 +372,10 @@ pub fn order(sys: &System, x: &[f64], edge: Option<f64>) -> Order {
     s.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let d0 = s[n / 2];
     let cut = 1.35 * d0;
-    let (cx, cy) = ((0..n).map(|i| x[2 * i]).sum::<f64>() / n as f64, (0..n).map(|i| x[2 * i + 1]).sum::<f64>() / n as f64);
+    let (cx, cy) = (
+        (0..n).map(|i| x[2 * i]).sum::<f64>() / n as f64,
+        (0..n).map(|i| x[2 * i + 1]).sum::<f64>() / n as f64,
+    );
     let (mut defects, mut counted, mut re, mut im, mut loc) = (0usize, 0usize, 0.0, 0.0, 0.0);
     for i in 0..n {
         if let Some(rmax) = edge {
@@ -385,7 +408,13 @@ pub fn order(sys: &System, x: &[f64], edge: Option<f64>) -> Order {
         }
     }
     let k = counted.max(1) as f64;
-    Order { defects, counted, psi6_global: ((re / k).powi(2) + (im / k).powi(2)).sqrt(), psi6_local: loc / k, d0 }
+    Order {
+        defects,
+        counted,
+        psi6_global: ((re / k).powi(2) + (im / k).powi(2)).sqrt(),
+        psi6_local: loc / k,
+        d0,
+    }
 }
 
 /// Small deterministic RNG (xorshift64*), with Gaussian samples by Box-Muller.
@@ -408,14 +437,23 @@ impl Rng {
 }
 
 /// Uniform random configuration with minimum separation `dmin` (periodic box or disk of radius `rdisk`).
-pub fn uniform_config(sys: &System, n: usize, dmin: f64, rdisk: Option<f64>, seed: u64) -> Vec<f64> {
+pub fn uniform_config(
+    sys: &System,
+    n: usize,
+    dmin: f64,
+    rdisk: Option<f64>,
+    seed: u64,
+) -> Vec<f64> {
     let mut rng = Rng::new(seed);
     let mut x: Vec<f64> = Vec::with_capacity(2 * n);
     while x.len() < 2 * n {
         let (px, py) = match (sys.geometry, rdisk) {
             (Geometry::Periodic { lx, ly }, _) => (rng.uniform() * lx, rng.uniform() * ly),
             (_, Some(r)) => {
-                let (rr, th) = (r * rng.uniform().sqrt(), 2.0 * std::f64::consts::PI * rng.uniform());
+                let (rr, th) = (
+                    r * rng.uniform().sqrt(),
+                    2.0 * std::f64::consts::PI * rng.uniform(),
+                );
                 (rr * th.cos(), rr * th.sin())
             }
             _ => unreachable!("disk geometry needs rdisk"),
@@ -434,7 +472,16 @@ pub fn uniform_config(sys: &System, n: usize, dmin: f64, rdisk: Option<f64>, see
 
 /// Overdamped Langevin annealing (Euler-Maruyama), geometric temperature schedule `t0 -> t1` over `steps`;
 /// each step's displacement is capped at `cap` to survive close encounters.
-pub fn anneal(sys: &System, x0: &[f64], t0: f64, t1: f64, steps: usize, dt: f64, cap: f64, seed: u64) -> Vec<f64> {
+pub fn anneal(
+    sys: &System,
+    x0: &[f64],
+    t0: f64,
+    t1: f64,
+    steps: usize,
+    dt: f64,
+    cap: f64,
+    seed: u64,
+) -> Vec<f64> {
     let mut rng = Rng::new(seed);
     let mut x = x0.to_vec();
     let mut f = vec![0.0; x.len()];
@@ -459,7 +506,14 @@ mod tests {
 
     fn tri_system(kappa: f64) -> (System, Vec<f64>) {
         let a = spacing_density_one();
-        let sys = System { kappa, rc: 8.0, geometry: Geometry::Periodic { lx: 16.0 * a, ly: 9.0 * 3.0_f64.sqrt() * a } };
+        let sys = System {
+            kappa,
+            rc: 8.0,
+            geometry: Geometry::Periodic {
+                lx: 16.0 * a,
+                ly: 9.0 * 3.0_f64.sqrt() * a,
+            },
+        };
         (sys, triangular(16, 18, a))
     }
 
@@ -497,7 +551,11 @@ mod tests {
             sys.force(&xm, &mut fm);
             for r in [k, k + 1, 50] {
                 let fd = -(fp[r] - fm[r]) / (2.0 * e);
-                assert!((fd - h[r * m + k]).abs() < 1e-5, "r={r} k={k} fd={fd} h={}", h[r * m + k]);
+                assert!(
+                    (fd - h[r * m + k]).abs() < 1e-5,
+                    "r={r} k={k} fd={fd} h={}",
+                    h[r * m + k]
+                );
             }
         }
     }
@@ -508,7 +566,10 @@ mod tests {
         let a = spacing_density_one();
         let e_box = sys.energy(&x) / (x.len() / 2) as f64;
         let e_sum = lattice_energy(&sys, [[a, 0.0], [0.5 * a, 0.5 * 3.0_f64.sqrt() * a]]);
-        assert!((e_box - e_sum).abs() < 1e-12 * e_sum.abs(), "box {e_box} vs sum {e_sum}");
+        assert!(
+            (e_box - e_sum).abs() < 1e-12 * e_sum.abs(),
+            "box {e_box} vs sum {e_sum}"
+        );
         assert!(e_sum > 0.0);
     }
 
@@ -534,7 +595,11 @@ mod tests {
     #[test]
     fn square_lattice_costs_more_than_triangular() {
         let a = spacing_density_one();
-        let sys = System { kappa: 2.0, rc: 8.0, geometry: Geometry::Bowl { k: 0.0 } };
+        let sys = System {
+            kappa: 2.0,
+            rc: 8.0,
+            geometry: Geometry::Bowl { k: 0.0 },
+        };
         let e_tri = lattice_energy(&sys, [[a, 0.0], [0.5 * a, 0.5 * 3.0_f64.sqrt() * a]]);
         let e_sq = lattice_energy(&sys, [[1.0, 0.0], [0.0, 1.0]]);
         assert!(e_sq > e_tri, "square {e_sq} triangular {e_tri}");
