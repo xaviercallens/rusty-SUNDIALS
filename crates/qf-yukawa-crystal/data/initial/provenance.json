@@ -1,0 +1,1570 @@
+{
+ "dataset": "colabfit/OC20_IS2RES_val_id",
+ "license": "CC-BY-4.0",
+ "doi": "10.60732/b4005525",
+ "shard": "co_10.parquet",
+ "rows_in_shard": 41201,
+ "dmin": 0.537284965911771,
+ "items": [
+  {
+   "file": "oc20_tri_box_00.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7000,
+   "structures_used": 9,
+   "first_structures": [
+    {
+     "row": 31201,
+     "configuration_id": "CO_1080099209601601909451259",
+     "n_atoms": 77,
+     "accepted": 68
+    },
+    {
+     "row": 19397,
+     "configuration_id": "CO_3656286719886088252471900",
+     "n_atoms": 66,
+     "accepted": 47
+    },
+    {
+     "row": 5413,
+     "configuration_id": "CO_1230034596361369665490287",
+     "n_atoms": 125,
+     "accepted": 71
+    },
+    {
+     "row": 39776,
+     "configuration_id": "CO_1075861610140622005011847",
+     "n_atoms": 136,
+     "accepted": 59
+    },
+    {
+     "row": 2482,
+     "configuration_id": "CO_1227666851505853083221545",
+     "n_atoms": 32,
+     "accepted": 8
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_01.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7001,
+   "structures_used": 5,
+   "first_structures": [
+    {
+     "row": 38637,
+     "configuration_id": "CO_3540730754577521186938006",
+     "n_atoms": 166,
+     "accepted": 132
+    },
+    {
+     "row": 31783,
+     "configuration_id": "CO_1161362896566066475768853",
+     "n_atoms": 54,
+     "accepted": 35
+    },
+    {
+     "row": 31752,
+     "configuration_id": "CO_7749464391365227668826504",
+     "n_atoms": 133,
+     "accepted": 54
+    },
+    {
+     "row": 38469,
+     "configuration_id": "CO_3755319480503041167788506",
+     "n_atoms": 53,
+     "accepted": 24
+    },
+    {
+     "row": 9172,
+     "configuration_id": "CO_6607107791025900668180207",
+     "n_atoms": 166,
+     "accepted": 43
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_02.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7002,
+   "structures_used": 9,
+   "first_structures": [
+    {
+     "row": 7005,
+     "configuration_id": "CO_7997255782696782506150090",
+     "n_atoms": 38,
+     "accepted": 37
+    },
+    {
+     "row": 21350,
+     "configuration_id": "CO_1289921345788230467690022",
+     "n_atoms": 105,
+     "accepted": 75
+    },
+    {
+     "row": 8794,
+     "configuration_id": "CO_5178408996863787414180729",
+     "n_atoms": 79,
+     "accepted": 50
+    },
+    {
+     "row": 17181,
+     "configuration_id": "CO_9700538909460211966247205",
+     "n_atoms": 53,
+     "accepted": 24
+    },
+    {
+     "row": 25241,
+     "configuration_id": "CO_7499404385202605138228342",
+     "n_atoms": 100,
+     "accepted": 45
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_03.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7003,
+   "structures_used": 6,
+   "first_structures": [
+    {
+     "row": 8694,
+     "configuration_id": "CO_7150852232090742656419626",
+     "n_atoms": 50,
+     "accepted": 48
+    },
+    {
+     "row": 21148,
+     "configuration_id": "CO_6412873107319414904237998",
+     "n_atoms": 72,
+     "accepted": 56
+    },
+    {
+     "row": 9421,
+     "configuration_id": "CO_1237881459166029020073519",
+     "n_atoms": 60,
+     "accepted": 31
+    },
+    {
+     "row": 7109,
+     "configuration_id": "CO_3000479497040166514002850",
+     "n_atoms": 142,
+     "accepted": 74
+    },
+    {
+     "row": 18954,
+     "configuration_id": "CO_1107430923423917796451140",
+     "n_atoms": 128,
+     "accepted": 48
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_04.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7004,
+   "structures_used": 6,
+   "first_structures": [
+    {
+     "row": 5243,
+     "configuration_id": "CO_6936361501828569580975350",
+     "n_atoms": 98,
+     "accepted": 86
+    },
+    {
+     "row": 29019,
+     "configuration_id": "CO_1296821697981696971558924",
+     "n_atoms": 87,
+     "accepted": 58
+    },
+    {
+     "row": 2928,
+     "configuration_id": "CO_7832771058794294050916000",
+     "n_atoms": 111,
+     "accepted": 65
+    },
+    {
+     "row": 9423,
+     "configuration_id": "CO_4148564821393760744048884",
+     "n_atoms": 79,
+     "accepted": 34
+    },
+    {
+     "row": 37752,
+     "configuration_id": "CO_4611868818306307914802498",
+     "n_atoms": 54,
+     "accepted": 17
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_05.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7005,
+   "structures_used": 8,
+   "first_structures": [
+    {
+     "row": 6662,
+     "configuration_id": "CO_7452831296909529639376010",
+     "n_atoms": 64,
+     "accepted": 62
+    },
+    {
+     "row": 7570,
+     "configuration_id": "CO_1050654531878849529514170",
+     "n_atoms": 86,
+     "accepted": 69
+    },
+    {
+     "row": 35055,
+     "configuration_id": "CO_1041582360269489854912370",
+     "n_atoms": 18,
+     "accepted": 10
+    },
+    {
+     "row": 11432,
+     "configuration_id": "CO_5087117562020227060228496",
+     "n_atoms": 52,
+     "accepted": 33
+    },
+    {
+     "row": 36189,
+     "configuration_id": "CO_5061573726862459078679913",
+     "n_atoms": 75,
+     "accepted": 38
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_06.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7006,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 18097,
+     "configuration_id": "CO_4797096195974258777323219",
+     "n_atoms": 81,
+     "accepted": 68
+    },
+    {
+     "row": 13995,
+     "configuration_id": "CO_1041508312019807038460451",
+     "n_atoms": 63,
+     "accepted": 45
+    },
+    {
+     "row": 39773,
+     "configuration_id": "CO_1239100122783843554913557",
+     "n_atoms": 217,
+     "accepted": 107
+    },
+    {
+     "row": 31608,
+     "configuration_id": "CO_9063000288815517997073998",
+     "n_atoms": 51,
+     "accepted": 20
+    },
+    {
+     "row": 25743,
+     "configuration_id": "CO_1413468202577517875334455",
+     "n_atoms": 54,
+     "accepted": 21
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_07.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7007,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 21000,
+     "configuration_id": "CO_5770727053120692683508328",
+     "n_atoms": 80,
+     "accepted": 74
+    },
+    {
+     "row": 4740,
+     "configuration_id": "CO_1283359498730907246294908",
+     "n_atoms": 64,
+     "accepted": 47
+    },
+    {
+     "row": 20940,
+     "configuration_id": "CO_8941317334438828013433711",
+     "n_atoms": 59,
+     "accepted": 40
+    },
+    {
+     "row": 29912,
+     "configuration_id": "CO_6530252716414590157875226",
+     "n_atoms": 97,
+     "accepted": 49
+    },
+    {
+     "row": 3078,
+     "configuration_id": "CO_1083412729259072010359971",
+     "n_atoms": 53,
+     "accepted": 31
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_08.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7008,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 39775,
+     "configuration_id": "CO_9454019634422392281435842",
+     "n_atoms": 79,
+     "accepted": 63
+    },
+    {
+     "row": 36114,
+     "configuration_id": "CO_4737413335799674326932291",
+     "n_atoms": 55,
+     "accepted": 38
+    },
+    {
+     "row": 36433,
+     "configuration_id": "CO_3328948040896562007956801",
+     "n_atoms": 101,
+     "accepted": 57
+    },
+    {
+     "row": 25890,
+     "configuration_id": "CO_1334117009671808334113026",
+     "n_atoms": 104,
+     "accepted": 53
+    },
+    {
+     "row": 32636,
+     "configuration_id": "CO_3797708116451482371523836",
+     "n_atoms": 74,
+     "accepted": 26
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_09.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7009,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 9113,
+     "configuration_id": "CO_1875977931041359936043707",
+     "n_atoms": 35,
+     "accepted": 34
+    },
+    {
+     "row": 19243,
+     "configuration_id": "CO_7236267747283554552144476",
+     "n_atoms": 33,
+     "accepted": 23
+    },
+    {
+     "row": 39167,
+     "configuration_id": "CO_6113384593415496064133847",
+     "n_atoms": 101,
+     "accepted": 78
+    },
+    {
+     "row": 32300,
+     "configuration_id": "CO_3276611737040428154977817",
+     "n_atoms": 97,
+     "accepted": 57
+    },
+    {
+     "row": 7234,
+     "configuration_id": "CO_7547130965269288975551402",
+     "n_atoms": 100,
+     "accepted": 42
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_10.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7010,
+   "structures_used": 9,
+   "first_structures": [
+    {
+     "row": 37322,
+     "configuration_id": "CO_5551959658599722617631590",
+     "n_atoms": 59,
+     "accepted": 58
+    },
+    {
+     "row": 7798,
+     "configuration_id": "CO_1281543144314586927250220",
+     "n_atoms": 70,
+     "accepted": 57
+    },
+    {
+     "row": 17547,
+     "configuration_id": "CO_1282615257265785783686092",
+     "n_atoms": 68,
+     "accepted": 38
+    },
+    {
+     "row": 4968,
+     "configuration_id": "CO_6561420468861648598040317",
+     "n_atoms": 85,
+     "accepted": 52
+    },
+    {
+     "row": 17905,
+     "configuration_id": "CO_9576880565400122251510001",
+     "n_atoms": 83,
+     "accepted": 35
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_11.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7011,
+   "structures_used": 6,
+   "first_structures": [
+    {
+     "row": 29970,
+     "configuration_id": "CO_4567353184997437692177139",
+     "n_atoms": 81,
+     "accepted": 78
+    },
+    {
+     "row": 36013,
+     "configuration_id": "CO_6559270348934437226854365",
+     "n_atoms": 68,
+     "accepted": 41
+    },
+    {
+     "row": 23631,
+     "configuration_id": "CO_4267923587410255194228181",
+     "n_atoms": 104,
+     "accepted": 69
+    },
+    {
+     "row": 4263,
+     "configuration_id": "CO_2097899995234459676333128",
+     "n_atoms": 170,
+     "accepted": 65
+    },
+    {
+     "row": 9682,
+     "configuration_id": "CO_2583884895710958297043335",
+     "n_atoms": 59,
+     "accepted": 19
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_12.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7012,
+   "structures_used": 8,
+   "first_structures": [
+    {
+     "row": 38551,
+     "configuration_id": "CO_1193540760909817019591372",
+     "n_atoms": 119,
+     "accepted": 103
+    },
+    {
+     "row": 23049,
+     "configuration_id": "CO_6757660200769697006522849",
+     "n_atoms": 41,
+     "accepted": 25
+    },
+    {
+     "row": 356,
+     "configuration_id": "CO_1252744109795463508924825",
+     "n_atoms": 106,
+     "accepted": 56
+    },
+    {
+     "row": 4319,
+     "configuration_id": "CO_4545140882422353521434677",
+     "n_atoms": 45,
+     "accepted": 20
+    },
+    {
+     "row": 40624,
+     "configuration_id": "CO_9423416359795473129893081",
+     "n_atoms": 37,
+     "accepted": 18
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_13.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7013,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 6619,
+     "configuration_id": "CO_1050843767152512717374938",
+     "n_atoms": 57,
+     "accepted": 54
+    },
+    {
+     "row": 24021,
+     "configuration_id": "CO_9657585750487724161147804",
+     "n_atoms": 66,
+     "accepted": 53
+    },
+    {
+     "row": 18017,
+     "configuration_id": "CO_8960919681454961331365321",
+     "n_atoms": 124,
+     "accepted": 78
+    },
+    {
+     "row": 27445,
+     "configuration_id": "CO_4729201996064846134804447",
+     "n_atoms": 81,
+     "accepted": 33
+    },
+    {
+     "row": 15730,
+     "configuration_id": "CO_2230744344480481175195927",
+     "n_atoms": 56,
+     "accepted": 19
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_14.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7014,
+   "structures_used": 6,
+   "first_structures": [
+    {
+     "row": 4958,
+     "configuration_id": "CO_8699054024299854870840822",
+     "n_atoms": 123,
+     "accepted": 116
+    },
+    {
+     "row": 22347,
+     "configuration_id": "CO_9225488001702302869088783",
+     "n_atoms": 64,
+     "accepted": 40
+    },
+    {
+     "row": 17501,
+     "configuration_id": "CO_8593235526697170400274796",
+     "n_atoms": 102,
+     "accepted": 52
+    },
+    {
+     "row": 39733,
+     "configuration_id": "CO_1070131376906191582731280",
+     "n_atoms": 51,
+     "accepted": 27
+    },
+    {
+     "row": 34799,
+     "configuration_id": "CO_5792923495170531986442067",
+     "n_atoms": 121,
+     "accepted": 48
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_15.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7015,
+   "structures_used": 8,
+   "first_structures": [
+    {
+     "row": 30523,
+     "configuration_id": "CO_1292172549300324810726378",
+     "n_atoms": 71,
+     "accepted": 68
+    },
+    {
+     "row": 8849,
+     "configuration_id": "CO_3505767097923301265542906",
+     "n_atoms": 52,
+     "accepted": 34
+    },
+    {
+     "row": 4236,
+     "configuration_id": "CO_2145929507434407399534903",
+     "n_atoms": 69,
+     "accepted": 44
+    },
+    {
+     "row": 16993,
+     "configuration_id": "CO_1258231588430699591532755",
+     "n_atoms": 99,
+     "accepted": 51
+    },
+    {
+     "row": 17536,
+     "configuration_id": "CO_1058561576196859634233029",
+     "n_atoms": 77,
+     "accepted": 32
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_16.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7016,
+   "structures_used": 8,
+   "first_structures": [
+    {
+     "row": 24049,
+     "configuration_id": "CO_2387111618310272696876218",
+     "n_atoms": 61,
+     "accepted": 50
+    },
+    {
+     "row": 23435,
+     "configuration_id": "CO_9490547127499445289553829",
+     "n_atoms": 103,
+     "accepted": 70
+    },
+    {
+     "row": 6418,
+     "configuration_id": "CO_1189316959984085571989016",
+     "n_atoms": 70,
+     "accepted": 43
+    },
+    {
+     "row": 4685,
+     "configuration_id": "CO_2596775948532985290506644",
+     "n_atoms": 77,
+     "accepted": 46
+    },
+    {
+     "row": 7506,
+     "configuration_id": "CO_8259219904417896632295405",
+     "n_atoms": 143,
+     "accepted": 50
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_17.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7017,
+   "structures_used": 5,
+   "first_structures": [
+    {
+     "row": 22445,
+     "configuration_id": "CO_1161168246886029798737866",
+     "n_atoms": 103,
+     "accepted": 96
+    },
+    {
+     "row": 18490,
+     "configuration_id": "CO_1162356840568279125441488",
+     "n_atoms": 67,
+     "accepted": 45
+    },
+    {
+     "row": 30486,
+     "configuration_id": "CO_4561993281276067704411589",
+     "n_atoms": 74,
+     "accepted": 40
+    },
+    {
+     "row": 36533,
+     "configuration_id": "CO_1078654411879499710404395",
+     "n_atoms": 200,
+     "accepted": 73
+    },
+    {
+     "row": 34182,
+     "configuration_id": "CO_1305447544942424499873187",
+     "n_atoms": 89,
+     "accepted": 34
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_18.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7018,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 18414,
+     "configuration_id": "CO_1038538355921163523857301",
+     "n_atoms": 104,
+     "accepted": 101
+    },
+    {
+     "row": 35787,
+     "configuration_id": "CO_9808294437648830537852252",
+     "n_atoms": 71,
+     "accepted": 51
+    },
+    {
+     "row": 38456,
+     "configuration_id": "CO_5855579834429108608733571",
+     "n_atoms": 80,
+     "accepted": 52
+    },
+    {
+     "row": 7562,
+     "configuration_id": "CO_1133454037206136616888122",
+     "n_atoms": 47,
+     "accepted": 23
+    },
+    {
+     "row": 13137,
+     "configuration_id": "CO_1199540434255786764229757",
+     "n_atoms": 69,
+     "accepted": 28
+    }
+   ]
+  },
+  {
+   "file": "oc20_tri_box_19.csv",
+   "kind": "tri_box",
+   "n": 288,
+   "seed": 7019,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 16576,
+     "configuration_id": "CO_6032373395906063388612836",
+     "n_atoms": 65,
+     "accepted": 54
+    },
+    {
+     "row": 9776,
+     "configuration_id": "CO_1336610242765967131464971",
+     "n_atoms": 39,
+     "accepted": 36
+    },
+    {
+     "row": 27187,
+     "configuration_id": "CO_8483188934057862613497795",
+     "n_atoms": 56,
+     "accepted": 40
+    },
+    {
+     "row": 23636,
+     "configuration_id": "CO_4674246563825389669088100",
+     "n_atoms": 70,
+     "accepted": 35
+    },
+    {
+     "row": 25201,
+     "configuration_id": "CO_4700327506963618133487588",
+     "n_atoms": 196,
+     "accepted": 81
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_00.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10000,
+   "structures_used": 6,
+   "first_structures": [
+    {
+     "row": 6856,
+     "configuration_id": "CO_8308766960288518441504932",
+     "n_atoms": 184,
+     "accepted": 83
+    },
+    {
+     "row": 21288,
+     "configuration_id": "CO_1032680461334022694717203",
+     "n_atoms": 102,
+     "accepted": 61
+    },
+    {
+     "row": 37779,
+     "configuration_id": "CO_9401194585509290825851809",
+     "n_atoms": 92,
+     "accepted": 44
+    },
+    {
+     "row": 15404,
+     "configuration_id": "CO_6267089385320466700038423",
+     "n_atoms": 147,
+     "accepted": 60
+    },
+    {
+     "row": 35793,
+     "configuration_id": "CO_1813954990210282059627517",
+     "n_atoms": 85,
+     "accepted": 23
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_01.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10001,
+   "structures_used": 6,
+   "first_structures": [
+    {
+     "row": 18508,
+     "configuration_id": "CO_7025840053458153648128085",
+     "n_atoms": 77,
+     "accepted": 76
+    },
+    {
+     "row": 29450,
+     "configuration_id": "CO_1122155256564872131771321",
+     "n_atoms": 71,
+     "accepted": 37
+    },
+    {
+     "row": 15924,
+     "configuration_id": "CO_1027679413202068121470453",
+     "n_atoms": 166,
+     "accepted": 99
+    },
+    {
+     "row": 9574,
+     "configuration_id": "CO_1286116384656081483444515",
+     "n_atoms": 75,
+     "accepted": 36
+    },
+    {
+     "row": 22673,
+     "configuration_id": "CO_1329801473500252300774336",
+     "n_atoms": 92,
+     "accepted": 27
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_02.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10002,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 38292,
+     "configuration_id": "CO_1008091650904358824297600",
+     "n_atoms": 51,
+     "accepted": 42
+    },
+    {
+     "row": 26170,
+     "configuration_id": "CO_4573887179213363654631812",
+     "n_atoms": 55,
+     "accepted": 44
+    },
+    {
+     "row": 21227,
+     "configuration_id": "CO_8319103363122270893110408",
+     "n_atoms": 69,
+     "accepted": 46
+    },
+    {
+     "row": 20659,
+     "configuration_id": "CO_1201628722362657337615904",
+     "n_atoms": 72,
+     "accepted": 49
+    },
+    {
+     "row": 10447,
+     "configuration_id": "CO_1505887145112295587486382",
+     "n_atoms": 65,
+     "accepted": 30
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_03.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10003,
+   "structures_used": 8,
+   "first_structures": [
+    {
+     "row": 13099,
+     "configuration_id": "CO_3600063194552934876585234",
+     "n_atoms": 68,
+     "accepted": 56
+    },
+    {
+     "row": 28352,
+     "configuration_id": "CO_9517204860048682397427713",
+     "n_atoms": 37,
+     "accepted": 30
+    },
+    {
+     "row": 32976,
+     "configuration_id": "CO_7085247338925022413693221",
+     "n_atoms": 99,
+     "accepted": 77
+    },
+    {
+     "row": 15189,
+     "configuration_id": "CO_3647372347172830730160488",
+     "n_atoms": 37,
+     "accepted": 23
+    },
+    {
+     "row": 4375,
+     "configuration_id": "CO_8466597545963742043551439",
+     "n_atoms": 58,
+     "accepted": 27
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_04.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10004,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 16547,
+     "configuration_id": "CO_1050049024148169075450256",
+     "n_atoms": 70,
+     "accepted": 66
+    },
+    {
+     "row": 34584,
+     "configuration_id": "CO_1076622556165081273451247",
+     "n_atoms": 61,
+     "accepted": 51
+    },
+    {
+     "row": 35973,
+     "configuration_id": "CO_3799409437867194985806039",
+     "n_atoms": 40,
+     "accepted": 27
+    },
+    {
+     "row": 38487,
+     "configuration_id": "CO_3829853771972207259443798",
+     "n_atoms": 100,
+     "accepted": 52
+    },
+    {
+     "row": 28852,
+     "configuration_id": "CO_4548979229296726779836348",
+     "n_atoms": 99,
+     "accepted": 42
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_05.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10005,
+   "structures_used": 8,
+   "first_structures": [
+    {
+     "row": 13815,
+     "configuration_id": "CO_4646364325025805545452084",
+     "n_atoms": 80,
+     "accepted": 75
+    },
+    {
+     "row": 8704,
+     "configuration_id": "CO_7132566431252130781343106",
+     "n_atoms": 63,
+     "accepted": 42
+    },
+    {
+     "row": 15414,
+     "configuration_id": "CO_4345970715913136100634164",
+     "n_atoms": 49,
+     "accepted": 31
+    },
+    {
+     "row": 1283,
+     "configuration_id": "CO_4305821813337382265236576",
+     "n_atoms": 88,
+     "accepted": 44
+    },
+    {
+     "row": 10131,
+     "configuration_id": "CO_5378868466603406360760377",
+     "n_atoms": 53,
+     "accepted": 20
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_06.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10006,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 14851,
+     "configuration_id": "CO_1020479481384578086266993",
+     "n_atoms": 88,
+     "accepted": 80
+    },
+    {
+     "row": 5750,
+     "configuration_id": "CO_9498522138314100955653746",
+     "n_atoms": 81,
+     "accepted": 58
+    },
+    {
+     "row": 332,
+     "configuration_id": "CO_1304460673945111893172802",
+     "n_atoms": 52,
+     "accepted": 36
+    },
+    {
+     "row": 18374,
+     "configuration_id": "CO_1302423385028152483834420",
+     "n_atoms": 67,
+     "accepted": 30
+    },
+    {
+     "row": 28643,
+     "configuration_id": "CO_1298840253106939735205260",
+     "n_atoms": 160,
+     "accepted": 51
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_07.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10007,
+   "structures_used": 8,
+   "first_structures": [
+    {
+     "row": 6179,
+     "configuration_id": "CO_7272592375212542007899066",
+     "n_atoms": 80,
+     "accepted": 79
+    },
+    {
+     "row": 33920,
+     "configuration_id": "CO_1012274904350629171283030",
+     "n_atoms": 80,
+     "accepted": 68
+    },
+    {
+     "row": 38437,
+     "configuration_id": "CO_1315280612064059473094129",
+     "n_atoms": 37,
+     "accepted": 29
+    },
+    {
+     "row": 28056,
+     "configuration_id": "CO_1074219275314545330389805",
+     "n_atoms": 45,
+     "accepted": 16
+    },
+    {
+     "row": 13781,
+     "configuration_id": "CO_5570617382879660828163322",
+     "n_atoms": 53,
+     "accepted": 26
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_08.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10008,
+   "structures_used": 7,
+   "first_structures": [
+    {
+     "row": 18747,
+     "configuration_id": "CO_6354387006455614196370816",
+     "n_atoms": 53,
+     "accepted": 52
+    },
+    {
+     "row": 23747,
+     "configuration_id": "CO_1286583802372817407851813",
+     "n_atoms": 115,
+     "accepted": 92
+    },
+    {
+     "row": 555,
+     "configuration_id": "CO_1795633783098308965397533",
+     "n_atoms": 56,
+     "accepted": 31
+    },
+    {
+     "row": 34553,
+     "configuration_id": "CO_1150700023358701066921457",
+     "n_atoms": 53,
+     "accepted": 22
+    },
+    {
+     "row": 6508,
+     "configuration_id": "CO_3002280005942681698628422",
+     "n_atoms": 62,
+     "accepted": 26
+    }
+   ]
+  },
+  {
+   "file": "oc20_square_box_09.csv",
+   "kind": "square_box",
+   "n": 289,
+   "seed": 10009,
+   "structures_used": 9,
+   "first_structures": [
+    {
+     "row": 32802,
+     "configuration_id": "CO_1060230753187851895138018",
+     "n_atoms": 13,
+     "accepted": 11
+    },
+    {
+     "row": 21520,
+     "configuration_id": "CO_8640285122835070313206343",
+     "n_atoms": 60,
+     "accepted": 51
+    },
+    {
+     "row": 38704,
+     "configuration_id": "CO_9692302788771324866463777",
+     "n_atoms": 66,
+     "accepted": 49
+    },
+    {
+     "row": 29712,
+     "configuration_id": "CO_5776843856651558343040258",
+     "n_atoms": 87,
+     "accepted": 57
+    },
+    {
+     "row": 6877,
+     "configuration_id": "CO_4662174672482961214777851",
+     "n_atoms": 78,
+     "accepted": 28
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_00.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4000,
+   "structures_used": 14,
+   "first_structures": [
+    {
+     "row": 36023,
+     "configuration_id": "CO_8107209561482745704928465",
+     "n_atoms": 58,
+     "accepted": 44
+    },
+    {
+     "row": 18730,
+     "configuration_id": "CO_9154840064013072171126712",
+     "n_atoms": 77,
+     "accepted": 42
+    },
+    {
+     "row": 200,
+     "configuration_id": "CO_5752902646484417549068669",
+     "n_atoms": 83,
+     "accepted": 10
+    },
+    {
+     "row": 37582,
+     "configuration_id": "CO_1309879352843293989222160",
+     "n_atoms": 49,
+     "accepted": 19
+    },
+    {
+     "row": 3580,
+     "configuration_id": "CO_5745180626877981790936524",
+     "n_atoms": 77,
+     "accepted": 6
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_01.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4001,
+   "structures_used": 12,
+   "first_structures": [
+    {
+     "row": 39407,
+     "configuration_id": "CO_4565559569817740350439809",
+     "n_atoms": 86,
+     "accepted": 32
+    },
+    {
+     "row": 2737,
+     "configuration_id": "CO_8112372103361282911307695",
+     "n_atoms": 83,
+     "accepted": 33
+    },
+    {
+     "row": 25727,
+     "configuration_id": "CO_1258870004536174595475568",
+     "n_atoms": 86,
+     "accepted": 35
+    },
+    {
+     "row": 34211,
+     "configuration_id": "CO_2167718559913969951455834",
+     "n_atoms": 66,
+     "accepted": 29
+    },
+    {
+     "row": 34105,
+     "configuration_id": "CO_9011542690335630046532765",
+     "n_atoms": 41,
+     "accepted": 13
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_02.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4002,
+   "structures_used": 11,
+   "first_structures": [
+    {
+     "row": 4520,
+     "configuration_id": "CO_1174334194374527458855444",
+     "n_atoms": 78,
+     "accepted": 42
+    },
+    {
+     "row": 24371,
+     "configuration_id": "CO_5335948930174427342413229",
+     "n_atoms": 100,
+     "accepted": 65
+    },
+    {
+     "row": 4322,
+     "configuration_id": "CO_9603360693534939843102419",
+     "n_atoms": 50,
+     "accepted": 14
+    },
+    {
+     "row": 17432,
+     "configuration_id": "CO_5713778116083364950375378",
+     "n_atoms": 68,
+     "accepted": 15
+    },
+    {
+     "row": 32427,
+     "configuration_id": "CO_4725348090820705672550453",
+     "n_atoms": 112,
+     "accepted": 46
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_03.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4003,
+   "structures_used": 10,
+   "first_structures": [
+    {
+     "row": 5356,
+     "configuration_id": "CO_6370734205661210519889045",
+     "n_atoms": 56,
+     "accepted": 28
+    },
+    {
+     "row": 4226,
+     "configuration_id": "CO_4716725903795239633603029",
+     "n_atoms": 79,
+     "accepted": 57
+    },
+    {
+     "row": 39558,
+     "configuration_id": "CO_9199128356737654633293884",
+     "n_atoms": 103,
+     "accepted": 8
+    },
+    {
+     "row": 31439,
+     "configuration_id": "CO_6086093160384413336217438",
+     "n_atoms": 103,
+     "accepted": 37
+    },
+    {
+     "row": 15917,
+     "configuration_id": "CO_1535190005059921479043069",
+     "n_atoms": 172,
+     "accepted": 78
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_04.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4004,
+   "structures_used": 13,
+   "first_structures": [
+    {
+     "row": 31789,
+     "configuration_id": "CO_4769344793913880332355577",
+     "n_atoms": 53,
+     "accepted": 49
+    },
+    {
+     "row": 33098,
+     "configuration_id": "CO_5987346490315434833739504",
+     "n_atoms": 128,
+     "accepted": 48
+    },
+    {
+     "row": 3763,
+     "configuration_id": "CO_7997576610602261154109802",
+     "n_atoms": 82,
+     "accepted": 37
+    },
+    {
+     "row": 18063,
+     "configuration_id": "CO_3714433634119918504915771",
+     "n_atoms": 96,
+     "accepted": 27
+    },
+    {
+     "row": 9782,
+     "configuration_id": "CO_3455569759003694278504237",
+     "n_atoms": 126,
+     "accepted": 45
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_05.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4005,
+   "structures_used": 12,
+   "first_structures": [
+    {
+     "row": 36988,
+     "configuration_id": "CO_2103923464192550283237396",
+     "n_atoms": 163,
+     "accepted": 99
+    },
+    {
+     "row": 38221,
+     "configuration_id": "CO_9976556500286109019238717",
+     "n_atoms": 40,
+     "accepted": 12
+    },
+    {
+     "row": 40337,
+     "configuration_id": "CO_1333329016783209667831366",
+     "n_atoms": 66,
+     "accepted": 39
+    },
+    {
+     "row": 29196,
+     "configuration_id": "CO_4256241662978831364623645",
+     "n_atoms": 40,
+     "accepted": 23
+    },
+    {
+     "row": 29614,
+     "configuration_id": "CO_8795504969341062532632067",
+     "n_atoms": 68,
+     "accepted": 16
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_06.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4006,
+   "structures_used": 14,
+   "first_structures": [
+    {
+     "row": 7015,
+     "configuration_id": "CO_9126082876601941726508150",
+     "n_atoms": 79,
+     "accepted": 58
+    },
+    {
+     "row": 18718,
+     "configuration_id": "CO_3837600882584198592013186",
+     "n_atoms": 86,
+     "accepted": 25
+    },
+    {
+     "row": 25658,
+     "configuration_id": "CO_1017659497974306033895062",
+     "n_atoms": 96,
+     "accepted": 27
+    },
+    {
+     "row": 1213,
+     "configuration_id": "CO_8859876116617433173891547",
+     "n_atoms": 100,
+     "accepted": 32
+    },
+    {
+     "row": 7545,
+     "configuration_id": "CO_2225589025080410450114952",
+     "n_atoms": 60,
+     "accepted": 20
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_07.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4007,
+   "structures_used": 12,
+   "first_structures": [
+    {
+     "row": 28387,
+     "configuration_id": "CO_4084576909532975679117522",
+     "n_atoms": 164,
+     "accepted": 82
+    },
+    {
+     "row": 18048,
+     "configuration_id": "CO_7812707637642084273600149",
+     "n_atoms": 55,
+     "accepted": 15
+    },
+    {
+     "row": 24385,
+     "configuration_id": "CO_1333451935704994173945981",
+     "n_atoms": 97,
+     "accepted": 41
+    },
+    {
+     "row": 14781,
+     "configuration_id": "CO_2720812747017887809896337",
+     "n_atoms": 104,
+     "accepted": 33
+    },
+    {
+     "row": 40811,
+     "configuration_id": "CO_8651526798655989794201081",
+     "n_atoms": 77,
+     "accepted": 23
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_08.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4008,
+   "structures_used": 13,
+   "first_structures": [
+    {
+     "row": 25371,
+     "configuration_id": "CO_5092480913082521035769905",
+     "n_atoms": 92,
+     "accepted": 47
+    },
+    {
+     "row": 13447,
+     "configuration_id": "CO_4901601671315708383087502",
+     "n_atoms": 59,
+     "accepted": 50
+    },
+    {
+     "row": 16103,
+     "configuration_id": "CO_8853737762279595798840645",
+     "n_atoms": 129,
+     "accepted": 50
+    },
+    {
+     "row": 34084,
+     "configuration_id": "CO_9554480354268708842805783",
+     "n_atoms": 36,
+     "accepted": 14
+    },
+    {
+     "row": 11033,
+     "configuration_id": "CO_1083157166051376887136192",
+     "n_atoms": 44,
+     "accepted": 20
+    }
+   ]
+  },
+  {
+   "file": "oc20_disk_09.csv",
+   "kind": "disk",
+   "n": 300,
+   "seed": 4009,
+   "structures_used": 14,
+   "first_structures": [
+    {
+     "row": 31931,
+     "configuration_id": "CO_9841202614654160605717763",
+     "n_atoms": 115,
+     "accepted": 42
+    },
+    {
+     "row": 14358,
+     "configuration_id": "CO_6225838266130382166678147",
+     "n_atoms": 56,
+     "accepted": 29
+    },
+    {
+     "row": 14130,
+     "configuration_id": "CO_6002090723718407968319609",
+     "n_atoms": 145,
+     "accepted": 39
+    },
+    {
+     "row": 10995,
+     "configuration_id": "CO_7943127920016878097465205",
+     "n_atoms": 98,
+     "accepted": 26
+    },
+    {
+     "row": 25087,
+     "configuration_id": "CO_5937867770433688356258046",
+     "n_atoms": 61,
+     "accepted": 9
+    }
+   ]
+  }
+ ]
+}

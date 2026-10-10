@@ -1,0 +1,2 @@
+{"kappa":1,"rc":8.0,"e_tri_sum":1.607609217185270e0,"e_tri_periodic_box":1.607609217185348e0,"e_square_sum":1.617145573002928e0,"square_minus_tri":9.536356e-3,"truncation_v_rc":4.193e-5}
+{"kappa":2,"rc":8.0,"e_tri_sum":3.935333668255099e-1,"e_tri_periodic_box":3.935333668255304e-1,"e_square_sum":4.009647698931363e-1,"square_minus_tri":7.431403e-3,"truncation_v_rc":1.407e-8}
