@@ -1,0 +1,23 @@
+{
+  "id": "JEL-TRI-1",
+  "date": "2026-10-11",
+  "stage": "preregistration, committed before any jellium code in crates/qf-yukawa-crystal",
+  "question": "Numerical (Tier X) check of the renormalized/jellium extension of planar universal optimality: upstream manuscript (OpenAI, 'Universal optimality of the triangular lattice', 2026-09-23), Section 8, Corollary 'Planar renormalized and jellium energies' (0 <= s < 2), which is NOT formalised in upstream's Lean. Case s = 1: classical 2D Wigner crystal (electrons in a plane with 1/r interaction and a uniform neutralising background).",
+  "instrument": "Ewald-summed one-component plasma energy per particle in a periodic rectangle at density 1, with neutralising background; analytic forces; overdamped relaxation dx/dt = -grad E with rusty-SUNDIALS CVODE (BDF, finite-difference Jacobian); Hessian by finite differences of the analytic force + cyclic Jacobi; annealing (Euler-Maruyama) outside SUNDIALS, then a CVODE quench",
+  "positive_controls": {
+    "C1_madelung_triangular": "energy per particle of the perfect triangular lattice equals eta_tri / r_s with eta_tri = -1.106102587 (Hartree x r_s; recalculation of Bonsall & Maradudin, Phys. Rev. B 15, 1959 (1977), reported in arXiv:2103.01622) and r_s = 1/sqrt(pi) at density 1, i.e. e_tri = -1.106102587 * sqrt(pi); tolerance 1e-8 relative",
+    "C2_madelung_square": "same for the square lattice with eta_sq = -1.100244420; tolerance 1e-8 relative",
+    "C3_ewald_invariance": "energy independent of the Ewald splitting parameter alpha to 1e-10 relative over a 4x range of alpha",
+    "C4_force": "analytic force equals minus the finite-difference gradient to 1e-6"
+  },
+  "predictions": {
+    "J1_no_undercut": "No relaxed density-1 periodic configuration (T = 0 quenches and annealed runs, uniform and OC20-derived initial conditions from data/initial) has jellium energy per particle below e_tri by more than 1e-9 relative. A violation contradicts the upstream corollary or reveals an Ewald error, to be checked against C1-C4.",
+    "J2_annealed_reaches_lattice": "At least one annealed run per family reaches the perfect triangular lattice (0 defects, |e - e_tri| < 1e-8 |e_tri|). Heuristic; failure is reported, not hidden.",
+    "J3_square_saddle": "The square lattice is a stationary point with at least one negative Hessian eigenvalue (consistent with the imaginary phonon branch reported by Bonsall & Maradudin)."
+  },
+  "negative_control": "incommensurate square box (N = 289): relaxed states stay above e_tri",
+  "secondary_s0": "If time allows, the logarithmic case s = 0 (2D one-component plasma), same predictions; no literature Madelung anchor is preregistered for it, so its C1 is replaced by alpha-invariance and the triangular < square comparison.",
+  "not_claimed": "The s = 2 endpoint (Riesz s = d) is outside upstream's statement and is not tested. Nothing here is a proof: Tier X throughout.",
+  "lean_target_separate": "Formal target, separate ledger rows: for every periodic density-one configuration C, H_C(t) >= H_A(t) for all t > 0 (the heat-trace comparison feeding upstream's Lemma 'Heat comparison across period lattices'), derived from upstream's Gaussian universal optimality. Prior ~30%; kill criterion: the identification of upstream's lower energy of a periodic configuration with its periodic Gaussian sum cannot be formalised within the session.",
+  "cpu_budget": "2 cores (owner's standing instruction)"
+}
