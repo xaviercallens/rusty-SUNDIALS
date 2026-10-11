@@ -604,6 +604,33 @@ fn main() {
             let lines = parallel(jobs, threads);
             write(&jres, "main_kappa_jellium_s1.jsonl", &lines);
         }
+        "fss-lattice" => {
+            // Finite-size check of the perfect triangular lattice in commensurate periodic boxes.
+            // With the minimum image, E/N equals the direct lattice sum e_tri exactly once both box sides are
+            // >= 2 rc, whatever N is. The 6 x 12 box (6.45 x 11.17, below 2 rc = 16) is the negative control:
+            // there the minimum image misses periodic images inside rc, so E/N must come out wrong (too low).
+            println!(
+                "kappa nx ny N lx ly sides_ge_2rc e_box_per_particle e_tri_direct_sum e_box_minus_e_tri"
+            );
+            for kappa in [2.0, 1.0] {
+                let e_ref = e_tri(kappa);
+                for (nx, ny) in [(6, 12), (16, 18), (32, 36), (48, 54)] {
+                    let (lx, ly) = (nx as f64 * a, ny as f64 * a * 3.0_f64.sqrt() / 2.0);
+                    let sys = System {
+                        kappa,
+                        rc: 8.0,
+                        geometry: Geometry::Periodic { lx, ly },
+                    };
+                    let n = nx * ny;
+                    let e_box = sys.energy(&triangular(nx, ny, a)) / n as f64;
+                    let ok = lx.min(ly) >= 2.0 * sys.rc;
+                    println!(
+                        "{kappa} {nx} {ny} {n} {lx:.4} {ly:.4} {ok} {e_box:.15e} {e_ref:.15e} {:.3e}",
+                        e_box - e_ref
+                    );
+                }
+            }
+        }
         other => panic!("unknown command {other}"),
     }
 }
