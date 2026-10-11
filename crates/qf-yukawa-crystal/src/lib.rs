@@ -378,10 +378,10 @@ pub fn order(sys: &System, x: &[f64], edge: Option<f64>) -> Order {
     );
     let (mut defects, mut counted, mut re, mut im, mut loc) = (0usize, 0usize, 0.0, 0.0, 0.0);
     for i in 0..n {
-        if let Some(rmax) = edge {
-            if ((x[2 * i] - cx).powi(2) + (x[2 * i + 1] - cy).powi(2)).sqrt() > rmax {
-                continue;
-            }
+        if edge.is_some_and(|rmax| {
+            ((x[2 * i] - cx).powi(2) + (x[2 * i + 1] - cy).powi(2)).sqrt() > rmax
+        }) {
+            continue;
         }
         let (mut c, mut pr, mut pi) = (0usize, 0.0, 0.0);
         for j in 0..n {
@@ -472,6 +472,7 @@ pub fn uniform_config(
 
 /// Overdamped Langevin annealing (Euler-Maruyama), geometric temperature schedule `t0 -> t1` over `steps`;
 /// each step's displacement is capped at `cap` to survive close encounters.
+#[allow(clippy::too_many_arguments)]
 pub fn anneal(
     sys: &System,
     x0: &[f64],
