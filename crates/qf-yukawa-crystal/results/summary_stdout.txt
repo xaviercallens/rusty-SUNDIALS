@@ -1,0 +1,182 @@
+{
+ "main_kappa1": {
+  "families": {
+   "hf_oc20/quench": {
+    "runs": 10,
+    "perfect_lattice": 0,
+    "defected": 8,
+    "min_rel_gap": 5.765269e-05,
+    "max_rel_gap": 0.001695497,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "hf_oc20/anneal_quench": {
+    "runs": 10,
+    "perfect_lattice": 0,
+    "defected": 5,
+    "min_rel_gap": 5.765269e-05,
+    "max_rel_gap": 0.001222066,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "uniform/quench": {
+    "runs": 10,
+    "perfect_lattice": 1,
+    "defected": 8,
+    "min_rel_gap": 3.964073e-14,
+    "max_rel_gap": 0.001222872,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "uniform/anneal_quench": {
+    "runs": 10,
+    "perfect_lattice": 2,
+    "defected": 3,
+    "min_rel_gap": 1.933694e-14,
+    "max_rel_gap": 0.0008506005,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "ctl_neg_incommensurate_box/quench": {
+    "runs": 5,
+    "perfect_lattice": 0,
+    "defected": 5,
+    "min_rel_gap": 0.0003096628,
+    "max_rel_gap": 0.001072121,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "ctl_neg_incommensurate_box/anneal_quench": {
+    "runs": 5,
+    "perfect_lattice": 0,
+    "defected": 5,
+    "min_rel_gap": 0.0003087223,
+    "max_rel_gap": 0.0006253837,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   }
+  },
+  "errors": [],
+  "P1_no_undercut": {
+   "pass": true,
+   "undercuts": []
+  },
+  "P2_annealed_reaches_lattice": {
+   "per_family_perfect": {
+    "hf_oc20": 0,
+    "uniform": 2
+   },
+   "pass": false
+  },
+  "P3_quench_glassy": {
+   "defected_over_runs": {
+    "hf_oc20": "8/10",
+    "uniform": "8/10"
+   }
+  },
+  "neg_control_incommensurate": {
+   "min_rel_gap": 0.0003087223,
+   "defected": 5,
+   "runs": 5,
+   "pass": true
+  }
+ },
+ "main_kappa2": {
+  "families": {
+   "hf_oc20/quench": {
+    "runs": 20,
+    "perfect_lattice": 0,
+    "defected": 15,
+    "min_rel_gap": 0.0001838044,
+    "max_rel_gap": 0.004894163,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "hf_oc20/anneal_quench": {
+    "runs": 20,
+    "perfect_lattice": 1,
+    "defected": 11,
+    "min_rel_gap": 7.603043e-14,
+    "max_rel_gap": 0.00252694,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "uniform/quench": {
+    "runs": 20,
+    "perfect_lattice": 0,
+    "defected": 14,
+    "min_rel_gap": 0.0001838044,
+    "max_rel_gap": 0.006039306,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "uniform/anneal_quench": {
+    "runs": 20,
+    "perfect_lattice": 1,
+    "defected": 11,
+    "min_rel_gap": 8.477604e-14,
+    "max_rel_gap": 0.002389648,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "ctl_neg_incommensurate_box/quench": {
+    "runs": 10,
+    "perfect_lattice": 0,
+    "defected": 10,
+    "min_rel_gap": 0.0009598053,
+    "max_rel_gap": 0.005671139,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   },
+   "ctl_neg_incommensurate_box/anneal_quench": {
+    "runs": 10,
+    "perfect_lattice": 0,
+    "defected": 10,
+    "min_rel_gap": 0.0009598053,
+    "max_rel_gap": 0.001726664,
+    "not_converged": 0,
+    "hess_negative_runs": 0
+   }
+  },
+  "errors": [],
+  "P1_no_undercut": {
+   "pass": true,
+   "undercuts": []
+  },
+  "P2_annealed_reaches_lattice": {
+   "per_family_perfect": {
+    "hf_oc20": 1,
+    "uniform": 1
+   },
+   "pass": true
+  },
+  "P3_quench_glassy": {
+   "defected_over_runs": {
+    "hf_oc20": "15/20",
+    "uniform": "14/20"
+   }
+  },
+  "neg_control_incommensurate": {
+   "min_rel_gap": 0.0009598053,
+   "defected": 10,
+   "runs": 10,
+   "pass": true
+  }
+ },
+ "disk": {
+  "open_bowl": {
+   "runs": 10,
+   "interior_defect_fraction_mean": 0.08554350530612945,
+   "edge_defect_fraction_mean": 0.9652501289202309,
+   "interior_psi6_local_mean": 0.9128549999999999,
+   "cluster_radius_mean": 10.805509999999998
+  },
+  "closed_wall": {
+   "runs": 10,
+   "interior_defect_fraction_mean": 0.03256901047225612,
+   "edge_defect_fraction_mean": 0.602250023463206,
+   "interior_psi6_local_mean": 0.9305160000000001,
+   "cluster_radius_mean": 9.88722
+  }
+ }
+}
