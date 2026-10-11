@@ -1,6 +1,11 @@
 //! Experiment driver for the preregistered study `results/preregistration.json` (YUK-TRI-1).
 //!
 //! `yukawa_crystal refs|controls|main|disk <crate_dir>` writes JSON results under `<crate_dir>/results/`.
+//!
+//! Exploratory additions (postdate the preregistration, written under `results/exploratory/`):
+//! `yukawa_crystal global <crate_dir> [kappa] [nrun] [hops] [rounds]` runs basin hopping and parallel tempering from
+//! the `uniform_*` starts of `main`; `yukawa_crystal floor <crate_dir> [kappa] [csv...]` checks configurations against
+//! the exact triangular-lattice floor (`global_opt::floor_check`).
 
 use qf_yukawa_crystal::*;
 use std::fmt::Write as _;
@@ -140,6 +145,9 @@ fn one_run(
     RunOut { json: s }
 }
 
+/// A boxed job for [`parallel`].
+type Job<T> = Box<dyn FnOnce() -> T + Send>;
+
 fn parallel<T: Send>(jobs: Vec<Box<dyn FnOnce() -> T + Send>>, threads: usize) -> Vec<T> {
     let jobs = std::sync::Mutex::new(jobs.into_iter().enumerate().collect::<Vec<_>>());
     let out = std::sync::Mutex::new(Vec::new());
@@ -168,6 +176,17 @@ fn write(dir: &Path, name: &str, lines: &[String]) {
     fs::create_dir_all(dir).unwrap();
     fs::write(dir.join(name), lines.join("\n") + "\n").unwrap();
     println!("wrote {}", dir.join(name).display());
+}
+
+/// Exact triangular-floor check of a periodic configuration as a JSON object.
+fn floor_json(sys: &System, x: &[f64], r_exact: f64) -> String {
+    match global_opt::floor_check(sys, x, r_exact) {
+        Ok(c) => format!(
+            "{{\"r_exact\":{r_exact},\"density\":{:.12},\"e_exact\":{:.15e},\"e_floor\":{:.15e},\"margin\":{:.6e},\"tolerance\":{:.3e},\"tail_bound\":{:.3e},\"violated\":{}}}",
+            c.density, c.e_config, c.e_floor, c.margin, c.tolerance, c.tail_bound, c.violated
+        ),
+        Err(e) => format!("{{\"error\":\"{}\"}}", e.replace('"', "'")),
+    }
 }
 
 fn tri_jellium() -> jellium::Jellium {
@@ -443,7 +462,7 @@ fn main() {
                     .collect();
                 fs::write(out.join(format!("{name}.csv")), s).unwrap();
             };
-            let mut jobs: Vec<Box<dyn FnOnce() -> (String, Vec<f64>, f64) + Send>> = Vec::new();
+            let mut jobs: Vec<Job<(String, Vec<f64>, f64)>> = Vec::new();
             let p0 = init.join("oc20_tri_box_00.csv");
             let p17 = init.join("oc20_tri_box_17.csv");
             let pd = init.join("oc20_disk_00.csv");
@@ -603,6 +622,145 @@ fn main() {
             }
             let lines = parallel(jobs, threads);
             write(&jres, "main_kappa_jellium_s1.jsonl", &lines);
+        }
+        "global" => {
+            // Exploratory: can global searches turn the glassy quench / anneal outcomes (soft kappa = 1 especially)
+            // into the lattice? Same uniform starts (seeds 500 + k) as `main`, so the runs are directly comparable.
+            let kappa: f64 = args.get(3).map(|s| s.parse().unwrap()).unwrap_or(1.0);
+            let nrun: usize = args.get(4).map(|s| s.parse().unwrap()).unwrap_or(4);
+            let hops: usize = args.get(5).map(|s| s.parse().unwrap()).unwrap_or(60);
+            let rounds: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(400);
+            let r_exact = 40.0 / kappa;
+            let mut jobs: Vec<Box<dyn FnOnce() -> String + Send>> = Vec::new();
+            for k in 0..nrun {
+                for method in ["basin_hopping", "parallel_tempering"] {
+                    jobs.push(Box::new(move || {
+                        let sys = tri_box(kappa);
+                        let x0 = uniform_config(&sys, 288, 0.5 * a, None, 500 + k as u64);
+                        let clock = std::time::Instant::now();
+                        let out = if method == "basin_hopping" {
+                            global_opt::basin_hopping(
+                                &sys,
+                                &x0,
+                                &global_opt::HopParams {
+                                    hops,
+                                    sigma: 0.25 * a,
+                                    radius: Some(2.5 * a),
+                                    min_sep: 0.3 * a,
+                                    temperature: 0.02,
+                                    ftol: 1e-7,
+                                    tmax: TMAX,
+                                    seed: 1300 + k as u64,
+                                },
+                            )
+                        } else {
+                            global_opt::parallel_tempering(
+                                &sys,
+                                &x0,
+                                &global_opt::TemperParams {
+                                    temps: global_opt::temperature_ladder(4e-3, 2e-2, 24),
+                                    rounds,
+                                    steps_per_round: 500,
+                                    dt: 0.01,
+                                    cap: 0.05,
+                                    quench_every: 50,
+                                    ftol: 1e-7,
+                                    tmax: TMAX,
+                                    seed: 1700 + k as u64,
+                                    threads: 1,
+                                },
+                            )
+                        };
+                        let eref = e_tri(kappa);
+                        let head = format!(
+                            "\"label\":\"uniform_{k:02}\",\"method\":\"{method}\",\"exploratory\":true,\"n\":288,\"kappa\":{kappa},\"e_ref\":{eref:.15e}"
+                        );
+                        let g = match out {
+                            Ok(g) => g,
+                            Err(e) => return format!("{{{head},\"error\":\"{}\"}}", e.replace('"', "'")),
+                        };
+                        // Polish the best minimum to the study's force tolerance.
+                        let best = relax(&sys, &g.best.x, FTOL, TMAX).unwrap_or(g.best);
+                        let e = sys.energy(&best.x) / 288.0;
+                        let o = order(&sys, &best.x, None);
+                        let floor = floor_json(&sys, &best.x, r_exact);
+                        format!(
+                            "{{{head},\"e_start_quench\":{:.15e},\"e\":{e:.15e},\"gap\":{:.6e},\"rel_gap\":{:.6e},\"defects\":{},\"psi6_global\":{:.6},\"psi6_local\":{:.6},\"max_force\":{:.3e},\"converged\":{},\"accepted\":{},\"proposals\":{},\"failures\":{},\"wall_s\":{:.1},\"floor\":{floor}}}",
+                            g.start_energy / 288.0,
+                            e - eref,
+                            (e - eref) / eref.abs(),
+                            o.defects,
+                            o.psi6_global,
+                            o.psi6_local,
+                            best.max_force,
+                            best.converged,
+                            g.accepted,
+                            g.proposals,
+                            g.failures,
+                            clock.elapsed().as_secs_f64()
+                        )
+                    }));
+                }
+            }
+            let lines = parallel(jobs, threads);
+            write(
+                &res.join("exploratory"),
+                &format!("global_kappa{kappa}.jsonl"),
+                &lines,
+            );
+        }
+        "floor" => {
+            // Exact-floor audit. Without CSVs: positive controls (lattice, relaxed noisy lattice) and the square
+            // lattice. With CSVs: each file is checked in the study box (288 points: triangular box, 289: square box).
+            let kappa: f64 = args.get(3).map(|s| s.parse().unwrap()).unwrap_or(1.0);
+            let r_exact = 40.0 / kappa;
+            let mut lines = Vec::new();
+            let files: Vec<PathBuf> = args.iter().skip(4).map(PathBuf::from).collect();
+            if files.is_empty() {
+                let sys = tri_box(kappa);
+                let x = triangular(16, 18, a);
+                lines.push(format!(
+                    "{{\"label\":\"triangular\",\"kappa\":{kappa},\"floor\":{}}}",
+                    floor_json(&sys, &x, r_exact)
+                ));
+                let mut xn = x.clone();
+                let mut rng = Rng::new(3);
+                xn.iter_mut().for_each(|v| *v += 0.1 * a * rng.gauss());
+                let r = relax(&sys, &xn, FTOL, TMAX).unwrap();
+                lines.push(format!(
+                    "{{\"label\":\"noisy_relaxed\",\"kappa\":{kappa},\"floor\":{}}}",
+                    floor_json(&sys, &r.x, r_exact)
+                ));
+                let sq = square_box(kappa);
+                lines.push(format!(
+                    "{{\"label\":\"square\",\"kappa\":{kappa},\"floor\":{}}}",
+                    floor_json(&sq, &square(17, 1.0), r_exact)
+                ));
+            }
+            for p in files {
+                let x = read_csv(&p);
+                let sys = if x.len() / 2 == 289 {
+                    square_box(kappa)
+                } else {
+                    tri_box(kappa)
+                };
+                lines.push(format!(
+                    "{{\"file\":\"{}\",\"kappa\":{kappa},\"n\":{},\"floor\":{}}}",
+                    p.display(),
+                    x.len() / 2,
+                    floor_json(&sys, &x, r_exact)
+                ));
+            }
+            for l in &lines {
+                if l.contains("\"violated\":true") {
+                    eprintln!("FLOOR VIOLATION (bug, not physics): {l}");
+                }
+            }
+            write(
+                &res.join("exploratory"),
+                &format!("floor_kappa{kappa}.jsonl"),
+                &lines,
+            );
         }
         other => panic!("unknown command {other}"),
     }
