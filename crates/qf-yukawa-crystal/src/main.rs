@@ -170,6 +170,49 @@ fn write(dir: &Path, name: &str, lines: &[String]) {
     println!("wrote {}", dir.join(name).display());
 }
 
+/// Like `parallel`, but appends each finished job's line to `partial` as soon as it completes (prefixed with its job
+/// index), so a crash or reboot loses only the jobs in flight. The sorted result is returned as before.
+fn parallel_streaming(
+    jobs: Vec<Box<dyn FnOnce() -> String + Send>>,
+    threads: usize,
+    partial: &Path,
+) -> Vec<String> {
+    use std::io::Write;
+    fs::create_dir_all(partial.parent().unwrap()).unwrap();
+    let sink = std::sync::Mutex::new(
+        fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(partial)
+            .unwrap(),
+    );
+    let jobs = std::sync::Mutex::new(jobs.into_iter().enumerate().collect::<Vec<_>>());
+    let out = std::sync::Mutex::new(Vec::new());
+    std::thread::scope(|sc| {
+        for _ in 0..threads {
+            sc.spawn(|| {
+                loop {
+                    let job = jobs.lock().unwrap().pop();
+                    match job {
+                        Some((i, f)) => {
+                            let r = f();
+                            let mut fh = sink.lock().unwrap();
+                            writeln!(fh, "{{\"job\":{i},\"result\":{r}}}").unwrap();
+                            fh.flush().unwrap();
+                            drop(fh);
+                            out.lock().unwrap().push((i, r));
+                        }
+                        None => break,
+                    }
+                }
+            });
+        }
+    });
+    let mut v = out.into_inner().unwrap();
+    v.sort_by_key(|(i, _)| *i);
+    v.into_iter().map(|(_, r)| r).collect()
+}
+
 fn tri_jellium() -> jellium::Jellium {
     let a = spacing_density_one();
     jellium::Jellium::new(16.0 * a, 9.0 * 3.0_f64.sqrt() * a, 0.66, 8.0, 7.0)
@@ -601,7 +644,11 @@ fn main() {
                     )
                 }));
             }
-            let lines = parallel(jobs, threads);
+            let lines = parallel_streaming(
+                jobs,
+                threads,
+                &jres.join("main_kappa_jellium_s1.partial.jsonl"),
+            );
             write(&jres, "main_kappa_jellium_s1.jsonl", &lines);
         }
         "fss-lattice" => {
