@@ -246,8 +246,9 @@ impl Jellium {
     }
 }
 
-/// Literature Madelung energies (Hartree x r_s per electron): Bonsall & Maradudin, Phys. Rev. B 15, 1959 (1977), as
-/// recalculated in arXiv:2103.01622. At density 1, `r_s = 1/sqrt(pi)`, so the energy per particle is `eta sqrt(pi)`.
+/// Literature Madelung energies (Hartree x r_s per electron): the ten-digit values of Alves, Bendazzoli, Evangelisti
+/// & Berger, Phys. Rev. B 103, 245125 (2021) (arXiv:2103.01622), which agree with Bonsall & Maradudin, Phys. Rev. B 15,
+/// 1959 (1977). At density 1, `r_s = 1/sqrt(pi)`, so the energy per particle is `eta sqrt(pi)`.
 pub const ETA_TRIANGULAR: f64 = -1.106102587;
 pub const ETA_SQUARE: f64 = -1.100244420;
 
