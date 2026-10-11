@@ -170,6 +170,87 @@ fn write(dir: &Path, name: &str, lines: &[String]) {
     println!("wrote {}", dir.join(name).display());
 }
 
+fn tri_jellium() -> jellium::Jellium {
+    let a = spacing_density_one();
+    jellium::Jellium::new(16.0 * a, 9.0 * 3.0_f64.sqrt() * a, 0.66, 8.0, 7.0)
+}
+
+fn square_jellium() -> jellium::Jellium {
+    jellium::Jellium::new(17.0, 17.0, 0.66, 8.0, 7.0)
+}
+
+/// Literature triangular Madelung energy per particle at density 1 (Bonsall & Maradudin; see `jellium`).
+fn e_tri_jellium() -> f64 {
+    jellium::ETA_TRIANGULAR * std::f64::consts::PI.sqrt()
+}
+
+/// One jellium run (T = 0 quench, optional anneal + quench), JSON with the same fields as `one_run`.
+/// The reference is the triangular box energy computed with the same Ewald parameters (it equals the literature value
+/// to < 1e-8, `jellium::tests`); the anneal uses 100 000 steps (each force costs an Ewald k-sum).
+fn jel_run(
+    label: &str,
+    family: &str,
+    j: &jellium::Jellium,
+    x0: &[f64],
+    anneal_it: bool,
+    seed: u64,
+    hess: bool,
+) -> String {
+    let n = x0.len() / 2;
+    let a = spacing_density_one();
+    let eref = tri_jellium().energy(&triangular(16, 18, a)) / 288.0;
+    let geo = j.geometry_system();
+    let mut fields = format!(
+        "\"label\":\"{label}\",\"family\":\"{family}\",\"n\":{n},\"model\":\"jellium_s1\",\"e_ref\":{eref:.15e},\"e_ref_literature\":{:.15e}",
+        e_tri_jellium()
+    );
+    let record = |tag: &str, r: &Result<Relaxed, String>, fields: &mut String| match r {
+        Ok(r) => {
+            let e = j.energy(&r.x) / n as f64;
+            let o = order(&geo, &r.x, None);
+            let _ = write!(
+                fields,
+                ",\"{tag}\":{{\"e\":{e:.15e},\"gap\":{:.6e},\"rel_gap\":{:.6e},\"defects\":{},\"psi6_global\":{:.6},\"psi6_local\":{:.6},\"max_force\":{:.3e},\"t\":{:.3e},\"cvode_steps\":{},\"rhs_evals\":{},\"converged\":{}",
+                e - eref,
+                (e - eref) / eref.abs(),
+                o.defects,
+                o.psi6_global,
+                o.psi6_local,
+                r.max_force,
+                r.t,
+                r.steps,
+                r.rhs_evals,
+                r.converged
+            );
+            if hess {
+                let m = r.x.len();
+                let ev = symmetric_eigenvalues(&j.hessian_fd(&r.x, 1e-5), m);
+                let scale = ev[m - 1].abs();
+                let neg = ev.iter().filter(|&&v| v < -1e-9 * scale).count();
+                let _ = write!(
+                    fields,
+                    ",\"hess_lowest\":[{:.3e},{:.3e},{:.3e}],\"hess_negative\":{neg}",
+                    ev[0], ev[1], ev[2]
+                );
+            }
+            fields.push('}');
+        }
+        Err(e) => {
+            let _ = write!(
+                fields,
+                ",\"{tag}\":{{\"error\":\"{}\"}}",
+                e.replace('"', "'")
+            );
+        }
+    };
+    record("quench", &j.relax(x0, FTOL, TMAX), &mut fields);
+    if anneal_it {
+        let xa = j.anneal(x0, 0.05, 1e-5, 100_000, 0.01, 0.05, seed);
+        record("anneal_quench", &j.relax(&xa, FTOL, TMAX), &mut fields);
+    }
+    format!("{{{fields}}}")
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let cmd = args.get(1).map(String::as_str).unwrap_or("refs");
@@ -350,6 +431,99 @@ fn main() {
             }
             let lines = parallel(jobs, threads);
             write(&res, "disk.jsonl", &lines);
+        }
+        "jel-controls" => {
+            let jres = res.join("jellium");
+            let mut jobs: Vec<Box<dyn FnOnce() -> String + Send>> = Vec::new();
+            jobs.push(Box::new(move || {
+                jel_run(
+                    "ctl_pos_perfect",
+                    "control",
+                    &tri_jellium(),
+                    &triangular(16, 18, a),
+                    false,
+                    0,
+                    true,
+                )
+            }));
+            jobs.push(Box::new(move || {
+                let mut x = triangular(16, 18, a);
+                let mut rng = Rng::new(3);
+                x.iter_mut().for_each(|v| *v += 0.1 * a * rng.gauss());
+                jel_run(
+                    "ctl_pos_noisy",
+                    "control",
+                    &tri_jellium(),
+                    &x,
+                    false,
+                    0,
+                    true,
+                )
+            }));
+            jobs.push(Box::new(move || {
+                let j = square_jellium();
+                let x = square(17, 1.0);
+                let e_sq = j.energy(&x) / 289.0;
+                let m = x.len();
+                let ev = symmetric_eigenvalues(&j.hessian_fd(&x, 1e-5), m);
+                let scale = ev[m - 1].abs();
+                let neg = ev.iter().filter(|&&v| v < -1e-9 * scale).count();
+                format!(
+                    "{{\"label\":\"ctl_neg_square_saddle\",\"e_square_box\":{e_sq:.15e},\"e_square_literature\":{:.15e},\"hess_lowest\":[{:.3e},{:.3e},{:.3e}],\"hess_negative\":{neg},\"e_tri_literature\":{:.15e}}}",
+                    jellium::ETA_SQUARE * std::f64::consts::PI.sqrt(), ev[0], ev[1], ev[2], e_tri_jellium()
+                )
+            }));
+            let lines = parallel(jobs, threads);
+            write(&jres, "controls.jsonl", &lines);
+        }
+        "jel-main" => {
+            let jres = res.join("jellium");
+            let nrun: usize = args.get(3).map(|s| s.parse().unwrap()).unwrap_or(20);
+            let mut jobs: Vec<Box<dyn FnOnce() -> String + Send>> = Vec::new();
+            for k in 0..nrun {
+                let p = init.join(format!("oc20_tri_box_{k:02}.csv"));
+                jobs.push(Box::new(move || {
+                    jel_run(
+                        &format!("oc20_{k:02}"),
+                        "hf_oc20",
+                        &tri_jellium(),
+                        &read_csv(&p),
+                        true,
+                        100 + k as u64,
+                        true,
+                    )
+                }));
+                jobs.push(Box::new(move || {
+                    let j = tri_jellium();
+                    let x0 =
+                        uniform_config(&j.geometry_system(), 288, 0.5 * a, None, 500 + k as u64);
+                    jel_run(
+                        &format!("uniform_{k:02}"),
+                        "uniform",
+                        &j,
+                        &x0,
+                        true,
+                        900 + k as u64,
+                        true,
+                    )
+                }));
+            }
+            for k in 0..(nrun / 2).max(1) {
+                let p = init.join(format!("oc20_square_box_{k:02}.csv"));
+                jobs.push(Box::new(move || {
+                    jel_run(
+                        &format!("incommensurate_{k:02}"),
+                        "ctl_neg_incommensurate_box",
+                        &square_jellium(),
+                        &read_csv(&p),
+                        true,
+                        700 + k as u64,
+                        false,
+                    )
+                }));
+            }
+            let lines = parallel(jobs, threads);
+            write(&jres, "main_kappa_jellium_s1.jsonl", &lines);
         }
         other => panic!("unknown command {other}"),
     }

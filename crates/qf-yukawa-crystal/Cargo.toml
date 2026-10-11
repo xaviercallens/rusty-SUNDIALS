@@ -8,6 +8,7 @@ description = "Numerical check of planar universal optimality for the 2D Yukawa 
 [dependencies]
 cvode = { path = "../cvode" }
 nvector = { path = "../nvector" }
+libm = "0.2"
 
 [[bin]]
 name = "yukawa_crystal"
