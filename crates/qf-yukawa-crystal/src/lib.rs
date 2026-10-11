@@ -9,6 +9,9 @@
 //! predicts that no density-1 configuration has a lower energy per particle than the triangular lattice. The
 //! truncation makes the potential not exactly completely monotone beyond `rc`; its size is `~exp(-kappa rc)`.
 
+pub mod global_opt;
+pub mod jellium;
+
 use cvode::{Cvode, DenseMat, Method, Task};
 use nvector::SerialVector;
 
@@ -60,7 +63,7 @@ impl System {
         )
     }
 
-    fn delta(&self, xi: f64, yi: f64, xj: f64, yj: f64) -> (f64, f64) {
+    pub fn delta(&self, xi: f64, yi: f64, xj: f64, yj: f64) -> (f64, f64) {
         let (mut dx, mut dy) = (xi - xj, yi - yj);
         if let Geometry::Periodic { lx, ly } = self.geometry {
             dx -= lx * (dx / lx).round();

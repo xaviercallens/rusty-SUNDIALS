@@ -4,14 +4,14 @@
 //!   on stdout, and **never runs solver code itself**: each solver tool call is delegated to a worker
 //!   subprocess (see below), so nothing a solver prints can reach the protocol stream.
 //! * `--worker <tool> <arguments-json> <result-path>` — runs one tool and writes the outcome as JSON
-//!   to `<result-path>`. Its stdout is a duplicate of the parent's stderr handle, so solver
-//!   diagnostics (e.g. `cvode/src/solver.rs`'s `println!("ERROR FAIL …")`) land in the client's log,
-//!   not in the protocol.
+//!   to `<result-path>`. Its stdout is a duplicate of the parent's stderr handle, so anything a
+//!   solver might print lands in the client's log, not in the protocol. (`cvode/src/solver.rs`
+//!   itself now writes its `ERROR FAIL …` diagnostics to stderr; the worker is defense in depth.)
 //!
 //! `SUNDIALS_MCP_TIMEOUT_SECS` (default 120; `SUNDIALS_MCP_TIMEOUT_MS` overrides it, for tests)
 //! bounds each worker; on timeout the worker is killed and
 //! the call returns `ran: false`. `SUNDIALS_MCP_NO_ISOLATION=1` runs solvers in the protocol process
-//! instead — **test-only**, it exists so the isolation test has a control that must fail.
+//! instead — **test-only**; `tests/stdio.rs` uses it to show the stream stays pure even then.
 #![forbid(unsafe_code)]
 
 use std::io::{BufRead, Write};
