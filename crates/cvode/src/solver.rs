@@ -480,7 +480,7 @@ where
                     self.zn.restore(self.q);
                     err_fails += 1;
                     if err_fails >= MAX_ERR_TEST_FAILS {
-                        println!("ERROR FAIL 1: jacobian compute");
+                        eprintln!("ERROR FAIL 1: jacobian compute");
                         return Err(CvodeError::Solver(
                             sundials_core::SundialsError::ErrTestFailure,
                         ));
@@ -500,7 +500,7 @@ where
                         self.zn.restore(self.q);
                         err_fails += 1;
                         if err_fails >= MAX_ERR_TEST_FAILS {
-                            println!("ERROR FAIL 2: jacobian compute 2");
+                            eprintln!("ERROR FAIL 2: jacobian compute 2");
                             return Err(CvodeError::Solver(
                                 sundials_core::SundialsError::ErrTestFailure,
                             ));
@@ -757,7 +757,7 @@ where
             self.etamax = 1.0;
             err_fails += 1;
             if err_fails >= MAX_ERR_TEST_FAILS {
-                println!("ERROR FAIL 3: local error test failed > max times");
+                eprintln!("ERROR FAIL 3: local error test failed > max times");
                 return Err(CvodeError::Solver(
                     sundials_core::SundialsError::ErrTestFailure,
                 ));

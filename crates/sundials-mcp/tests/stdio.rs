@@ -1,8 +1,16 @@
-//! End-to-end tests of the real binary over stdio. The central one reproduces the pitfall this
-//! server is built around: `cvode/src/solver.rs` prints `ERROR FAIL 3: …` to stdout when the local
-//! error test fails, which on a stdio protocol corrupts the stream. With isolation the protocol
-//! stream stays pure JSON-RPC; the control (isolation disabled) must show the corruption, so the
-//! test demonstrably can fail.
+//! End-to-end tests of the real binary over stdio.
+//!
+//! History: this server was built around a pitfall in `cvode/src/solver.rs`, which used to
+//! `println!("ERROR FAIL …")` to stdout on some failure paths and so could corrupt a stdio
+//! protocol stream. Those diagnostics now go to stderr (docs/CVODE_ADAMS_FIX.md, part B), and
+//! `crates/cvode/tests/diagnostics_stderr.rs` proves it by capturing a child process that reaches
+//! that path. The worker-subprocess isolation is kept as defense in depth and for the timeout.
+//! The two tests that used to need a stdout-printing solve (`solver_stdout_never_reaches_the_
+//! protocol_stream` and its control `control_without_isolation_the_stream_is_corrupted`) were
+//! `#[ignore]`d because no built-in problem reached a printing path any more; with the solver
+//! silent on stdout the control could never show corruption again, so the pair is replaced by
+//! the two tests below: the worker binary run directly writes nothing to stdout on a failing
+//! solve, and a session with isolation disabled keeps the protocol stream pure.
 
 use std::io::Write;
 use std::process::{Command, Stdio};
@@ -12,9 +20,9 @@ use serde_json::{Value, json};
 const BIN: &str = env!("CARGO_BIN_EXE_sundials-mcp");
 
 /// A failing solve: y' = -sqrt(y) reaches y = 0 at t = 2; past it the RHS leaves its real
-/// domain (NaN), so CVODE's error-test failure path (which prints to stdout) fires. The previous
-/// fixture, exponential decay at rtol 1e-9, only failed because of the tout-rescale defect fixed
-/// in docs/CVODE_TIGHT_TOLERANCE_FIX.md.
+/// domain (NaN) and the solver fails (Newton non-convergence). A genuine failure, not a tolerance
+/// artefact (the earlier fixture, exponential decay at rtol 1e-9, only failed because of the
+/// tout-rescale defect fixed in docs/CVODE_TIGHT_TOLERANCE_FIX.md).
 fn failing_solve(id: i64) -> Value {
     json!({"jsonrpc": "2.0", "id": id, "method": "tools/call",
            "params": {"name": "solve", "arguments": {"problem": "domain_exit", "t_out": [1.0, 3.0]}}})
@@ -58,17 +66,58 @@ fn handshake() -> Vec<Value> {
     ]
 }
 
+/// The worker binary, run directly with its stdout captured (no isolation layer in between),
+/// writes nothing at all to stdout while a solve fails. This is the property the isolation layer
+/// used to have to provide; it is now guaranteed by the solver itself.
 #[test]
-#[ignore = "needs a solve that makes cvode println! to stdout; after the tout-rescale fix (docs/CVODE_TIGHT_TOLERANCE_FIX.md) no built-in problem reaches a printing path (domain_exit fails via Newton non-convergence, which is silent). Follow-up: route cvode diagnostics to stderr."]
-fn solver_stdout_never_reaches_the_protocol_stream() {
+fn worker_binary_writes_nothing_to_stdout_on_a_failing_solve() {
+    let result_path = std::env::temp_dir().join(format!(
+        "sundials-mcp-stdio-test-{}.json",
+        std::process::id()
+    ));
+    let out = Command::new(BIN)
+        .arg("--worker")
+        .arg("solve")
+        .arg(json!({"problem": "domain_exit", "t_out": [1.0, 3.0]}).to_string())
+        .arg(&result_path)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()
+        .expect("run worker");
+    let result: Value = serde_json::from_str(
+        &std::fs::read_to_string(&result_path).expect("worker wrote its result file"),
+    )
+    .unwrap();
+    let _ = std::fs::remove_file(&result_path);
+    assert!(out.status.success(), "worker exit status {:?}", out.status);
+    assert!(
+        out.stdout.is_empty(),
+        "the worker wrote to stdout during a failing solve:\n{}",
+        String::from_utf8_lossy(&out.stdout)
+    );
+    assert_eq!(result["status"], "err", "{result}");
+    assert_eq!(result["ran"], true, "{result}");
+    assert!(
+        result["message"].as_str().unwrap().contains("domain_exit"),
+        "{result}"
+    );
+}
+
+/// With isolation disabled (solver code runs inside the protocol process), a failing solve still
+/// leaves the protocol stream pure JSON-RPC: the solver no longer writes to stdout, so the
+/// worker subprocess is defense in depth rather than the only barrier. Before the stderr change
+/// this configuration was the control that showed the corruption.
+#[test]
+fn without_isolation_a_failing_solve_leaves_the_protocol_stream_pure() {
     let mut msgs = handshake();
     msgs.push(failing_solve(2));
     msgs.push(json!({"jsonrpc": "2.0", "id": 3, "method": "tools/call",
                      "params": {"name": "solve", "arguments": {"problem": "exponential"}}}));
-    let (stdout, stderr) = session(&msgs, &[]);
+    let (stdout, _) = session(&msgs, &[("SUNDIALS_MCP_NO_ISOLATION", "1")]);
     assert!(
         is_pure_jsonrpc(&stdout),
-        "protocol stream corrupted:\n{stdout}"
+        "protocol stream corrupted without isolation:\n{stdout}"
     );
     let resps: Vec<Value> = stdout
         .lines()
@@ -79,23 +128,6 @@ fn solver_stdout_never_reaches_the_protocol_stream() {
     assert_eq!(fail["isError"], true);
     assert_eq!(fail["structuredContent"]["ran"], true);
     assert_eq!(resps[2]["result"]["isError"], false);
-    assert!(
-        stderr.contains("ERROR FAIL"),
-        "the solver's diagnostic should be routed to stderr: {stderr}"
-    );
-}
-
-#[test]
-#[ignore = "control for the test above; same reason"]
-fn control_without_isolation_the_stream_is_corrupted() {
-    let mut msgs = handshake();
-    msgs.push(failing_solve(2));
-    let (stdout, _) = session(&msgs, &[("SUNDIALS_MCP_NO_ISOLATION", "1")]);
-    assert!(
-        !is_pure_jsonrpc(&stdout),
-        "control failed to reproduce the corruption; the isolation test would then prove nothing:\n{stdout}"
-    );
-    assert!(stdout.contains("ERROR FAIL"));
 }
 
 #[test]
