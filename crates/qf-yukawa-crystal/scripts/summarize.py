@@ -29,7 +29,8 @@ def main() -> None:
                 if not s or "error" in s:
                     continue
                 f = fam.setdefault(f'{r["family"]}/{stage}', {"runs": 0, "perfect_lattice": 0, "defected": 0, "min_rel_gap": None,
-                                                               "max_rel_gap": None, "not_converged": 0, "hess_negative_runs": 0})
+                                                               "max_rel_gap": None, "not_converged": 0, "hess_negative_runs": 0,
+                                                               "hess_checked": 0, "hess_third_min": None})
                 f["runs"] += 1
                 g = s["rel_gap"]
                 f["min_rel_gap"] = g if f["min_rel_gap"] is None else min(f["min_rel_gap"], g)
@@ -40,8 +41,13 @@ def main() -> None:
                     f["defected"] += 1
                 if not s["converged"]:
                     f["not_converged"] += 1
-                if s.get("hess_negative", 0) > 0:
-                    f["hess_negative_runs"] += 1
+                # Only runs whose final Hessian was computed count here; a missing field is "not checked", never 0.
+                if "hess_negative" in s:
+                    f["hess_checked"] += 1
+                    if s["hess_negative"] > 0:
+                        f["hess_negative_runs"] += 1
+                    third = s["hess_lowest"][2]
+                    f["hess_third_min"] = third if f["hess_third_min"] is None else min(f["hess_third_min"], third)
                 if g < -REL_TOL_UNDERCUT and r["family"] != "ctl_neg_incommensurate_box":
                     undercuts.append({"label": r["label"], "stage": stage, "rel_gap": g})
                 if r["family"] == "ctl_neg_incommensurate_box" and g < -REL_TOL_UNDERCUT:
