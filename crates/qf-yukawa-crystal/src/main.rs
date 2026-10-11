@@ -432,6 +432,85 @@ fn main() {
             let lines = parallel(jobs, threads);
             write(&res, "disk.jsonl", &lines);
         }
+        "snapshot" => {
+            // Re-run selected published runs with their exact seeds and parameters and write coordinates for figures.
+            // Each line of snapshots.jsonl records the energy, so it can be compared with the published jsonl value.
+            let out = res.join("figures_data");
+            fs::create_dir_all(&out).unwrap();
+            let save = |name: &str, x: &[f64]| {
+                let s: String = (0..x.len() / 2)
+                    .map(|i| format!("{:.12},{:.12}\n", x[2 * i], x[2 * i + 1]))
+                    .collect();
+                fs::write(out.join(format!("{name}.csv")), s).unwrap();
+            };
+            let mut jobs: Vec<Box<dyn FnOnce() -> (String, Vec<f64>, f64) + Send>> = Vec::new();
+            let p0 = init.join("oc20_tri_box_00.csv");
+            let p17 = init.join("oc20_tri_box_17.csv");
+            let pd = init.join("oc20_disk_00.csv");
+            jobs.push(Box::new(move || {
+                let sys = tri_box(2.0);
+                let x0 = read_csv(&p0);
+                let e = sys.energy(&x0) / 288.0;
+                ("yuk_oc20_00_initial".into(), x0, e)
+            }));
+            let p0b = init.join("oc20_tri_box_00.csv");
+            jobs.push(Box::new(move || {
+                let sys = tri_box(2.0);
+                let r = relax(&sys, &read_csv(&p0b), FTOL, TMAX).unwrap();
+                let e = sys.energy(&r.x) / 288.0;
+                ("yuk_oc20_00_quench".into(), r.x, e)
+            }));
+            jobs.push(Box::new(move || {
+                let sys = tri_box(2.0);
+                let xa = anneal(&sys, &read_csv(&p17), 0.05, 1e-5, 300_000, 0.01, 0.05, 117);
+                let r = relax(&sys, &xa, FTOL, TMAX).unwrap();
+                let e = sys.energy(&r.x) / 288.0;
+                ("yuk_oc20_17_anneal_quench".into(), r.x, e)
+            }));
+            jobs.push(Box::new(move || {
+                let sys = square_box(2.0);
+                let x = square(17, 1.0);
+                let mut xs = x.clone();
+                let mut rng = Rng::new(5);
+                xs.iter_mut().for_each(|v| *v += 1e-3 * rng.gauss());
+                let r = relax(&sys, &xs, FTOL, TMAX).unwrap();
+                let e = sys.energy(&r.x) / 289.0;
+                ("yuk_square_saddle_relaxed".into(), r.x, e)
+            }));
+            let rdisk = (300.0 / std::f64::consts::PI).sqrt();
+            for (gname, geom) in [
+                ("open_bowl", Geometry::Bowl { k: 0.02 }),
+                (
+                    "closed_wall",
+                    Geometry::Wall {
+                        radius: rdisk,
+                        eps: 100.0,
+                    },
+                ),
+            ] {
+                let pd = pd.clone();
+                jobs.push(Box::new(move || {
+                    let sys = System {
+                        kappa: 2.0,
+                        rc: 8.0,
+                        geometry: geom,
+                    };
+                    let xa = anneal(&sys, &read_csv(&pd), 0.05, 1e-5, 300_000, 0.01, 0.05, 300);
+                    let r = relax(&sys, &xa, FTOL, TMAX).unwrap();
+                    let e = sys.energy(&r.x) / 300.0;
+                    (format!("disk_00_{gname}"), r.x, e)
+                }));
+            }
+            let results = parallel(jobs, threads);
+            let mut lines = Vec::new();
+            for (name, x, e) in results {
+                save(&name, &x);
+                lines.push(format!(
+                    "{{\"name\":\"{name}\",\"e_per_particle\":{e:.15e}}}"
+                ));
+            }
+            write(&out, "snapshots.jsonl", &lines);
+        }
         "jel-controls" => {
             let jres = res.join("jellium");
             let mut jobs: Vec<Box<dyn FnOnce() -> String + Send>> = Vec::new();
