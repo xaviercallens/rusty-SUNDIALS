@@ -89,7 +89,10 @@ fn one_run(
     let n = x0.len() / 2;
     let mut s = String::new();
     let quench = relax(sys, x0, FTOL, TMAX);
-    let mut fields = format!("\"label\":\"{label}\",\"family\":\"{family}\",\"n\":{n},\"kappa\":{},\"e_ref\":{eref:.15e}", sys.kappa);
+    let mut fields = format!(
+        "\"label\":\"{label}\",\"family\":\"{family}\",\"n\":{n},\"kappa\":{},\"e_ref\":{eref:.15e}",
+        sys.kappa
+    );
     let record = |tag: &str, r: &Result<Relaxed, String>, fields: &mut String| match r {
         Ok(r) => {
             let e = sys.energy(&r.x) / n as f64;
@@ -97,7 +100,16 @@ fn one_run(
             let _ = write!(
                 fields,
                 ",\"{tag}\":{{\"e\":{e:.15e},\"gap\":{:.6e},\"rel_gap\":{:.6e},\"defects\":{},\"psi6_global\":{:.6},\"psi6_local\":{:.6},\"max_force\":{:.3e},\"t\":{:.3e},\"cvode_steps\":{},\"rhs_evals\":{},\"converged\":{}",
-                e - eref, (e - eref) / eref.abs(), o.defects, o.psi6_global, o.psi6_local, r.max_force, r.t, r.steps, r.rhs_evals, r.converged
+                e - eref,
+                (e - eref) / eref.abs(),
+                o.defects,
+                o.psi6_global,
+                o.psi6_local,
+                r.max_force,
+                r.t,
+                r.steps,
+                r.rhs_evals,
+                r.converged
             );
             if hess {
                 let (l0, l1, l2, neg) = hessian_summary(sys, &r.x);
@@ -133,14 +145,16 @@ fn parallel<T: Send>(jobs: Vec<Box<dyn FnOnce() -> T + Send>>, threads: usize) -
     let out = std::sync::Mutex::new(Vec::new());
     std::thread::scope(|sc| {
         for _ in 0..threads {
-            sc.spawn(|| loop {
-                let job = jobs.lock().unwrap().pop();
-                match job {
-                    Some((i, f)) => {
-                        let r = f();
-                        out.lock().unwrap().push((i, r));
+            sc.spawn(|| {
+                loop {
+                    let job = jobs.lock().unwrap().pop();
+                    match job {
+                        Some((i, f)) => {
+                            let r = f();
+                            out.lock().unwrap().push((i, r));
+                        }
+                        None => break,
                     }
-                    None => break,
                 }
             });
         }
