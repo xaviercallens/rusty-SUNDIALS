@@ -14,6 +14,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [11.7.0] — 2026-10-11 — Yukawa crystal: universal-optimality energy floor + global optimizers
+
+**New crate `crates/qf-yukawa-crystal`** (PR #73): 2D Yukawa `exp(-kappa r)/r` N-body relaxation with CVODE
+(BDF, analytic Hessian Jacobian) testing planar universal optimality. It covers the preregistered study YUK-TRI-1
+(kappa = 2 and 1, square and incommensurate negative controls, open/closed disk study) and a 2D Wigner-crystal
+(jellium) Ewald check.
+
+**`global_opt` module (exploratory, postdates the preregistration):**
+- `floor_check` / `check_reported_energy`: a one-sided ground-truth test. For `f(r^2)` completely monotone, no
+  periodic configuration has lower energy per particle than the triangular lattice at the same density.
+  - Energies are recomputed with the **exact** potential. The shifted-force dynamics potential lies below it
+    everywhere and would raise false alarms.
+  - The exact sum is truncated with a rigorous tail bound and roundoff slack.
+  - `violated == true` can only mean a bug. A pass proves nothing about optimality.
+  - Periodic geometry only; jellium is out of the theorem's scope.
+- `basin_hopping` (kick, CVODE quench, Metropolis, overlap guard) and `parallel_tempering` (replica-exchange
+  Langevin with periodic CVODE quenches), aimed at the glassy kappa = 1 outcomes.
+- New CLI subcommands `yukawa_crystal global` and `yukawa_crystal floor`, writing to `results/exploratory/`.
+
+**Measured:**
+- Floor audit on the 288-particle kappa = 1 box: the lattice is at -2e-12 (tolerance 5e-10) and the square
+  lattice +9.5e-3 above, with no violations.
+- A short kappa = 1 global run did not improve on the 4-defect quench, so full-budget runs are pending.
+- An 8-rung tempering ladder accepted 0/70 swaps at N = 288. The default is now 24 rungs over
+  [4e-3, 2e-2] (29/69 accepted).
+
+No claim is made that this proves ODE solvers insufficient for soft potentials.
+
+---
+
 ## [6.4.1] — 2026-09-27 — MCP Server + CMB Dark-Energy Bound
 
 ### Last Improvement Summary
