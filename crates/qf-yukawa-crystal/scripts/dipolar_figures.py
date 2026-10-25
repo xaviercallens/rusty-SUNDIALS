@@ -45,9 +45,25 @@ def main(res: str, out: str) -> None:
     phys = json.load(open(os.path.join(res, "physical_d.json")))
     refs = jl(os.path.join(res, "references.jsonl"))
     ctl = jl(os.path.join(res, "controls.jsonl")) if os.path.exists(os.path.join(res, "controls.jsonl")) else []
+    # main results: the batch jsonl if the process finished, else the RESULT lines it printed per finished job
     mains = []
+    done_d = set()
     for p in sorted(glob.glob(os.path.join(res, "main_d*.jsonl"))):
-        mains += jl(p)
+        rows_ = jl(p)
+        mains += rows_
+        done_d |= {r["d"] for r in rows_}
+    for p in sorted(glob.glob(os.path.join(res, "main_d*_stdout.txt"))):
+        for line in open(p):
+            if line.startswith("RESULT "):
+                r = json.loads(line[len("RESULT "):])
+                if r["d"] not in done_d:
+                    r["source"] = os.path.basename(p)
+                    mains.append(r)
+    # controls also yield relaxed competitors (noisy lattice, square + noise)
+    for c in ctl:
+        for tag in ("quench", "relax_from_square_plus_noise"):
+            if tag in c:
+                mains.append({"label": c["label"], "family": "control_" + c["label"], "d": c["d"], "quench": c[tag]})
 
     # --- figure 1: lattice gaps vs d
     fig, ax = plt.subplots(figsize=(5.2, 3.4))
@@ -87,13 +103,24 @@ def main(res: str, out: str) -> None:
                      "rel_gap_exact": rec["rel_gap_exact"], "gap_sf": rec["gap_sf"], "defects": rec["defects"],
                      "converged": rec["converged"], "max_force": rec["max_force"],
                      "hess_negative": rec.get("hess_negative"), "wall_s": rec["wall_s"]})
+    fams["control_ctl_neg_square_saddle"] = (VIOLET, "D", "square lattice + noise (control)")
+    fams["control_ctl_pos_noisy"] = (INK2, "x", "triangular + noise (pos. control)")
     for fam, (c, mk, lab) in fams.items():
-        xs = [r["d"] * (1 + 0.04 * (hash(r["label"]) % 5 - 2)) for r in rows if r.get("family") == fam]
-        ys = [r["rel_gap_exact"] for r in rows if r.get("family") == fam]
+        sel = [r for r in rows if r.get("family") == fam]
+        # deterministic jitter from the label digits (reproducible, unlike hash())
+        jit = [sum(ord(ch) for ch in r["label"]) % 5 - 2 for r in sel]
+        xs = [r["d"] * (1 + 0.05 * j) for r, j in zip(sel, jit)]
+        ys = [r["rel_gap_exact"] for r in sel]
         if xs:
-            ax.scatter(xs, ys, s=22, color=c, marker=mk, label=lab, edgecolors="white", linewidths=0.8, zorder=3)
+            kw = {"edgecolors": "white", "linewidths": 0.8} if mk != "x" else {}
+            ax.scatter(xs, ys, s=22, color=c, marker=mk, label=lab, zorder=3, **kw)
+    ax.axhline(0.0, color=INK, lw=0.8)
     ax.set_xscale("log")
-    ax.set_yscale("log")
+    ax.set_yscale("symlog", linthresh=1e-12)
+    ax.set_ylim(-1e-4, 5e-2)
+    ax.axhline(-1e-9, color=ORANGE, lw=1, ls="--")
+    ax.text(0.99, -1e-9, "prereg. P1 threshold $-10^{-9}$", fontsize=7, color=INK2, ha="right", va="top",
+            transform=ax.get_yaxis_transform())
     ax.set_xlabel(r"$\tilde d = d\,\sqrt{n}$", fontsize=9, color=INK)
     ax.set_ylabel(r"$(e - e_{\rm tri})/e_{\rm tri}$, exact potential", fontsize=9, color=INK)
     ax.set_title("CVODE-relaxed periodic configurations (N = 288/289): all above the triangular lattice?",
@@ -112,7 +139,7 @@ def main(res: str, out: str) -> None:
     ax.set_yscale("log")
     ax.set_xlabel("radius R of the direct lattice sum (plus exact uniform tail)", fontsize=9, color=INK)
     ax.set_ylabel(r"$|e_{\rm tri}(R) - e_{\rm tri}^{\rm Ewald}|$ (units of $d^2$)", fontsize=9, color=INK)
-    ax.set_title("Lattice-minus-continuum residual of a spherical cutoff (why Ewald is used)", fontsize=8,
+    ax.set_title("Lattice-minus-continuum residual of a spherical cutoff (why Ewald is used);\nthe five d curves coincide to plotting accuracy in units of d$^2$", fontsize=8,
                  color=INK)
     style(ax)
     ax.legend(fontsize=7, frameon=False)
@@ -123,8 +150,10 @@ def main(res: str, out: str) -> None:
         "n_runs": len(rows), "n_errors": len(rows) - len(ok),
         "min_rel_gap_exact_by_d": {str(d): min((r["rel_gap_exact"] for r in ok if r["d"] == d), default=None)
                                    for d in sorted({r["d"] for r in ok})},
-        "P1_full_undercuts": [r for r in ok if r["gap_exact"] < -1e-9 * 4.0],
-        "P1b_sf_undercuts": [r for r in ok if r["gap_sf"] < -1e-9 * 4.0],
+        "P1_full_undercuts": [r for r in ok if r["rel_gap_exact"] < -1e-9],
+        "P1b_sf_undercuts_abs_gap_lt_-1e-9_times_e_tri_sf_approx": [r for r in ok if r["gap_sf"] < -1e-9 * 2.5],
+        "eta_independence_lattice_grid_max_rel": max(abs(g["e_tri_exact_eta1.2"] - g["e_tri"]) / g["e_tri"]
+                                                     for g in gaps),
         "not_converged": [r["label"] + "@" + str(r["d"]) for r in ok if not r["converged"]],
         "perfect_lattice_reached": [r["label"] + "@" + str(r["d"]) for r in ok
                                     if r["defects"] == 0 and abs(r["rel_gap_exact"]) < 1e-8],
@@ -133,6 +162,18 @@ def main(res: str, out: str) -> None:
         "controls": ctl, "runs": rows,
         "lattice_gap_at_physical_d": {k: min(gaps, key=lambda g: abs(math.log(g["d"] / v))) for k, v in dt.items()},
     }
+    # physical scale of the square-triangular gap per exciton, unscreened (eps_r = 1; divide by eps_r otherwise):
+    # V_phys = (e^2 / 4 pi eps0) sqrt(n) d_tilde^2 U, e^2/(4 pi eps0) = 1.439964548 eV nm (CODATA-derived constant)
+    ke = 1.439964548
+    d_nm = phys["MoSe2_WSe2_proxy_d_A"] / 10.0
+    summ["physical_square_minus_tri_meV_eps1"] = {}
+    for key, n_cm2 in (("1e+11", 1e11), ("1e+12", 1e12), ("3e+12", 3e12)):
+        sqrt_n_nm = math.sqrt(n_cm2 * 1e-14)
+        dt_ = d_nm * sqrt_n_nm
+        g = min(refs, key=lambda r: abs(r["d"] - dt_))  # refs were run at the rounded d_tilde values
+        summ["physical_square_minus_tri_meV_eps1"][key] = {
+            "d_tilde": dt_, "d_tilde_of_ref_used": g["d"], "square_minus_tri_U": g["square_minus_tri_exact"],
+            "meV": 1e3 * ke * sqrt_n_nm * g["d"] ** 2 * g["square_minus_tri_exact"]}
     json.dump(summ, open(os.path.join(out, "summary.json"), "w"), indent=1)
     print(json.dumps({k: v for k, v in summ.items() if k not in ("runs", "controls", "lattice_gap_at_physical_d")},
                      indent=1))
