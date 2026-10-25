@@ -144,8 +144,10 @@ impl SigmaModel {
 
 /// Packed real state to complex amplitudes.
 pub fn unpack(y: &[f64]) -> Vec<Complex64> {
-    y.chunks_exact(2)
-        .map(|p| Complex64::new(p[0], p[1]))
+    y.as_chunks::<2>()
+        .0
+        .iter()
+        .map(|&[re, im]| Complex64::new(re, im))
         .collect()
 }
 
