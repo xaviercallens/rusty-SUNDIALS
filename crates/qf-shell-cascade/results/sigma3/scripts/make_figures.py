@@ -31,6 +31,7 @@ def main() -> None:
     st = json.load(open(sys.argv[1]))
     sp = json.load(open(sys.argv[2]))
     out = sys.argv[3]
+    supp = [json.loads(line) for line in open(sys.argv[4])] if len(sys.argv) > 4 else []
     os.makedirs(out, exist_ok=True)
 
     # Fig 1: conservation vs rtol, positive vs perturbed-coupling negative control.
@@ -70,9 +71,14 @@ def main() -> None:
     c2 = [r for r in st["C2_sigma2_vs_sigma3"] if "error" not in r]
     for j, (lab, sig) in enumerate((("σ = 2 (H$_2$ in place of H$_3$)", 2.0), ("σ = 3", 3.0))):
         sub = [r for r in c2 if r["sigma"] == sig]
+        if sig == 2.0 and supp:
+            sub = sub + [r for r in supp if "top_shell" in r["label"] and r["n_max"] > max(q["n_max"] for q in sub)]
         x = np.array([r["n_max"] for r in sub])
         y = np.array([r["sup_ratio"] for r in sub])
         ax.semilogy(x, y, marker="o", ms=5, color=C[j], label=lab)
+        if sig == 2.0:
+            ref = (x, y[-1] * 2.0 ** (x - x[-1]))
+    ax.semilogy(ref[0], ref[1], color=MUTED, lw=1, ls="--", label="2$^n$ reference through last σ = 2 point")
     ax.axhline(1.0, color=MUTED, lw=1, ls=":")
     ax.set_xlabel("truncation n$_{max}$")
     ax.set_ylabel(r"$\sup_t\,2D\Omega(t)\,/\,(H_\sigma(0)+S(0)^{3/2})$")
