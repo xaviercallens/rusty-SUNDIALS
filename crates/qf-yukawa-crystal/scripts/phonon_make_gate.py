@@ -29,7 +29,34 @@ def table(head, rows):
     return s
 
 
-refuted = [k for k, v in cm.items() if v.get("min_d_ez_stable_competitor", {}).get("d_ez", 1) < 0]
+edge = json.load(open(os.path.join(wd, "edge_check.json")))
+lw = json.load(open(os.path.join(wd, "longwave_check.json")))
+
+
+def robust(spec):
+    """lowest dE_zp(n=384) among competitors that are stable on n = 96, 192, 384 (candidates: also rc = 400 and 800)."""
+    it = edge[spec]
+    pts = []
+    flips = []
+    for xy in sorted({(c["x"], c["y"]) for c in it["candidates"]}):
+        cs = [c for c in it["candidates"] if (c["x"], c["y"]) == xy]
+        if all(c["stable"] for c in cs):
+            c384 = [c for c in cs if c["n"] == 384 and c["rc"] == 800][0]
+            pts.append((c384["dEzp"], xy[0], xy[1], "candidate"))
+        elif cs[0]["stable"] and not all(c["stable"] for c in cs):
+            flips.append((xy[0], xy[1], "n=96 stable, unstable at n=192/384"))
+    for name, pth in it["paths"].items():
+        if "refined" in pth:
+            r = pth["refined"]
+            if all(q["stable"] for q in r):
+                pts.append((r[-1]["dEzp"], pth["argmin"][0], pth["argmin"][1], "dense " + name))
+            else:
+                flips.append((pth["argmin"][0], pth["argmin"][1], "dense " + name + " minimum, unstable at n=192/384"))
+    return (min(pts) if pts else None), flips
+
+
+rob = {k: robust(k) for k in cm}
+refuted = [k for k in cm if rob[k][0] and rob[k][0][0] < 0]
 survive = [k for k in cm if k not in refuted]
 
 L = []
@@ -47,16 +74,16 @@ L.append(
     "Montgomery case, the rhombic lattice tau = 0.5 + 0.966025 i is dynamically stable (no imaginary frequency on k-grids "
     "n = 96, 192, 384) and has E_zp = 1.4902783 against 1.5033523 for the triangular lattice (grids n = 384, same code); "
     "the k-grid error at n = 96 is 1.3e-6, so the margin is about 10^4 times the numerical error. "
-    "The largest sampled margin is dE_zp = -4.87e-2 (3.2 % of E_zp) at tau = 0.3 + 0.9539 i. The result was reproduced by an "
+    "The largest margin found (dense arc scan, stable at n = 384) is dE_zp = -5.12e-2 (3.4 % of E_zp) at tau = 0.295 + 0.9555 i; the sampled-grid value was -4.87e-2 at tau = 0.3 + 0.9539 i. The elastic (k -> 0) limit of the headline competitor is stable: min eigenvalue of D(k)/|k|^2 = 0.105 against 0.238 for the triangular lattice (independent of any k-grid). The result was reproduced by an "
     "independent numpy implementation (explicit real-space sum, no folding, Gamma-centred and half-shifted k-grids, section Controls).\n"
 )
 L.append(
     f"Refuted for {len(refuted)} of {len(cm)} tested potentials by a stable competitor with lower E_zp: "
     + ", ".join(f"`{k}`" for k in refuted)
-    + ". Not refuted on the sampled stable lattices (triangular lowest, and a local minimum of E_zp): "
+    + ". Not refuted (no stable lower lattice found on the 567-point scan nor on dense 0.005-step scans along the arc |tau| = 1 and the line Re tau = 1/2; triangular is a strict local minimum of E_zp): "
     + ", ".join(f"`{k}`" for k in survive)
     + ". The conjecture 'for every CM g' is therefore refuted; a restricted version (narrow potentials) is not contradicted by this scan "
-    "but the stable set there is tiny (6 to 16 sampled lattices), so this is weak evidence, not a confirmation.\n"
+    "but the stable set there is small, so this is evidence from two 1-D paths plus a sparse 2-D sample, not a confirmation.\n"
 )
 L.append(
     "Mechanism seen in the data (interpretation, Tier C, not tested separately): around the triangular point the static energy has positive "
@@ -152,6 +179,39 @@ L.append(
 )
 
 # ---------------------------------------------------------------- main table
+L.append("## Verification at the stability edge and dense edge scans (`phonon_edge_check.py`, `phonon_longwave_check.py`)\n")
+L.append(
+    "Stability on an n = 96 k-grid is optimistic near the stability boundary: soft long-wave modes need a finer grid to be seen. "
+    "Every competitor used for a verdict below was therefore recomputed on n = 96, 192, 384, and the two candidate points also at rc = 400 and 800, and it counts only if stable on all of them. "
+    "Dense 1-D scans (step 0.005, n = 96) were run along the arc |tau| = 1 from x = 0.5 to 0.2 and along Re tau = 1/2 from y = sqrt(3)/2 to 1.1; the lowest stable point of each path was refined at n = 192, 384.\n"
+)
+rows = []
+for k in cm:
+    b, fl = rob[k]
+    rows.append(
+        [
+            k,
+            f"{b[0]:+.4e}",
+            f"({b[1]:.4f}, {b[2]:.4f}) {b[3]}",
+            "REFUTED" if b[0] < 0 else "survives (dense edge scan)",
+            "; ".join(f"({x:.3f}, {y:.4f}): {why}" for x, y, why in fl) or "none",
+        ]
+    )
+L.append(table(["potential", "robust min dE_zp (n=384)", "at tau", "verdict", "points stable at n=96 but unstable on a finer grid (dropped)"], rows))
+rows = []
+for r in lw:
+    rows.append([r["pot"], f"({r['x']:.3f}, {r['y']:.4f})", f"{r['min_lambda_over_eps2_0.001']:+.4f}", f"{r['min_lambda_over_eps2_0.01']:+.4f}"])
+L.append(
+    "Elastic-limit check (explicit sum, k = eps (cos t, sin t), 721 directions): min over t of lambda_min(D)/eps^2, positive = stable at long wavelength, independent of the k-grid. "
+    "The triangular lattice (y = 0.8660) is the reference.\n"
+)
+L.append(table(["potential", "tau", "eps = 1e-3", "eps = 1e-2"], rows))
+L.append(
+    "The long-wave values explain the edge: at gauss:0.5 and tau = 0.5 + 1.036 i a sound-speed eigenvalue is negative (-0.0087), so that lattice is elastically unstable, and tau = 0.5 + 1.016 i is only just stable (0.0014); "
+    "the gauss:0.5 verdict does not rest on that point (the lattice 0.5 + 0.966 i has 0.027 > 0 and dE_zp = -6.31e-3 at n = 384). "
+    "The long-wave check covers Gaussian and Yukawa only; for the dipolar and Riesz potentials stability rests on the k-grids up to n = 384.\n"
+)
+
 L.append("## Results for the completely monotone potentials (n = 96, rc = 400; 167 coarse + 400 random shapes, all with 0 <= Re tau <= 1/2, y in [0.85, 2.4])\n")
 rows = []
 for k, v in cm.items():
@@ -165,11 +225,11 @@ for k, v in cm.items():
             f"{v['e_zp_tri_extrapolated']:.7f}",
             (f"{c['d_ez']:+.3e}" if c else "-"),
             (f"({c['x']:.3f}, {c['y']:.3f})" if c else "-"),
-            ("REFUTED" if c and c["d_ez"] < 0 else "survives on sample"),
+            ("REFUTED" if k in refuted else "survives (dense edge scan)"),
             f"{cl['d_ec']:+.2e} ({'stable' if cl['stable'] else 'unstable'})",
         ]
     )
-L.append(table(["potential", "tri stable", "stable / sampled", "E_zp(tri) extrap.", "min dE_zp over stable lattices (not tri)", "at tau", "verdict", "min dE_zp,clip (all, favours competitor)"], rows))
+L.append(table(["potential", "tri stable", "stable / sampled", "E_zp(tri) extrap.", "min dE_zp over the n=96-stable sample (not tri; see edge verification for the robust values)", "at tau", "verdict", "min dE_zp,clip (all, favours competitor)"], rows))
 L.append(
     "The square lattice tau = i is dynamically unstable for every potential here (negative eigenvalue of D(k)), and the stable region is a small neighbourhood of the triangular point (all stable sampled lattices lie within 0.23 of rho in tau, with Im tau <= 1.03 and Re tau >= 0.30; measured by phonon_stable_extent.py on the scan CSVs). "
     "dE_zp,clip is lower than the triangular value for unstable lattices for most potentials (imaginary modes contribute 0), so clipping would manufacture counterexamples; those are not used.\n"
@@ -213,8 +273,8 @@ L.append(
     "- Tier X only: floating-point numerics. The refutation is numerical; it is a robust one (margin about 10^4 times the grid error, two independent implementations, stable on k-grids up to n = 384, frozen-phonon agreement 2e-7), but it is not a Lean statement.\n"
     "- Only 2-dimensional Bravais lattices (one particle per cell) and the harmonic approximation. Nothing is said about non-Bravais structures (QU-2), anharmonic corrections or the true quantum ground state.\n"
     "- The competitor lattices are not stress-free: they are not static-energy minima over lattice shape (the triangular lattice has the lower static energy, dE_static > 0), so they are not metastable crystals at fixed density. QU-1 as stated compares the functional E_zp over lattice shapes and is refuted regardless; a version asking about E_total at its own equilibrium shape is a different statement.\n"
-    "- The stable set is small and sampled: 6 to 16 lattices out of 567 for the CM potentials. The 'survives on sample' verdicts (gauss 0.25, 2, 4 and riesz 6) are weak, and for riesz 4 the triangular lattice is a local minimum of E_zp (c > 0) but a stable lattice at tau = 0.3 + 0.954 i lies lower, so local analysis alone is not enough.\n"
-    "- The lowest sampled competitor at x = 0.3 sits near the edge of the sampled stable region; the headline competitor tau = 0.5 + 0.966 i is well inside it. Not claimed: that these are the global minimisers of E_zp over the stable set.\n"
+    "- The stable set is small and sampled: 6 to 16 lattices out of 567 for the CM potentials at n = 96 (fewer on finer grids). The 'survives' verdicts (gauss 0.25, 2, 4 and riesz 6) rest on the 2-D sample plus two dense 1-D paths, not on an exhaustive 2-D search. For riesz 4 the triangular lattice is a local minimum of E_zp (c > 0) yet a stable lattice at tau = 0.3 + 0.954 i (stable at n = 384, rc = 800) and another at tau = 0.5 + 1.031 i lie lower, so local curvature alone does not decide a verdict.\n"
+    "- Several of the lowest n = 96 competitors sit at the stability edge and turned unstable on finer k-grids (listed above) and were dropped; the verdicts use only points that are stable on n = 96, 192, 384. The headline competitor tau = 0.5 + 0.966 i is well inside the stable region (elastic eigenvalue 0.105 against 0.238 for the triangular lattice). Not claimed: that any listed point is the global minimiser of E_zp over the stable set.\n"
     "- Coulomb and Keldysh are not covered (see above); unit amplitude and hbar = m = 1 only rescale E_zp.\n"
     "- Anything resting on openai/math universal-optimality results (the premise that the Gaussian is 'admissible' for the static theorem) is conditional on them (AI-generated, not peer reviewed); the refutation itself does not use them: it only needs the Gaussian to be completely monotone in r^2, which is elementary.\n"
     "- Consequence for the programme: step 1 refutes QU-1 for 8 of 12 potentials, so step 2 (human proof for Gaussian g) as formulated cannot succeed (a proof of a false statement). The numerics suggest a restricted question (for which g is the triangular lattice a local minimum of E_zp, i.e. sign of c) as a possible QU-1'; that is a conjecture suggested by this table, Tier C, untested beyond the table.\n"
@@ -234,6 +294,8 @@ L.append(
     "python -I scripts/phonon_controls.py BIN controls.json\n"
     "python -I scripts/phonon_independent_check.py independent_check.json\n"
     "python -I scripts/phonon_analyze.py data analysis_cm ; python -I scripts/phonon_analyze.py data_neg analysis_neg\n"
+    "python -I scripts/phonon_edge_check.py BIN .             # stability-edge verification and dense 1-D scans -> edge_check.json\n"
+    "python -I scripts/phonon_longwave_check.py longwave_check.json\n"
     "python -I scripts/phonon_make_gate.py . GATE.md\n"
     "bin/lattice_phonon point gauss:1 0.5 0.966025403784 96,192,384 400   # the headline competitor\n"
     "```\n"

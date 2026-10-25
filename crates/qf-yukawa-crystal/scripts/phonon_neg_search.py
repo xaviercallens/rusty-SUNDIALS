@@ -10,6 +10,7 @@ nothing is tuned beyond it.
 """
 
 import csv
+import os
 import json
 import math
 import subprocess
@@ -21,12 +22,13 @@ res = []
 for w in (0.08, 0.12, 0.2, 0.3):
     for c in (0.0, 0.5, 1.0):
         spec = f"wells:1.0,{math.sqrt(2.0):.12f},{w},{c}"
-        dst = f"/tmp/neg_{w}_{c}.csv"
+        dst = os.path.join(os.path.dirname(os.path.abspath(outp)), f"neg_{w}_{c}.csv")
         subprocess.run(["taskset", "-c", "6-7", binp, "scan", spec, "48", "400", taufile, dst], check=True)
         rows = []
         with open(dst) as f:
             for r in csv.DictReader(f):
                 rows.append({k: (float(v) if k not in ("pot",) else v) for k, v in r.items()})
+        os.remove(dst)
         tri = min(rows, key=lambda r: math.hypot(r["x"] - RHO[0], r["y"] - RHO[1]))
         smin = min(rows, key=lambda r: r["e_static"])
         stable = [r for r in rows if r["n_unstable"] == 0]

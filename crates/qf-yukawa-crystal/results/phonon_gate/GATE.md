@@ -4,9 +4,9 @@ Tier X (floating point) throughout. Nothing here is a proof. Date 2026-10-25. Pr
 
 ## Verdict
 
-**REFUTED(gauss:1, tau = 0.5 + 0.966025 i, margin dE_zp = -1.31e-2).** QU-1 as stated (triangular minimises E_zp among unit-covolume planar Bravais lattices for every completely monotone potential) is false numerically: for the Gaussian g(r^2) = exp(-pi r^2), which is completely monotone in r^2 and is the Montgomery case, the rhombic lattice tau = 0.5 + 0.966025 i is dynamically stable (no imaginary frequency on k-grids n = 96, 192, 384) and has E_zp = 1.4902783 against 1.5033523 for the triangular lattice (grids n = 384, same code); the k-grid error at n = 96 is 1.3e-6, so the margin is about 10^4 times the numerical error. The largest sampled margin is dE_zp = -4.87e-2 (3.2 % of E_zp) at tau = 0.3 + 0.9539 i. The result was reproduced by an independent numpy implementation (explicit real-space sum, no folding, Gamma-centred and half-shifted k-grids, section Controls).
+**REFUTED(gauss:1, tau = 0.5 + 0.966025 i, margin dE_zp = -1.31e-2).** QU-1 as stated (triangular minimises E_zp among unit-covolume planar Bravais lattices for every completely monotone potential) is false numerically: for the Gaussian g(r^2) = exp(-pi r^2), which is completely monotone in r^2 and is the Montgomery case, the rhombic lattice tau = 0.5 + 0.966025 i is dynamically stable (no imaginary frequency on k-grids n = 96, 192, 384) and has E_zp = 1.4902783 against 1.5033523 for the triangular lattice (grids n = 384, same code); the k-grid error at n = 96 is 1.3e-6, so the margin is about 10^4 times the numerical error. The largest margin found (dense arc scan, stable at n = 384) is dE_zp = -5.12e-2 (3.4 % of E_zp) at tau = 0.295 + 0.9555 i; the sampled-grid value was -4.87e-2 at tau = 0.3 + 0.9539 i. The elastic (k -> 0) limit of the headline competitor is stable: min eigenvalue of D(k)/|k|^2 = 0.105 against 0.238 for the triangular lattice (independent of any k-grid). The result was reproduced by an independent numpy implementation (explicit real-space sum, no folding, Gamma-centred and half-shifted k-grids, section Controls).
 
-Refuted for 8 of 12 tested potentials by a stable competitor with lower E_zp: `dipolar:0.1`, `dipolar:0.5`, `gauss:0.5`, `gauss:1`, `riesz:3`, `riesz:4`, `yukawa:1`, `yukawa:2`. Not refuted on the sampled stable lattices (triangular lowest, and a local minimum of E_zp): `gauss:0.25`, `gauss:2`, `gauss:4`, `riesz:6`. The conjecture 'for every CM g' is therefore refuted; a restricted version (narrow potentials) is not contradicted by this scan but the stable set there is tiny (6 to 16 sampled lattices), so this is weak evidence, not a confirmation.
+Refuted for 8 of 12 tested potentials by a stable competitor with lower E_zp: `dipolar:0.1`, `dipolar:0.5`, `gauss:0.5`, `gauss:1`, `riesz:3`, `riesz:4`, `yukawa:1`, `yukawa:2`. Not refuted (no stable lower lattice found on the 567-point scan nor on dense 0.005-step scans along the arc |tau| = 1 and the line Re tau = 1/2; triangular is a strict local minimum of E_zp): `gauss:0.25`, `gauss:2`, `gauss:4`, `riesz:6`. The conjecture 'for every CM g' is therefore refuted; a restricted version (narrow potentials) is not contradicted by this scan but the stable set there is small, so this is evidence from two 1-D paths plus a sparse 2-D sample, not a confirmation.
 
 Mechanism seen in the data (interpretation, Tier C, not tested separately): around the triangular point the static energy has positive curvature (Montgomery, consistent with the scan) while the harmonic zero-point energy has isotropic curvature of sign that depends on the potential; where it is negative, E_static + Lambda E_zp has a negative-curvature (shear-softened) triangular point for Lambda above a threshold. The triangular lattice minimises E_static + Lambda E_zp over the stable sample only for the potentials and Lambda marked in the coupling table.
 
@@ -76,20 +76,62 @@ The search must be able to find a counterexample, otherwise 'survives' is meanin
 
 `wells:1.0;1.414213562373;0.12;0.5`: the square lattice is a stable static minimiser lower than the triangular one by 0.506 per particle AND a stable rhombic lattice has E_zp lower by 3.03; `wells:...;0.2;0.0`: the triangular lattice is the static minimiser but a stable lattice has E_zp lower by 2.04 (static and zero-point optima need not coincide). `lj:0.9` behaves like the survivors (triangular lowest in both), `gdiff` has an unstable triangular lattice (E_zp undefined). Morse also shows a stable lower-E_zp competitor. So the pipeline does find counterexamples when they exist; the CM refutations above are therefore not a defect of the stable-set bookkeeping.
 
+## Verification at the stability edge and dense edge scans (`phonon_edge_check.py`, `phonon_longwave_check.py`)
+
+Stability on an n = 96 k-grid is optimistic near the stability boundary: soft long-wave modes need a finer grid to be seen. Every competitor used for a verdict below was therefore recomputed on n = 96, 192, 384, and the two candidate points also at rc = 400 and 800, and it counts only if stable on all of them. Dense 1-D scans (step 0.005, n = 96) were run along the arc |tau| = 1 from x = 0.5 to 0.2 and along Re tau = 1/2 from y = sqrt(3)/2 to 1.1; the lowest stable point of each path was refined at n = 192, 384.
+
+| potential | robust min dE_zp (n=384) | at tau | verdict | points stable at n=96 but unstable on a finer grid (dropped) |
+|---|---|---|---|---|
+| dipolar:0.1 | -3.3437e-02 | (0.3000, 0.9539) candidate | REFUTED | none |
+| dipolar:0.5 | -4.0679e-02 | (0.3000, 0.9539) candidate | REFUTED | none |
+| gauss:0.25 | +6.2302e-06 | (0.5000, 0.8710) dense line | survives (dense edge scan) | none |
+| gauss:0.5 | -1.4588e-02 | (0.5000, 1.0160) dense line | REFUTED | (0.300, 0.9539): n=96 stable, unstable at n=192/384; (0.300, 0.9539): dense arc minimum, unstable at n=192/384 |
+| gauss:1 | -5.1230e-02 | (0.2950, 0.9555) dense arc | REFUTED | none |
+| gauss:2 | +1.6293e-05 | (0.5000, 0.8710) dense line | survives (dense edge scan) | none |
+| gauss:4 | +1.0391e-05 | (0.5000, 0.8710) dense line | survives (dense edge scan) | none |
+| riesz:3 | -3.2737e-02 | (0.3000, 0.9539) candidate | REFUTED | (0.500, 1.0360): dense line minimum, unstable at n=192/384 |
+| riesz:4 | -1.2380e-02 | (0.3000, 0.9539) candidate | REFUTED | none |
+| riesz:6 | +1.1337e-04 | (0.5000, 0.8710) dense line | survives (dense edge scan) | none |
+| yukawa:1 | -2.3243e-02 | (0.3000, 0.9539) candidate | REFUTED | (0.295, 0.9555): dense arc minimum, unstable at n=192/384 |
+| yukawa:2 | -1.9717e-02 | (0.3000, 0.9539) candidate | REFUTED | none |
+
+Elastic-limit check (explicit sum, k = eps (cos t, sin t), 721 directions): min over t of lambda_min(D)/eps^2, positive = stable at long wavelength, independent of the k-grid. The triangular lattice (y = 0.8660) is the reference.
+
+| potential | tau | eps = 1e-3 | eps = 1e-2 |
+|---|---|---|---|
+| gauss:1.0 | (0.500, 0.9660) | +0.1047 | +0.1047 |
+| gauss:1.0 | (0.500, 1.0160) | +0.0408 | +0.0408 |
+| gauss:1.0 | (0.500, 1.0360) | +0.0160 | +0.0160 |
+| gauss:1.0 | (0.500, 0.8660) | +0.2383 | +0.2383 |
+| gauss:0.5 | (0.500, 0.9660) | +0.0269 | +0.0269 |
+| gauss:0.5 | (0.500, 1.0160) | +0.0014 | +0.0014 |
+| gauss:0.5 | (0.500, 1.0360) | -0.0087 | -0.0087 |
+| gauss:0.5 | (0.500, 0.8660) | +0.0808 | +0.0808 |
+| yukawa:1.0 | (0.500, 0.9660) | +0.0909 | +0.0909 |
+| yukawa:1.0 | (0.500, 1.0160) | +0.0270 | +0.0270 |
+| yukawa:1.0 | (0.500, 1.0360) | +0.0020 | +0.0020 |
+| yukawa:1.0 | (0.500, 0.8660) | +0.2250 | +0.2250 |
+| yukawa:2.0 | (0.500, 0.9660) | +0.0710 | +0.0710 |
+| yukawa:2.0 | (0.500, 1.0160) | +0.0212 | +0.0212 |
+| yukawa:2.0 | (0.500, 1.0360) | +0.0018 | +0.0018 |
+| yukawa:2.0 | (0.500, 0.8660) | +0.1753 | +0.1753 |
+
+The long-wave values explain the edge: at gauss:0.5 and tau = 0.5 + 1.036 i a sound-speed eigenvalue is negative (-0.0087), so that lattice is elastically unstable, and tau = 0.5 + 1.016 i is only just stable (0.0014); the gauss:0.5 verdict does not rest on that point (the lattice 0.5 + 0.966 i has 0.027 > 0 and dE_zp = -6.31e-3 at n = 384). The long-wave check covers Gaussian and Yukawa only; for the dipolar and Riesz potentials stability rests on the k-grids up to n = 384.
+
 ## Results for the completely monotone potentials (n = 96, rc = 400; 167 coarse + 400 random shapes, all with 0 <= Re tau <= 1/2, y in [0.85, 2.4])
 
-| potential | tri stable | stable / sampled | E_zp(tri) extrap. | min dE_zp over stable lattices (not tri) | at tau | verdict | min dE_zp,clip (all, favours competitor) |
+| potential | tri stable | stable / sampled | E_zp(tri) extrap. | min dE_zp over the n=96-stable sample (not tri; see edge verification for the robust values) | at tau | verdict | min dE_zp,clip (all, favours competitor) |
 |---|---|---|---|---|---|---|---|
 | dipolar:0.1 | True | 15/567 | 4.2096272 | -3.343e-02 | (0.300, 0.954) | REFUTED | -2.23e-01 (unstable) |
 | dipolar:0.5 | True | 15/567 | 3.5284909 | -4.068e-02 | (0.300, 0.954) | REFUTED | -2.45e-01 (unstable) |
-| gauss:0.25 | True | 11/567 | 0.9619934 | +7.653e-04 | (0.450, 0.893) | survives on sample | -1.16e-01 (unstable) |
+| gauss:0.25 | True | 11/567 | 0.9619934 | +7.653e-04 | (0.450, 0.893) | survives (dense edge scan) | -1.16e-01 (unstable) |
 | gauss:0.5 | True | 13/567 | 1.5062895 | -2.178e-02 | (0.300, 0.954) | REFUTED | -5.06e-01 (unstable) |
 | gauss:1 | True | 16/567 | 1.5033524 | -4.867e-02 | (0.300, 0.954) | REFUTED | -3.64e-01 (unstable) |
-| gauss:2 | True | 11/567 | 0.5419325 | +2.124e-03 | (0.450, 0.893) | survives on sample | -7.80e-03 (unstable) |
-| gauss:4 | True | 6/567 | 0.0300814 | +1.226e-03 | (0.450, 0.893) | survives on sample | +0.00e+00 (stable) |
+| gauss:2 | True | 11/567 | 0.5419325 | +2.124e-03 | (0.450, 0.893) | survives (dense edge scan) | -7.80e-03 (unstable) |
+| gauss:4 | True | 6/567 | 0.0300814 | +1.226e-03 | (0.450, 0.893) | survives (dense edge scan) | +0.00e+00 (stable) |
 | riesz:3 | True | 15/567 | 4.2449757 | -3.273e-02 | (0.300, 0.954) | REFUTED | -2.20e-01 (unstable) |
 | riesz:4 | True | 14/567 | 5.3229783 | -1.238e-02 | (0.300, 0.954) | REFUTED | -1.86e-01 (unstable) |
-| riesz:6 | True | 12/567 | 7.3147543 | +1.356e-02 | (0.450, 0.893) | survives on sample | -2.45e-02 (unstable) |
+| riesz:6 | True | 12/567 | 7.3147543 | +1.356e-02 | (0.450, 0.893) | survives (dense edge scan) | -2.45e-02 (unstable) |
 | yukawa:1 | True | 15/567 | 1.7658983 | -2.324e-02 | (0.300, 0.954) | REFUTED | -1.43e-01 (unstable) |
 | yukawa:2 | True | 15/567 | 1.4592747 | -1.972e-02 | (0.300, 0.954) | REFUTED | -1.17e-01 (unstable) |
 
@@ -145,8 +187,8 @@ With V -> eps V, E_static scales as eps and E_zp as sqrt(eps), so the physically
 - Tier X only: floating-point numerics. The refutation is numerical; it is a robust one (margin about 10^4 times the grid error, two independent implementations, stable on k-grids up to n = 384, frozen-phonon agreement 2e-7), but it is not a Lean statement.
 - Only 2-dimensional Bravais lattices (one particle per cell) and the harmonic approximation. Nothing is said about non-Bravais structures (QU-2), anharmonic corrections or the true quantum ground state.
 - The competitor lattices are not stress-free: they are not static-energy minima over lattice shape (the triangular lattice has the lower static energy, dE_static > 0), so they are not metastable crystals at fixed density. QU-1 as stated compares the functional E_zp over lattice shapes and is refuted regardless; a version asking about E_total at its own equilibrium shape is a different statement.
-- The stable set is small and sampled: 6 to 16 lattices out of 567 for the CM potentials. The 'survives on sample' verdicts (gauss 0.25, 2, 4 and riesz 6) are weak, and for riesz 4 the triangular lattice is a local minimum of E_zp (c > 0) but a stable lattice at tau = 0.3 + 0.954 i lies lower, so local analysis alone is not enough.
-- The lowest sampled competitor at x = 0.3 sits near the edge of the sampled stable region; the headline competitor tau = 0.5 + 0.966 i is well inside it. Not claimed: that these are the global minimisers of E_zp over the stable set.
+- The stable set is small and sampled: 6 to 16 lattices out of 567 for the CM potentials at n = 96 (fewer on finer grids). The 'survives' verdicts (gauss 0.25, 2, 4 and riesz 6) rest on the 2-D sample plus two dense 1-D paths, not on an exhaustive 2-D search. For riesz 4 the triangular lattice is a local minimum of E_zp (c > 0) yet a stable lattice at tau = 0.3 + 0.954 i (stable at n = 384, rc = 800) and another at tau = 0.5 + 1.031 i lie lower, so local curvature alone does not decide a verdict.
+- Several of the lowest n = 96 competitors sit at the stability edge and turned unstable on finer k-grids (listed above) and were dropped; the verdicts use only points that are stable on n = 96, 192, 384. The headline competitor tau = 0.5 + 0.966 i is well inside the stable region (elastic eigenvalue 0.105 against 0.238 for the triangular lattice). Not claimed: that any listed point is the global minimiser of E_zp over the stable set.
 - Coulomb and Keldysh are not covered (see above); unit amplitude and hbar = m = 1 only rescale E_zp.
 - Anything resting on openai/math universal-optimality results (the premise that the Gaussian is 'admissible' for the static theorem) is conditional on them (AI-generated, not peer reviewed); the refutation itself does not use them: it only needs the Gaussian to be completely monotone in r^2, which is elementary.
 - Consequence for the programme: step 1 refutes QU-1 for 8 of 12 potentials, so step 2 (human proof for Gaussian g) as formulated cannot succeed (a proof of a false statement). The numerics suggest a restricted question (for which g is the triangular lattice a local minimum of E_zp, i.e. sign of c) as a possible QU-1'; that is a conjecture suggested by this table, Tier C, untested beyond the table.
@@ -164,6 +206,8 @@ python -I scripts/phonon_neg_search.py BIN taus/coarse.txt neg_search.json
 python -I scripts/phonon_controls.py BIN controls.json
 python -I scripts/phonon_independent_check.py independent_check.json
 python -I scripts/phonon_analyze.py data analysis_cm ; python -I scripts/phonon_analyze.py data_neg analysis_neg
+python -I scripts/phonon_edge_check.py BIN .             # stability-edge verification and dense 1-D scans -> edge_check.json
+python -I scripts/phonon_longwave_check.py longwave_check.json
 python -I scripts/phonon_make_gate.py . GATE.md
 bin/lattice_phonon point gauss:1 0.5 0.966025403784 96,192,384 400   # the headline competitor
 ```
