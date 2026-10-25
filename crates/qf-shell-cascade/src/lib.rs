@@ -48,6 +48,8 @@
 
 use num_complex::Complex64;
 
+pub mod sigma;
+
 /// Wavenumbers `k_n = 2^n` for `n = 0..=n_max`.
 pub fn k_shells(n_max: usize) -> Vec<f64> {
     (0..=n_max).map(|n| 2f64.powi(n as i32)).collect()

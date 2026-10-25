@@ -1,7 +1,8 @@
 # qf-shell-cascade
 
 The complexified dyadic shell cascade (Katz–Pavlovic / Desnyansky–Novikov with a dispersive
-quantum-pressure regulator). Pure Rust; the only dependency is `num-complex`.
+quantum-pressure regulator). Pure Rust; dependencies are `num-complex` and this workspace's own
+`cvode`/`nvector` (used only by the `sigma` module).
 
 This is a port of `src/quantumfluids/w4_shell_model/{shell_dynamics,integrate}.py` in
 [SocrateAI-Scientific-QuantumFluids](https://github.com/xaviercallens/SocrateAI-Scientific-QuantumFluids).
@@ -68,3 +69,16 @@ dominated by `N=8, nu=0.1`'s 680,960) runs in ~7.5s, roughly 200k steps/s — in
 MechanicaFluidorum's own measured Numba throughput (~5.5e5 steps/s) without any SIMD or
 buffer-reuse optimization. `N >= 16` sweeps (10^10+ steps) remain intractable regardless of
 language; this crate does not attempt them.
+
+## The sigma-regulated model and CVODE (`sigma` module, `sigma3_study` binary)
+
+`sigma::SigmaModel` is the same conjugated nonlinearity with a dispersive rotation
+`-i D k_n^sigma v_n` (`sigma = 2` reproduces `quantum_pressure`). The module provides the second
+invariant `H_sigma = sum 2^-n D k_n^sigma |v_n|^2 + sum 2^-n k_n Im(conj(v_n)^2 v_{n+1})`, its exact
+first variation `ham_rate`, an analytical Jacobian, and `integrate_cvode` (this workspace's CVODE,
+BDF, one-step mode, invariants evaluated at every internal step). For `sigma = 3` the quadratic part
+of `H_3` is `2 D Omega`, which gives `2 D Omega(t) <= H_3(0) + S(0)^{3/2}` along solutions
+(kernel-checked in Lean in AutoevolveAI, lane H7). The numerics are floating-point exploration: they
+illustrate and stress-test that bound, they do not support it. Cost: the top-shell frequency
+`D 8^n_max` forces BDF to take on the order of `T D 8^n_max` steps, so `n_max <= 7` is the practical
+range at `D = 0.05`. `results/sigma3/` holds the study output, its scripts and figures.

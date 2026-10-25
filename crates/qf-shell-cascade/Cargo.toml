@@ -7,5 +7,7 @@ description = "The complexified dyadic shell cascade (Katz-Pavlovic / Desnyansky
 
 [dependencies]
 num-complex = "0.4"
+cvode = { path = "../cvode" }
+nvector = { path = "../nvector" }
 
 [dev-dependencies]

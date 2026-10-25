@@ -1,0 +1,157 @@
+{
+ "source_file": "/home/callensxavier_gmail_com/hf-data/sigma3_enstrophy/data/test/turbulent_radiative_layer_tcool_0.32.hdf5",
+ "method": "Dyadic shell energies from The Well turbulent_radiative_layer_2D velocity (one pinned file).\n\nRun with an interpreter that has h5py (the AutoevolveAI .venv does not):\n  /mnt/disks/disk-socrateai-local-1/venv-pta/bin/python -I well_spectrum.py HDF5 OUT_JSON\n\nMethod (velocity only, not sqrt(rho) u):\n  * x (128 points) is PERIODIC, y (384) is OPEN, so the FFT is taken along x only.\n  * u_hat(kx) = FFT_x(u)/Nx for each row y and each component; kx = 0 (the x-mean, which carries the mean\n    shear flow) is removed.\n  * one-sided spectrum e(kx) = sum over +-kx of 1/2 |u_hat|^2, averaged over y and summed over the two\n    components, so that sum_{kx>=1} e(kx) = 1/2 <|u - <u>_x|^2>  (Parseval; checked).\n  * shell n collects kx in [2^n, 2^{n+1}), n = 0..5 (kx = 64 is the Nyquist mode, kept separately and\n    reported, not used). E_n = sum e(kx), |v_n| = sqrt(2 E_n).\nControls on the same pipeline: Parseval identity on the data; a synthetic sin(2 pi 8 x / Lx) field must put\nall energy in shell 3; white noise gives E_n proportional to the number of modes per shell (2^n).\n",
+ "snapshots": [
+  {
+   "time_index": 25,
+   "time": 39.92582321166992,
+   "E_n": [
+    4.948519669767542e-05,
+    2.8634927001458414e-05,
+    1.9750749959259725e-05,
+    4.6577176166988274e-06,
+    3.3458877759231033e-07,
+    3.150035636534833e-08
+   ],
+   "amp_n": [
+    0.009948386471953672,
+    0.007567684850924808,
+    0.00628502187096588,
+    0.0030521197934218858,
+    0.0008180327347879305,
+    0.00025099942774973945
+   ],
+   "nyquist_energy": 1.0846511188193061e-10,
+   "parseval_lhs": 0.00010289478887416193,
+   "parseval_rhs": 0.00010289478887416188,
+   "parseval_rel_err": 3.9513742059308527e-16,
+   "E_shells_over_E_fluct": 0.9999989458638963
+  },
+  {
+   "time_index": 50,
+   "time": 79.85164642333984,
+   "E_n": [
+    8.48346179469209e-05,
+    0.00011559330976490413,
+    6.550007731595037e-05,
+    2.677344674107226e-05,
+    2.8050206375632833e-06,
+    4.786859418820931e-07
+   ],
+   "amp_n": [
+    0.013025714410113626,
+    0.015204822245912915,
+    0.011445529897383552,
+    0.007317574289485862,
+    0.0023685525696354234,
+    0.0009784538230106653
+   ],
+   "nyquist_energy": 4.248266401774645e-09,
+   "parseval_lhs": 0.00029598940661469485,
+   "parseval_rhs": 0.0002959894066146948,
+   "parseval_rel_err": 1.8314881348048855e-16,
+   "E_shells_over_E_fluct": 0.9999856472349793
+  },
+  {
+   "time_index": 75,
+   "time": 119.77747344970703,
+   "E_n": [
+    8.788541768719004e-05,
+    7.343524354007196e-05,
+    5.114820662688213e-05,
+    1.8519623596144632e-05,
+    2.9361423280091975e-06,
+    1.2269887371209652e-07
+   ],
+   "amp_n": [
+    0.0132578593813021,
+    0.01211901345325369,
+    0.01011416893539772,
+    0.00608598777457606,
+    0.002423279731277096,
+    0.0004953763694648676
+   ],
+   "nyquist_energy": 4.982662853980822e-10,
+   "parseval_lhs": 0.00023404783091829546,
+   "parseval_rhs": 0.0002340478309182955,
+   "parseval_rel_err": 1.158098932418639e-16,
+   "E_shells_over_E_fluct": 0.9999978710920606
+  },
+  {
+   "time_index": 100,
+   "time": 159.7032928466797,
+   "E_n": [
+    4.969099690842447e-05,
+    7.900890490392474e-05,
+    2.4715269457291193e-05,
+    6.212264006084342e-06,
+    1.0519453128745133e-06,
+    1.3437728571309185e-07
+   ],
+   "amp_n": [
+    0.009969051801292284,
+    0.012570513506132098,
+    0.007030685522378482,
+    0.003524844395454739,
+    0.0014504794468550826,
+    0.000518415442889372
+   ],
+   "nyquist_energy": 5.231708712107473e-10,
+   "parseval_lhs": 0.00016081428104518355,
+   "parseval_rhs": 0.00016081428104518358,
+   "parseval_rel_err": 1.6854880136249824e-16,
+   "E_shells_over_E_fluct": 0.999996746738736
+  }
+ ],
+ "tcool": 0.3199999928474426,
+ "shape": [
+  1,
+  101,
+  128,
+  384,
+  2
+ ],
+ "x_first_last": [
+  -0.5,
+  0.5
+ ],
+ "control_sin_k8": {
+  "E_n": [
+   6.438976931744424e-34,
+   1.1006493764595223e-32,
+   4.4364208193636935e-32,
+   0.25,
+   1.3104650671084685e-31,
+   2.829009402495425e-31
+  ],
+  "fraction_in_shell3": 1.0,
+  "parseval_lhs": 0.25,
+  "parseval_rhs": 0.25
+ },
+ "control_white_noise": {
+  "E_n": [
+   0.014960966183577269,
+   0.031498735759501,
+   0.061976013032232366,
+   0.12441333615999912,
+   0.25173021255178074,
+   0.504725576097528
+  ],
+  "E_n_over_modes": [
+   0.014960966183577269,
+   0.0157493678797505,
+   0.015494003258058092,
+   0.01555166701999989,
+   0.015733138284486296,
+   0.01577267425304775
+  ]
+ },
+ "log2_slope_E_n_data": [
+  -2.12654306482216,
+  -1.5637871740450928,
+  -1.7948815788448749,
+  -1.8096462701607936
+ ],
+ "log2_slope_E_n_white_noise": 1.0109147610887557,
+ "controls_pass": true
+}
