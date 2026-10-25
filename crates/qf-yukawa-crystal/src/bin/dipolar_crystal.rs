@@ -59,6 +59,7 @@ fn parallel(jobs: Vec<Box<dyn FnOnce() -> String + Send>>, threads: usize) -> Ve
                 match job {
                     Some((i, f)) => {
                         let s = f();
+                        println!("RESULT {s}");
                         eprintln!("done job {i}");
                         o.lock().unwrap()[i] = s;
                     }
@@ -262,6 +263,7 @@ fn main() {
         "main" => {
             let d: f64 = args.get(3).map(|s| s.parse().unwrap()).unwrap_or(0.066);
             let nq: usize = args.get(4).map(|s| s.parse().unwrap()).unwrap_or(8);
+            let ni: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(2);
             let na: usize = args.get(5).map(|s| s.parse().unwrap()).unwrap_or(2);
             let mut jobs: Vec<Box<dyn FnOnce() -> String + Send>> = Vec::new();
             for k in 0..nq {
@@ -289,7 +291,7 @@ fn main() {
                     )
                 }));
             }
-            for k in 0..2usize {
+            for k in 0..ni {
                 jobs.push(Box::new(move || {
                     let r = refs_for(d);
                     let sys = square_box(d);
