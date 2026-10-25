@@ -15,5 +15,9 @@ name = "yukawa_crystal"
 path = "src/main.rs"
 
 [[bin]]
+name = "dipolar_crystal"
+path = "src/bin/dipolar_crystal.rs"
+
+[[bin]]
 name = "keldysh_jellium"
 path = "src/bin/keldysh_jellium.rs"

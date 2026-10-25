@@ -1,0 +1,68 @@
+{
+ "colabfit/JARVIS_DFT_3D_12_12_2022": {
+  "sha": "f4de0085edcf92885870c67459363d2c7080c90b",
+  "license": "unknown",
+  "files": [
+   [
+    ".gitattributes",
+    2461
+   ],
+   [
+    "README.md",
+    3655
+   ],
+   [
+    "co/co_0.parquet",
+    54027813
+   ],
+   [
+    "ds.parquet",
+    19410
+   ]
+  ]
+ },
+ "colabfit/JARVIS_DFT_2D_3_12_2021": {
+  "sha": "a1b0a91056e1030388e8f619fc45bb69768888a4",
+  "license": "unknown",
+  "files": [
+   [
+    ".gitattributes",
+    2461
+   ],
+   [
+    "README.md",
+    3619
+   ],
+   [
+    "co/co_0.parquet",
+    4995064
+   ],
+   [
+    "ds.parquet",
+    19042
+   ]
+  ]
+ },
+ "colabfit/JARVIS_2DMatPedia": {
+  "sha": "8efdd245f39de6d98f7d1c4345aaf35685c3c2bd",
+  "license": "cc-by-4.0",
+  "files": [
+   [
+    ".gitattributes",
+    2461
+   ],
+   [
+    "README.md",
+    3328
+   ],
+   [
+    "co/co_0.parquet",
+    4221827
+   ],
+   [
+    "ds.parquet",
+    19561
+   ]
+  ]
+ }
+}
