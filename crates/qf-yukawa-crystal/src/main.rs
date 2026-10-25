@@ -709,6 +709,265 @@ fn main() {
                 &lines,
             );
         }
+        "exact-refs" => {
+            // Erratum fix (2026-10-25): lattice energies of the plain (untruncated) Yukawa potential with a rigorous
+            // tail bound and an independent Ewald-type cross-check, next to the published shifted-force values, plus a
+            // cutoff sweep. Written under results/exact/.
+            let out = res.join("exact");
+            let mut lines = Vec::new();
+            for kappa in [1.0, 2.0] {
+                let r = 40.0 / kappa;
+                let mut obj = format!("{{\"kind\":\"lattice\",\"kappa\":{kappa},\"R\":{r}");
+                for (name, basis) in [
+                    ("tri", exact::tri_basis()),
+                    ("square", exact::square_basis()),
+                ] {
+                    let d = exact::lattice_energy_exact(kappa, basis, r);
+                    let ew: Vec<String> = [0.5, 1.0, 2.0]
+                        .iter()
+                        .map(|&eta| {
+                            format!("{:.16e}", exact::lattice_energy_ewald(kappa, basis, eta))
+                        })
+                        .collect();
+                    let sf = exact::lattice_energy_shifted_force(kappa, basis, 8.0);
+                    let _ = write!(
+                        obj,
+                        ",\"{name}\":{{\"exact_partial\":{:.16e},\"tail_bound\":{:.3e},\"tail_continuum\":{:.3e},\"terms\":{},\"voronoi_delta\":{:.15e},\"ewald_eta_0.5_1_2\":[{}],\"shifted_force_rc8\":{sf:.16e},\"exact_minus_sf\":{:.6e}}}",
+                        d.partial,
+                        d.tail_bound,
+                        d.tail_continuum,
+                        d.terms,
+                        exact::voronoi_circumradius(basis),
+                        ew.join(","),
+                        d.partial - sf
+                    );
+                }
+                let t = exact::lattice_energy_exact(kappa, exact::tri_basis(), r).partial;
+                let s = exact::lattice_energy_exact(kappa, exact::square_basis(), r).partial;
+                let tsf = exact::lattice_energy_shifted_force(kappa, exact::tri_basis(), 8.0);
+                let ssf = exact::lattice_energy_shifted_force(kappa, exact::square_basis(), 8.0);
+                let _ = write!(
+                    obj,
+                    ",\"gap_exact\":{:.10e},\"gap_sf_rc8\":{:.10e},\"gap_change\":{:.3e}}}",
+                    s - t,
+                    ssf - tsf,
+                    (s - t) - (ssf - tsf)
+                );
+                lines.push(obj);
+                // Image-summed periodic boxes holding the perfect lattices.
+                let tb = exact::ExactBox::new(kappa, r, 16.0 * a, 9.0 * 3.0_f64.sqrt() * a);
+                let sb = exact::ExactBox::new(kappa, r, 17.0, 17.0);
+                let et = tb.energy(&triangular(16, 18, a)) / 288.0;
+                let es = sb.energy(&square(17, 1.0)) / 289.0;
+                let (eg, _) = global_opt::periodic_energy_exact(
+                    kappa,
+                    16.0 * a,
+                    9.0 * 3.0_f64.sqrt() * a,
+                    &triangular(16, 18, a),
+                    r,
+                );
+                lines.push(format!(
+                    "{{\"kind\":\"box\",\"kappa\":{kappa},\"R\":{r},\"tri_box\":{et:.16e},\"tri_box_minus_lattice\":{:.3e},\"tri_box_global_opt_periodic_energy_exact\":{eg:.16e},\"square_box\":{es:.16e},\"square_box_minus_lattice\":{:.3e},\"tri_self_image\":{:.3e},\"square_self_image\":{:.3e}}}",
+                    et - t,
+                    es - s,
+                    tb.self_image(),
+                    sb.self_image()
+                ));
+                for rc in [6.0, 8.0, 10.0, 12.0, 16.0, 20.0, 24.0, 32.0, 40.0] {
+                    let mut obj = format!("{{\"kind\":\"sweep\",\"kappa\":{kappa},\"rc\":{rc}");
+                    for (name, basis, conv) in [
+                        ("tri", exact::tri_basis(), t),
+                        ("square", exact::square_basis(), s),
+                    ] {
+                        let p = exact::lattice_energy_exact(kappa, basis, rc);
+                        let sf = exact::lattice_energy_shifted_force(kappa, basis, rc);
+                        let _ = write!(
+                            obj,
+                            ",\"{name}\":{{\"plain\":{:.16e},\"plain_err\":{:.3e},\"plain_tail_err\":{:.3e},\"sf\":{sf:.16e},\"sf_err\":{:.3e},\"tail_bound\":{:.3e}}}",
+                            p.partial,
+                            p.partial - conv,
+                            p.partial + p.tail_continuum - conv,
+                            sf - conv,
+                            p.tail_bound
+                        );
+                    }
+                    obj.push('}');
+                    lines.push(obj);
+                }
+            }
+            write(&out, "exact_refs.jsonl", &lines);
+        }
+        "exact-relax" => {
+            // Erratum fix (2026-10-25): re-run published seeds with the shifted-force protocol (reproducing the
+            // published energies), evaluate the exact Yukawa energy at those minimisers, re-relax them under the exact
+            // image-summed potential with CVODE, and report gaps to the exact triangular lattice.
+            // Args: kappa nrun anneal(0/1) [first].
+            let kappa: f64 = args.get(3).map(|s| s.parse().unwrap()).unwrap_or(2.0);
+            let nrun: usize = args.get(4).map(|s| s.parse().unwrap()).unwrap_or(3);
+            let do_anneal = args.get(5).map(|s| s == "1").unwrap_or(false);
+            let first: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(0);
+            let r = 40.0 / kappa;
+            let e_tri_exact = exact::lattice_energy_exact(kappa, exact::tri_basis(), r).partial;
+            let mut jobs: Vec<Job<String>> = Vec::new();
+            let mut specs: Vec<(String, String, bool, u64, u64)> = Vec::new();
+            for k in first..first + nrun {
+                specs.push((
+                    format!("oc20_{k:02}"),
+                    "hf_oc20".into(),
+                    false,
+                    100 + k as u64,
+                    k as u64,
+                ));
+                specs.push((
+                    format!("uniform_{k:02}"),
+                    "uniform".into(),
+                    false,
+                    900 + k as u64,
+                    k as u64,
+                ));
+            }
+            for k in first..first + (nrun / 2).max(1) {
+                specs.push((
+                    format!("incommensurate_{k:02}"),
+                    "ctl_neg_incommensurate_box".into(),
+                    true,
+                    700 + k as u64,
+                    k as u64,
+                ));
+            }
+            for (label, family, incomm, aseed, k) in specs {
+                let init = init.clone();
+                jobs.push(Box::new(move || {
+                    let t0 = std::time::Instant::now();
+                    let (sys, ebox, n) = if incomm {
+                        let l = 17.0;
+                        (square_box(kappa), exact::ExactBox::new(kappa, r, l, l), 289usize)
+                    } else {
+                        (
+                            tri_box(kappa),
+                            exact::ExactBox::new(kappa, r, 16.0 * a, 9.0 * 3.0_f64.sqrt() * a),
+                            288usize,
+                        )
+                    };
+                    let x0 = match family.as_str() {
+                        "uniform" => uniform_config(&sys, 288, 0.5 * a, None, 500 + k),
+                        "hf_oc20" => read_csv(&init.join(format!("oc20_tri_box_{k:02}.csv"))),
+                        _ => read_csv(&init.join(format!("oc20_square_box_{k:02}.csv"))),
+                    };
+                    let mut fields = format!(
+                        "\"label\":\"{label}\",\"family\":\"{family}\",\"n\":{n},\"kappa\":{kappa},\"R\":{r},\"e_tri_exact\":{e_tri_exact:.16e},\"e_tri_sf\":{:.16e},\"tail_continuum\":{:.3e}",
+                        e_tri(kappa),
+                        ebox.tail_continuum(n)
+                    );
+                    let mut stages: Vec<(&str, Vec<f64>)> = Vec::new();
+                    match relax(&sys, &x0, FTOL, TMAX) {
+                        Ok(q) => stages.push(("quench", q.x)),
+                        Err(e) => {
+                            let _ = write!(fields, ",\"quench_error\":\"{}\"", e.replace('"', "'"));
+                        }
+                    }
+                    if do_anneal {
+                        let xa = anneal(&sys, &x0, 0.05, 1e-5, 300_000, 0.01, 0.05, aseed);
+                        match relax(&sys, &xa, FTOL, TMAX) {
+                            Ok(q) => stages.push(("anneal_quench", q.x)),
+                            Err(e) => {
+                                let _ = write!(fields, ",\"anneal_quench_error\":\"{}\"", e.replace('"', "'"));
+                            }
+                        }
+                    }
+                    for (tag, xs) in stages {
+                        let e_sf = sys.energy(&xs) / n as f64;
+                        let e_ex0 = ebox.energy(&xs) / n as f64;
+                        let o0 = order(&sys, &xs, None);
+                        let _ = write!(
+                            fields,
+                            ",\"{tag}\":{{\"sf_e\":{e_sf:.16e},\"sf_gap\":{:.6e},\"sf_defects\":{},\"exact_e_at_sf_min\":{e_ex0:.16e},\"exact_gap_at_sf_min\":{:.6e}",
+                            e_sf - e_tri(kappa),
+                            o0.defects,
+                            e_ex0 - e_tri_exact
+                        );
+                        match exact::relax_exact(&ebox, &xs, FTOL, TMAX) {
+                            Ok(q) => {
+                                let e = ebox.energy(&q.x) / n as f64;
+                                let o = order(&sys, &q.x, None);
+                                let ev = symmetric_eigenvalues(&ebox.hessian(&q.x), q.x.len());
+                                let scale = ev[ev.len() - 1].abs();
+                                let neg = ev.iter().filter(|&&v| v < -1e-9 * scale).count();
+                                let disp = xs
+                                    .iter()
+                                    .zip(&q.x)
+                                    .enumerate()
+                                    .map(|(c, (p, qv))| {
+                                        let l = if c % 2 == 0 { ebox.lx } else { ebox.ly };
+                                        let d = qv - p;
+                                        (d - l * (d / l).round()).abs()
+                                    })
+                                    .fold(0.0_f64, f64::max);
+                                let _ = write!(
+                                    fields,
+                                    ",\"exact_e\":{e:.16e},\"exact_gap\":{:.6e},\"exact_rel_gap\":{:.6e},\"exact_defects\":{},\"exact_psi6_global\":{:.6},\"max_force\":{:.3e},\"converged\":{},\"cvode_steps\":{},\"rhs_evals\":{},\"max_displacement\":{disp:.3e},\"hess_lowest\":[{:.3e},{:.3e},{:.3e}],\"hess_negative\":{neg}}}",
+                                    e - e_tri_exact,
+                                    (e - e_tri_exact) / e_tri_exact,
+                                    o.defects,
+                                    o.psi6_global,
+                                    q.max_force,
+                                    q.converged,
+                                    q.steps,
+                                    q.rhs_evals,
+                                    ev[0],
+                                    ev[1],
+                                    ev[2]
+                                );
+                            }
+                            Err(e) => {
+                                let _ = write!(fields, ",\"exact_error\":\"{}\"}}", e.replace('"', "'"));
+                            }
+                        }
+                    }
+                    let _ = write!(fields, ",\"wall_s\":{:.1}", t0.elapsed().as_secs_f64());
+                    let line = format!("{{{fields}}}");
+                    eprintln!("{line}");
+                    line
+                }));
+            }
+            let lines = parallel(jobs, threads);
+            write(
+                &res.join("exact"),
+                &format!(
+                    "exact_relax_kappa{kappa}_a{}_f{first}.jsonl",
+                    u8::from(do_anneal)
+                ),
+                &lines,
+            );
+        }
+        "exact-saddle" => {
+            // Negative control under the exact potential: the perfect square lattice in its commensurate 17x17 box is a
+            // critical point; count unstable Hessian modes and relax a 1e-3 perturbation with CVODE.
+            let mut lines = Vec::new();
+            for kappa in [2.0, 1.0] {
+                let r = 40.0 / kappa;
+                let sb = exact::ExactBox::new(kappa, r, 17.0, 17.0);
+                let sys = square_box(kappa);
+                let x = square(17, 1.0);
+                let es = sb.energy(&x) / 289.0;
+                let ev = symmetric_eigenvalues(&sb.hessian(&x), x.len());
+                let scale = ev[ev.len() - 1].abs();
+                let neg = ev.iter().filter(|&&v| v < -1e-9 * scale).count();
+                let mut xs = x.clone();
+                let mut rng = Rng::new(5);
+                xs.iter_mut().for_each(|v| *v += 1e-3 * rng.gauss());
+                let q = exact::relax_exact(&sb, &xs, FTOL, TMAX).unwrap();
+                let e_after = sb.energy(&q.x) / 289.0;
+                let e_t = exact::lattice_energy_exact(kappa, exact::tri_basis(), r).partial;
+                let o = order(&sys, &q.x, None);
+                lines.push(format!(
+                    "{{\"label\":\"ctl_neg_square_saddle_exact\",\"kappa\":{kappa},\"R\":{r},\"e_square_box\":{es:.16e},\"hess_lowest\":[{:.3e},{:.3e},{:.3e}],\"hess_negative\":{neg},\"e_after_relax\":{e_after:.16e},\"lowered\":{},\"e_after_minus_e_tri_exact\":{:.6e},\"defects_after\":{},\"psi6_global_after\":{:.6},\"converged\":{}}}",
+                    ev[0], ev[1], ev[2], e_after < es, e_after - e_t, o.defects, o.psi6_global, q.converged
+                ));
+                eprintln!("{}", lines.last().unwrap());
+            }
+            write(&res.join("exact"), "exact_saddle.jsonl", &lines);
+        }
         "floor" => {
             // Exact-floor audit. Without CSVs: positive controls (lattice, relaxed noisy lattice) and the square
             // lattice. With CSVs: each file is checked in the study box (288 points: triangular box, 289: square box).

@@ -1,0 +1,7 @@
+   Compiling sundials-core v6.4.0 (/home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h7/crates/sundials-core)
+    Checking num-traits v0.2.19
+    Checking nvector v6.4.0 (/home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h7/crates/nvector)
+    Checking num-complex v0.4.6
+    Checking cvode v6.4.0 (/home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h7/crates/cvode)
+    Checking qf-shell-cascade v6.4.0 (/home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h7/crates/qf-shell-cascade)
+    Finished `release` profile [optimized] target(s) in 3.32s
