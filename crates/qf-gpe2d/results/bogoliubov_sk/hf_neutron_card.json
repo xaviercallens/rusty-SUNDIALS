@@ -1,0 +1,39 @@
+{
+ "repo": "popoff4rtem/2D-Neutron-Diffraction-Dataset-for-Discriminative-Models",
+ "sha": "648119c2030c5352c37a305deb74aa8ec84a4402",
+ "license_tags": [
+  "license:mit"
+ ],
+ "tags": [
+  "license:mit",
+  "region:us"
+ ],
+ "files": [
+  {
+   "name": ".gitattributes",
+   "size": 2504
+  },
+  {
+   "name": "README.md",
+   "size": 24
+  },
+  {
+   "name": "datasets/dataset.pkl",
+   "size": 4377902040
+  },
+  {
+   "name": "datasets/segmentation_maps.pkl",
+   "size": 3602947
+  },
+  {
+   "name": "datasets/test_data.pkl",
+   "size": 6480872
+  },
+  {
+   "name": "datasets/test_diffraction+error_matrices.pt",
+   "size": 5761873
+  }
+ ],
+ "card_path": "/home/callensxavier_gmail_com/hf-data/bogoliubov_sk/neutron_diffraction_card/README.md",
+ "card_head": "---\nlicense: mit\n---\n"
+}

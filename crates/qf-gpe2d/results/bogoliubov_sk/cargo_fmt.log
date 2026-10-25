@@ -1,0 +1,3 @@
+$ cargo fmt --manifest-path /home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h8/Cargo.toml -p qf-gpe2d
+
+exit 0

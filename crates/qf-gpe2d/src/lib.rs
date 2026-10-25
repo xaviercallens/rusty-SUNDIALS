@@ -209,8 +209,30 @@ pub fn smooth_phase_noise(
         .collect()
 }
 
-/// One Strang split step. `dt` real advances real time; `dt` with a negative imaginary part
-/// (`dt = -i tau`) is imaginary-time relaxation.
+/// Which nonlinear half-step the split step uses.
+///
+/// The Python reference (`quantumfluids.gpe.solver2d.step`, pinned by
+/// `tests/python_cross_check.rs`) computes the nonlinear phase `exp(-i dt (g|psi|^2 - mu)/2)`
+/// once, from `|psi|^2` at the *start* of the step, and applies that same factor before and after
+/// the kinetic step ([`Splitting::PythonReference`]; reproduces the pinned data to 2.5e-16).
+/// Textbook Strang splitting recomputes the second factor from `|psi|^2` *after* the kinetic step
+/// ([`Splitting::Strang`]). For energy and norm both behave alike (pure phase rotations), but
+/// the reference composition is not the symmetric (time-reversible) Strang composition.
+/// Measured on the Bogoliubov linear response (`linear_response`, example
+/// `bogoliubov_dispersion`): with the reference scheme the oscillation frequency still converges
+/// at second order, but the response amplitude converges only at first order in `dt` (relative
+/// error 2.65e-2 at `dt = max_dt(grid, 1)`, halving with each halving of `dt`), and a
+/// long-wavelength run (`k = 0.1`, 32x32 grid) grows from round-off late in the record. With
+/// `Strang` both converge at second order and the amplitude agrees with the f-sum rule.
+/// [`step`] and [`evolve`] keep the reference scheme so the Python cross-check stays exact.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Splitting {
+    PythonReference,
+    Strang,
+}
+
+/// One split step (the Python reference's composition, see [`Splitting`]). `dt` real advances
+/// real time; `dt` with a negative imaginary part (`dt = -i tau`) is imaginary-time relaxation.
 ///
 /// Builds a fresh FFT plan and recomputes `k2` on every call — convenient for a single step, but
 /// [`evolve`] does **not** call this in its loop (it would replan the FFT every step); it shares
@@ -219,7 +241,17 @@ pub fn step(psi: &[Complex64], grid: &Grid2D, dt: Complex64, g: f64, mu: f64) ->
     let (fwd, inv) = fft_pair(grid.n);
     let k2 = grid.k2();
     let mut buf = psi.to_vec();
-    step_inplace(&mut buf, grid, dt, g, mu, &fwd, &inv, &k2);
+    step_inplace(
+        &mut buf,
+        grid,
+        dt,
+        g,
+        mu,
+        &fwd,
+        &inv,
+        &k2,
+        Splitting::PythonReference,
+    );
     buf
 }
 
@@ -233,6 +265,7 @@ fn step_inplace(
     fwd: &Arc<dyn Fft<f64>>,
     inv: &Arc<dyn Fft<f64>>,
     k2: &[f64],
+    splitting: Splitting,
 ) {
     let n = grid.n;
     let half: Vec<Complex64> = psi
@@ -247,12 +280,21 @@ fn step_inplace(
         *v *= (-Complex64::i() * dt * k2i / 2.0).exp();
     }
     fft2_inverse(inv, psi, n);
-    for (v, &h) in psi.iter_mut().zip(&half) {
-        *v *= h;
+    match splitting {
+        Splitting::PythonReference => {
+            for (v, &h) in psi.iter_mut().zip(&half) {
+                *v *= h;
+            }
+        }
+        Splitting::Strang => {
+            for v in psi.iter_mut() {
+                *v *= (-Complex64::i() * dt * (g * v.norm_sqr() - mu) / 2.0).exp();
+            }
+        }
     }
 }
 
-/// `n_steps` of the Strang split step (see [`step`]), sharing one FFT plan and one `k2` array
+/// `n_steps` of the split step [`step`] (Python-reference composition, see [`Splitting`]), sharing one FFT plan and one `k2` array
 /// across every step. `renorm: true` rescales the norm back to `n^2` after every step — imaginary
 /// time is not norm-preserving, unlike real time.
 pub fn evolve(
@@ -268,7 +310,17 @@ pub fn evolve(
     let k2 = grid.k2();
     let mut psi = psi.to_vec();
     for _ in 0..n_steps {
-        step_inplace(&mut psi, grid, dt, g, mu, &fwd, &inv, &k2);
+        step_inplace(
+            &mut psi,
+            grid,
+            dt,
+            g,
+            mu,
+            &fwd,
+            &inv,
+            &k2,
+            Splitting::PythonReference,
+        );
         if renorm {
             let total: f64 = psi.iter().map(|z| z.norm_sqr()).sum();
             let scale = ((grid.n * grid.n) as f64 / total).sqrt();
@@ -279,6 +331,36 @@ pub fn evolve(
     }
     psi
 }
+
+/// Real- or imaginary-time evolution like [`evolve`] (one shared FFT plan, one `k2` array), but
+/// calling `observe(step_index, &psi)` once before the first step (`step_index = 0`) and after
+/// every step (`step_index = 1..=n_steps`). This is what time-series measurements such as
+/// [`linear_response`] need: calling [`step`] in a loop would replan the FFT every step, the
+/// exact cost [`evolve`] was rewritten to avoid. No renormalisation is done; use it for real time.
+/// `splitting` picks the nonlinear half-step (see [`Splitting`]).
+#[allow(clippy::too_many_arguments)]
+pub fn evolve_observe<F: FnMut(usize, &[Complex64])>(
+    psi: &[Complex64],
+    grid: &Grid2D,
+    dt: Complex64,
+    n_steps: usize,
+    g: f64,
+    mu: f64,
+    splitting: Splitting,
+    mut observe: F,
+) -> Vec<Complex64> {
+    let (fwd, inv) = fft_pair(grid.n);
+    let k2 = grid.k2();
+    let mut psi = psi.to_vec();
+    observe(0, &psi);
+    for s in 1..=n_steps {
+        step_inplace(&mut psi, grid, dt, g, mu, &fwd, &inv, &k2, splitting);
+        observe(s, &psi);
+    }
+    psi
+}
+
+pub mod linear_response;
 
 /// `E = int [ |grad psi|^2/2 + g|psi|^4/2 ]`. The kinetic part is computed via Fourier (exact on
 /// the grid).

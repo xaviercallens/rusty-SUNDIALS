@@ -1,0 +1,3095 @@
+{
+ "structure factor": [],
+ "static structure factor": [],
+ "dynamic structure factor": [],
+ "liquid helium": [],
+ "helium-4": [],
+ "superfluid helium": [],
+ "neutron scattering": [],
+ "neutron diffraction": [
+  {
+   "id": "popoff4rtem/2D-Neutron-Diffraction-Dataset-for-Discriminative-Models",
+   "sha": "648119c2030c5352c37a305deb74aa8ec84a4402",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 4,
+   "last_modified": "2026-02-13 10:26:41+00:00",
+   "tags": [
+    "region:us"
+   ]
+  }
+ ],
+ "x-ray diffraction liquid": [],
+ "Bose-Einstein condensate": [],
+ "BEC": [
+  {
+   "id": "proffttega/join_illuminati_to_become_rich",
+   "sha": "7864dbb7766e97129a1cc10b4a02a959ad7eb642",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2021-09-21 15:09:38+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Evelyn18/becas",
+   "sha": "cc9cf630ade5331cbf5de98414a71b3b85a905dd",
+   "license": [],
+   "downloads": 6,
+   "last_modified": "2022-05-26 23:41:42+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Evelyn18/becasv2",
+   "sha": "aafb6d6a071b3af08cad99c19334a5670365969b",
+   "license": [],
+   "downloads": 7,
+   "last_modified": "2022-07-15 19:51:15+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Evelyn18/becasv3",
+   "sha": "be9464bcfa499eabfe6a7f5064d4a05b1f24ca46",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2022-07-13 03:59:24+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "becurrio/advABSA",
+   "sha": "e4d8ebdbd6644c78caac2655731820a7e07fd298",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 98,
+   "last_modified": "2022-07-21 05:57:48+00:00",
+   "tags": [
+    "arxiv:2207.08099",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Bioskop/BeccaCP",
+   "sha": "266a789657f551170b540c38555a03be58b55650",
+   "license": [
+    "license:unknown"
+   ],
+   "downloads": 8,
+   "last_modified": "2022-10-10 01:52:28+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:imagefolder",
+    "modality:image",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Bioskop/BeccaER",
+   "sha": "7a0de57544433aedf02f1e597bf2ac01bc4b8d7b",
+   "license": [
+    "license:other"
+   ],
+   "downloads": 5,
+   "last_modified": "2022-10-10 02:24:30+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Bioskop/autotrain-data-beccacp",
+   "sha": "3a206d464eacf0492d232e1a2d80ecfebdd6dc0c",
+   "license": [],
+   "downloads": 44,
+   "last_modified": "2022-10-10 02:51:18+00:00",
+   "tags": [
+    "task_categories:image-classification",
+    "region:us"
+   ]
+  },
+  {
+   "id": "autoevaluate/autoeval-staging-eval-project-19f625bb-a07b-4f3a-bec2-d734d6029176-6159",
+   "sha": "cd348cda88fc5bf04f04e1cf878a6093fadb96ee",
+   "license": [],
+   "downloads": 22,
+   "last_modified": "2022-11-21 14:19:12+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us",
+    "autotrain",
+    "evaluation"
+   ]
+  },
+  {
+   "id": "becerriljc/sentiment-banking",
+   "sha": "e0abb75f3a0b1ac52df7241b87e1047a0da6480a",
+   "license": [],
+   "downloads": 12,
+   "last_modified": "2023-07-03 04:11:18+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "tomdavies32/beckhamtest",
+   "sha": "d2c76508be40fea9ece1289e7c40c66e442ea1d6",
+   "license": [
+    "license:other"
+   ],
+   "downloads": 2,
+   "last_modified": "2023-08-07 13:29:55+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "tomdavies32/beckham150823",
+   "sha": "40d1567ed1f49da013263e11793f3481d580b367",
+   "license": [],
+   "downloads": 2,
+   "last_modified": "2023-08-15 08:12:51+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "CyberHarem/becky_blackbell_spyxfamily",
+   "sha": "71af8a38f316eb93e95c3d2416efaa3cfa8b3716",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 27,
+   "last_modified": "2023-09-17 17:28:18+00:00",
+   "tags": [
+    "task_categories:text-to-image",
+    "size_categories:1K<n<10K",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us",
+    "art",
+    "not-for-all-audiences"
+   ]
+  },
+  {
+   "id": "autoevaluate/autoeval-eval-billsum-default-bec98f-32334145010",
+   "sha": "56fc3463859e9532e95fbfd19f99d55fd47dfd9f",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2023-10-04 14:12:51+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "autoevaluate/autoeval-eval-billsum-default-bec98f-32334145011",
+   "sha": "167d522bd1d5e96afbc989d458a0a55e464ab280",
+   "license": [],
+   "downloads": 11,
+   "last_modified": "2023-10-04 14:28:44+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us",
+    "autotrain",
+    "evaluation"
+   ]
+  },
+  {
+   "id": "Paolify/BeckyGv5",
+   "sha": "e84d5733b9a0695310b352d8197bbef20e147bdd",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2024-01-13 13:58:07+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Paolify/Beckyg",
+   "sha": "b68cd2f06d4ee2cf48c4b677e0bd77a1729a41c0",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 9,
+   "last_modified": "2026-06-30 22:11:17+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Guylherme/becu",
+   "sha": "c6c4a7dfe403e544ae6caccdddae9b3c179d7e6a",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2024-02-06 17:14:02+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:audiofolder",
+    "modality:audio",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "beckhamc/design_bench_data",
+   "sha": "79006c5105c6d0da75b2d9b599f31a5e74136778",
+   "license": [],
+   "downloads": 1906,
+   "last_modified": "2024-04-15 01:14:36+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "beckhamc/test_dataset",
+   "sha": "5f7b2f7ad28f4a08a2b1382aa5f0fba8f71ef7e2",
+   "license": [],
+   "downloads": 20,
+   "last_modified": "2024-04-14 14:34:25+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:text",
+    "modality:text",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Becks9002/eng-to-amh-translation",
+   "sha": "ae41cee5a4fb3fa1dd3ae4a83526fd2ecdbc5848",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 2,
+   "last_modified": "2024-05-10 18:51:23+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Beck2020/SafeLLMs",
+   "sha": "b59daf4680695c2fcf770dd8b82de3530534cd11",
+   "license": [],
+   "downloads": 2,
+   "last_modified": "2024-05-31 03:37:43+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "vcbvbc/beckalim",
+   "sha": "a6c25f3d1a7cdeac1ece8932c51255a16d8b011c",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 2,
+   "last_modified": "2024-06-09 13:01:55+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "adegbem/Annotated_Transcript_Judith_Beck_Abe",
+   "sha": "39406901eb0677cd8a36368262c509096d9e1cca",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2024-06-11 18:05:15+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "faruk-becirovic/AgroSmart",
+   "sha": "d3c796d5dd01639240ce14a125093714b3969051",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2024-09-13 08:15:05+00:00",
+   "tags": [
+    "language:en",
+    "modality:image",
+    "modality:text",
+    "region:us"
+   ]
+  },
+  {
+   "id": "oluchiUH/Annotated_Transcript_Judith_Beck_Abe",
+   "sha": "2120d30f6d18f5039818debb108c5b8fbc861ecf",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2024-07-15 16:26:59+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "becodev/dataset",
+   "sha": "4fc0dc7f6bd6e02e35b237ed9677d2fa4f0e5de2",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 2,
+   "last_modified": "2024-07-30 15:33:42+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:tabular",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Gopher-Lab/huberman_lab_Jocko_Willink_How_to_Become_Resilient_Forge_Your_Identity__Lead_Others",
+   "sha": "947728b14f91bbac7e8f6b124816fcdf4c506382",
+   "license": [],
+   "downloads": 7,
+   "last_modified": "2024-08-12 15:45:32+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Gopher-Lab/huberman_lab_Dr__Becky_Kennedy_Protocols_for_Excellent_Parenting__Improving_Relationships_of_All",
+   "sha": "63cb615b31cc9e4c4d410d10570ef9ef94435223",
+   "license": [],
+   "downloads": 15,
+   "last_modified": "2024-08-12 15:37:44+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Gopher-Lab/bankless_DEBRIEF_Justin_Sun_On_Tron_Vitalik_and_Becoming_Humble",
+   "sha": "6a7b71ccbd8c2ba647bb92ea35c43c62f8b9c8a9",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2024-08-12 15:56:09+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Gopher-Lab/bankless_EARLY_ACCESS_Justin_Sun_On_Tron_Vitalik_and_Becoming_Humble",
+   "sha": "4c0ec19132bb65671df59c5bd16aafd61112357a",
+   "license": [],
+   "downloads": 9,
+   "last_modified": "2024-08-12 16:01:18+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Gopher-Lab/laurashin_Why_CoinFund_Believes_Worldcoin_Could_Become_More_Popular_Than_Bitcoin_-_Ep__525",
+   "sha": "94921b4183ac6d472586043df3337782e1c75b43",
+   "license": [],
+   "downloads": 13,
+   "last_modified": "2024-08-12 15:48:38+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Xcopter/Beckhoff",
+   "sha": "e83e03d0a9c93e1dd254ff64a13ec51e46572ef0",
+   "license": [],
+   "downloads": 6,
+   "last_modified": "2024-08-19 06:53:21+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "argilla-internal-testing/test_import_dataset_from_hub_with_classlabel_354a63f9-5cbd-4539-bece-c47fa495a9cb",
+   "sha": "f15c40538937c4375c0ed2a99c1b81ac794a12e7",
+   "license": [],
+   "downloads": 2,
+   "last_modified": "2024-09-23 11:01:31+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "beckhamc/dog-example",
+   "sha": "d56e828b9397a2db299eebf87c386c3ccb20bf07",
+   "license": [],
+   "downloads": 9,
+   "last_modified": "2024-09-23 19:20:33+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:imagefolder",
+    "modality:image",
+    "modality:text",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "argilla-internal-testing/test_import_dataset_from_hub_with_classlabel_bec2e7b7-4baa-43c1-b285-62b3bd3753e2",
+   "sha": "aa6284daed5798031df49ba8800ea843060cf384",
+   "license": [],
+   "downloads": 2,
+   "last_modified": "2024-09-26 08:32:40+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Archon69/Becka",
+   "sha": "11ba9704791dff6bf2f82ed6e348d0f90b180e82",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 6,
+   "last_modified": "2024-10-01 07:37:16+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "argilla-internal-testing/test_import_dataset_from_hub_with_classlabel_79d93a06-becf-4c7b-8a2a-3db8dfb80721",
+   "sha": "b787dfe81ce718368763cb34356883b6437f827d",
+   "license": [],
+   "downloads": 7,
+   "last_modified": "2024-10-03 09:25:26+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "ahsanirfan961/swe-bech-lite-bm25-13k-single",
+   "sha": "b611ba8dc163f4ef6921856c088bd5f5cb361a9f",
+   "license": [],
+   "downloads": 26,
+   "last_modified": "2024-10-05 16:14:03+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "ahsanirfan961/swe-bech-lite-bm25-13k-take3",
+   "sha": "d50cb8e2f603fb5147552215a21b13c514438dfb",
+   "license": [],
+   "downloads": 30,
+   "last_modified": "2024-12-21 13:41:14+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "beccabai/slimpajama_labeled",
+   "sha": "485274490c3b91ea230be538657edd8e3d6baf7d",
+   "license": [],
+   "downloads": 737,
+   "last_modified": "2024-10-21 08:36:56+00:00",
+   "tags": [
+    "task_categories:text-generation",
+    "language:en",
+    "size_categories:10M<n<100M",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "arxiv:2410.08102",
+    "region:us"
+   ]
+  },
+  {
+   "id": "ahsanirfan961/swe-bech-lite-bm25-13k-take50",
+   "sha": "529454e3dd72aa92a68b6956b6cb86e84169c1a4",
+   "license": [],
+   "downloads": 52,
+   "last_modified": "2024-10-25 17:04:39+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Beckettguy/Testing123",
+   "sha": "cebd5053e6b9eee6b3199ca186feade02f6ad775",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2024-10-28 04:15:29+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Beckettguy/Dudesnude",
+   "sha": "505a749862dd97185a05556003ec72ceea286bc9",
+   "license": [],
+   "downloads": 1,
+   "last_modified": "2024-10-30 00:04:35+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Beckettguy/NSFWnakedMen",
+   "sha": "aa5cf16a46631c4061238dd0b5b7a0f1a64f34ec",
+   "license": [
+    "license:unknown"
+   ],
+   "downloads": 5,
+   "last_modified": "2024-11-01 07:18:41+00:00",
+   "tags": [
+    "language:en",
+    "size_categories:n<1K",
+    "region:us",
+    "not-for-all-audiences.",
+    "biology",
+    "men",
+    "nsfw",
+    "nakedman",
+    "not-for-all-audiences"
+   ]
+  },
+  {
+   "id": "argilla-internal-testing/test_import_dataset_from_hub_with_classlabel_b8d2736f-40fa-4a1d-becd-8addbff7e95b",
+   "sha": "10dfe112f05faee28d989bfc714d190b7ac0cd56",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2024-11-11 11:52:34+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "argilla-internal-testing/test_import_dataset_from_hub_with_classlabel_1cd90e20-bbb4-416d-becd-84b7c883b7fc",
+   "sha": "9069e877e3fb40c70e39e5b8410c783137f58273",
+   "license": [],
+   "downloads": 2,
+   "last_modified": "2024-11-26 13:48:07+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "argilla-internal-testing/test_import_dataset_from_hub_with_classlabel_bec52a64-6903-45fa-af37-03f734a82077",
+   "sha": "1bcabcb4ba01d3915047187c95f38953c664b864",
+   "license": [],
+   "downloads": 2,
+   "last_modified": "2024-12-02 11:10:09+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Kaballas/bechtest",
+   "sha": "00a822cac3b4121a7938943b2dff017aeb4e570f",
+   "license": [],
+   "downloads": 12,
+   "last_modified": "2024-12-07 04:52:26+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "ANTI-PHILOSOPHER/YOU-CAN-BECOME-AN-ANTI-PHILOSOPHER-FOR-A-MOMENT",
+   "sha": "a292013a383da1d5f63c84719b828dd1fb8bda17",
+   "license": [],
+   "downloads": 1,
+   "last_modified": "2024-12-30 11:04:34+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "DEEP-BRAIN-MELTDOWN/AND-NOW-YOU-HAVE-BECOME-GOD",
+   "sha": "209352b313626302475537a13ba54ac3d213cdc7",
+   "license": [],
+   "downloads": 2,
+   "last_modified": "2025-01-10 14:05:44+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "argilla-internal-testing/test_import_dataset_from_hub_with_classlabel_8e060dda-25f0-4599-becc-43955ea21b24",
+   "sha": "1a0b3f51bb246dee3674a3668d29da5326b9f4fe",
+   "license": [],
+   "downloads": 4,
+   "last_modified": "2025-02-17 08:29:38+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Becomebright/QAEgo4D-MC-test",
+   "sha": "ee31cc135035dad4d14c9c2d95bd7afca64d341c",
+   "license": [
+    "license:cc-by-4.0"
+   ],
+   "downloads": 1547,
+   "last_modified": "2025-02-28 08:59:11+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:json",
+    "modality:text",
+    "modality:video",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Becomebright/RVS",
+   "sha": "03232e8520da83a127686d5ebc04464197d57c41",
+   "license": [
+    "license:cc-by-nc-4.0"
+   ],
+   "downloads": 456,
+   "last_modified": "2025-02-28 08:55:40+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "modality:video",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "BeckerAnas/convnext_cifar10_demo",
+   "sha": "dff7befa8576f925e4e42b841ce6601e6abbe4b5",
+   "license": [],
+   "downloads": 6,
+   "last_modified": "2025-04-03 08:41:11+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:image",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "BeckerAnas/nat_cifar10_demo",
+   "sha": "9f64ef3f8131c58f07ac1c2572b02a6b2433cc01",
+   "license": [],
+   "downloads": 4,
+   "last_modified": "2025-04-04 07:11:47+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:image",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Becomebright/TMP",
+   "sha": "a44a0b6fa1bf34b36e81920ef508d5c7e4510bbe",
+   "license": [],
+   "downloads": 53,
+   "last_modified": "2025-10-11 14:11:49+00:00",
+   "tags": [
+    "modality:image",
+    "region:us"
+   ]
+  },
+  {
+   "id": "thagen/BECauSEv2",
+   "sha": "882d2d0e5a679589703405683069554b620e6f08",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 32,
+   "last_modified": "2026-07-31 09:18:14+00:00",
+   "tags": [
+    "task_categories:text-classification",
+    "task_categories:token-classification",
+    "multilinguality:monolingual",
+    "language:en",
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "becklabash/rectangular-patch-antenna-freq-response",
+   "sha": "4be72a22e55fbf46966c59a5d6b3ec95c836379b",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 80,
+   "last_modified": "2025-05-27 00:58:49+00:00",
+   "tags": [
+    "language:en",
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:timeseries",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "arxiv:2505.18188",
+    "region:us",
+    "patch-antenna"
+   ]
+  },
+  {
+   "id": "ChristianHugD/because",
+   "sha": "be9293eda5a2ac20d2b9994255bf8116731ae4b7",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 36,
+   "last_modified": "2025-08-17 14:13:19+00:00",
+   "tags": [
+    "task_categories:text-classification",
+    "task_categories:token-classification",
+    "language:en",
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  }
+ ],
+ "Bragg spectroscopy": [],
+ "cold atoms": [],
+ "ultracold": [],
+ "absorption imaging": [],
+ "quantum gas": [],
+ "superfluid": [
+  {
+   "id": "superfluidic/agent-orchestrator-training",
+   "sha": "90d4aefc9cfa96e66bd543a90a2efacaceda2ed6",
+   "license": [],
+   "downloads": 8,
+   "last_modified": "2025-12-06 04:39:10+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  }
+ ],
+ "Bogoliubov": [],
+ "pair distribution function": [],
+ "radial distribution function": [],
+ "helium": [
+  {
+   "id": "open-llm-leaderboard/kyutai__helium-1-preview-2b-details",
+   "sha": "00a115f86948777217902cdc1f677dc48775f6ca",
+   "license": [],
+   "downloads": 36,
+   "last_modified": "2025-02-13 16:51:41+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:json",
+    "modality:tabular",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "weiminw/heliumos_reward_score",
+   "sha": "78702817edae874f0be7acb75ce846d1bc54857b",
+   "license": [],
+   "downloads": 15,
+   "last_modified": "2025-06-15 04:02:00+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "library:distilabel",
+    "region:us",
+    "synthetic",
+    "distilabel"
+   ]
+  },
+  {
+   "id": "heliumind/clef_ehealth_2019",
+   "sha": "24f5ecb5bcf0c82ca5a7c5b2f64754edf03ebc00",
+   "license": [
+    "license:cc-by-nc-nd-4.0"
+   ],
+   "downloads": 22,
+   "last_modified": "2025-04-23 21:36:23+00:00",
+   "tags": [
+    "task_categories:text-classification",
+    "task_ids:multi-label-classification",
+    "annotations_creators:expert-generated",
+    "language_creators:expert-generated",
+    "language:de",
+    "size_categories:1K<n<10K",
+    "region:us",
+    "text classification",
+    "multi-label",
+    "ICD-10",
+    "ICD-10-GM",
+    "animal experiment"
+   ]
+  },
+  {
+   "id": "weiminw/heliumos_pair_rank_reward",
+   "sha": "93b7af56713df734483cbe67c1470ae6ccf28b69",
+   "license": [],
+   "downloads": 7,
+   "last_modified": "2025-05-30 08:30:47+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "library:distilabel",
+    "region:us",
+    "synthetic",
+    "distilabel",
+    "rlaif"
+   ]
+  },
+  {
+   "id": "Fred808/helium",
+   "sha": "1c725f80b1d497baed1a06e639fbf3d55ac68fef",
+   "license": [],
+   "downloads": 792,
+   "last_modified": "2025-11-13 23:25:36+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Fred808/helium_memory",
+   "sha": "7fec200ec9004f3e20aa6a8afe0dcad58421d3cc",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 164,
+   "last_modified": "2025-09-05 17:58:09+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "arxiv:2508.10925",
+    "region:us",
+    "vllm"
+   ]
+  },
+  {
+   "id": "samelias1/Helium",
+   "sha": "ad705f162168a574ba9903c1889d08e4314ce7be",
+   "license": [],
+   "downloads": 7937,
+   "last_modified": "2026-10-09 13:34:26+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "batmanLovesAI/HeliumSLM-Dataset",
+   "sha": "a2cd4f5cc518cbd5befc89cdbda9ca64b4f8a4c4",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 926,
+   "last_modified": "2025-12-01 01:03:17+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "samelias1/Helium_TG",
+   "sha": "f1d743590606b842351010bd640f32d7184de7d6",
+   "license": [],
+   "downloads": 1157,
+   "last_modified": "2026-10-05 21:17:14+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "batmanLovesAI/HeliumLM-tokenizer",
+   "sha": "6af2b0cf82d6beb8e57fa7e194e6d45dcfff0729",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 15,
+   "last_modified": "2026-01-07 05:01:34+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "HeliumHcc/preprocessed_EEG",
+   "sha": "dcaf69e858547fe8c0100050b565878978656966",
+   "license": [],
+   "downloads": 17,
+   "last_modified": "2026-01-20 18:21:11+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "HeliumHcc/EEG_raw_datasets",
+   "sha": "7976bc2de7820234a199d2d6642a4b1bd7a524d1",
+   "license": [],
+   "downloads": 15,
+   "last_modified": "2026-01-22 16:41:53+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "HeliumHcc/rawEEG_g1",
+   "sha": "0784dd5f36a1750a684190af8ddf1f96cfb8334a",
+   "license": [],
+   "downloads": 9,
+   "last_modified": "2026-02-15 06:41:03+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "HeliumHcc/rawEEG_g2",
+   "sha": "bc98fe5b3d3388b81d898868195f29fed1233bc8",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2026-02-14 13:12:43+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "HeliumHcc/rawEEG_g3",
+   "sha": "dca452afe8c8fc386269330d81927819d9f91b2b",
+   "license": [],
+   "downloads": 4,
+   "last_modified": "2026-02-14 20:21:49+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "heliumdeploydiscountcode/heliumdeploydiscountcodeoff10",
+   "sha": "4338ce4c5fa5257e1f60fac96aba2e3eab7668db",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2026-03-02 06:54:26+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Helium-bre/drill_play_franka_franka_umi_tacticle",
+   "sha": "3e70f2908e92d636163904d59a395727dd5dbf40",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 221,
+   "last_modified": "2026-04-19 07:19:33+00:00",
+   "tags": [
+    "task_categories:robotics",
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:image",
+    "modality:tabular",
+    "modality:timeseries",
+    "library:datasets",
+    "library:dask",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us",
+    "LeRobot"
+   ]
+  },
+  {
+   "id": "niloy629/imtalker-helium-audio-8s-backup",
+   "sha": "ced57f6cf043d1d8b14f0133aaf4c844bf54f63c",
+   "license": [],
+   "downloads": 27,
+   "last_modified": "2026-05-15 17:16:25+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:webdataset",
+    "modality:text",
+    "library:datasets",
+    "library:webdataset",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "aashay2035/helium-flow",
+   "sha": "3c7c71b13be8d68bcb54b52b54dbfd95297571ea",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2026-05-14 01:20:02+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "HeliumTrades/helium-market-resolution-benchmark",
+   "sha": "e9612b244d6dc7cb3e4edb72dfd438d44319e1f2",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 151,
+   "last_modified": "2026-07-24 18:25:06+00:00",
+   "tags": [
+    "task_categories:text-generation",
+    "task_categories:question-answering",
+    "language:en",
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us",
+    "benchmark"
+   ]
+  },
+  {
+   "id": "HeliumTrades/helium-model-worldview-benchmark",
+   "sha": "92e3560ce8794c7b091a727e36255e4fc35cb534",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 378,
+   "last_modified": "2026-07-24 18:25:08+00:00",
+   "tags": [
+    "task_categories:text-generation",
+    "task_categories:question-answering",
+    "language:en",
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us",
+    "benchmark"
+   ]
+  },
+  {
+   "id": "Darknsu/new_helium_adapter_checkpoint_librispeech_full_dataset",
+   "sha": "0e0fa95c3ad649c0195223e9c33f7ee2dd8b1e01",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 14,
+   "last_modified": "2026-06-24 12:35:52+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:csv",
+    "modality:tabular",
+    "library:datasets",
+    "library:dask",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "lukecccz/new_helium_adapter_checkpoint_librispeech_full_dataset",
+   "sha": "4034e2f0952e4fe82b94869715ef90e5c25520ce",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 4,
+   "last_modified": "2026-06-24 13:13:23+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:csv",
+    "modality:tabular",
+    "library:datasets",
+    "library:dask",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Helium-bre/pick_place_franka_robotiq",
+   "sha": "8007cd6038279f04cdc67e03e12fc705f5a2a76e",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 145,
+   "last_modified": "2026-06-28 02:56:26+00:00",
+   "tags": [
+    "task_categories:robotics",
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:timeseries",
+    "modality:video",
+    "library:datasets",
+    "library:dask",
+    "library:polars",
+    "library:mlcroissant",
+    "library:lerobot",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Helium-bre/push_franka_robotiq",
+   "sha": "bc62c93b414713e26b022b60911d2cd74a1a28b6",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 183,
+   "last_modified": "2026-06-28 02:57:32+00:00",
+   "tags": [
+    "task_categories:robotics",
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:timeseries",
+    "modality:video",
+    "library:datasets",
+    "library:dask",
+    "library:polars",
+    "library:mlcroissant",
+    "library:lerobot",
+    "region:us"
+   ]
+  },
+  {
+   "id": "HeliumTrades/helium-news-bias-corpus",
+   "sha": "4b28000ad5d7d5caf8f856720360532e9037b8f9",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 72,
+   "last_modified": "2026-07-06 17:43:41+00:00",
+   "tags": [
+    "task_categories:text-classification",
+    "language:en",
+    "region:us",
+    "news",
+    "media-bias",
+    "journalism",
+    "nlp",
+    "misinformation"
+   ]
+  },
+  {
+   "id": "Darknsu/helium_lora_v1",
+   "sha": "5275af888bac3e30dd4247a356fdf43ec219e093",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 21,
+   "last_modified": "2026-07-24 18:12:49+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Darknsu/helium_lora_random",
+   "sha": "72f126f9c41043b6f813b027d4bcfc839678f86b",
+   "license": [],
+   "downloads": 4,
+   "last_modified": "2026-08-11 14:32:40+00:00",
+   "tags": [
+    "arxiv:1910.09700",
+    "region:us",
+    "lora"
+   ]
+  },
+  {
+   "id": "Helium-bre/stack_franka_robotiq",
+   "sha": "150bbe4e8c7f49fd8a52aa265e4192bb3ab4f5d4",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 425,
+   "last_modified": "2026-08-22 08:52:02+00:00",
+   "tags": [
+    "task_categories:robotics",
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:timeseries",
+    "library:datasets",
+    "library:dask",
+    "library:polars",
+    "library:mlcroissant",
+    "library:lerobot",
+    "region:us",
+    "LeRobot"
+   ]
+  },
+  {
+   "id": "Darknsu/personaplex-helium-distillation-v1",
+   "sha": "5b0ffd9b06f5f8d83afdc1c667bb907c643b9da3",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 18,
+   "last_modified": "2026-09-23 16:26:57+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Darknsu/personaplex-helium-distillation-v2",
+   "sha": "f84fad825f33c3115ed06ebbd0963cca0f558d23",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 130,
+   "last_modified": "2026-09-26 08:15:59+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Darknsu/personaplex-helium-distillation-v2-300hr",
+   "sha": "1a04870a73bcdf0dcdd1d3559caffeaf95bf4153",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 39,
+   "last_modified": "2026-09-26 16:54:16+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Darknsu/personaplex-helium-distillation-v2-100hr-train-model",
+   "sha": "524cb7cdf82c29014124d45db4c805f17be04b22",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 137,
+   "last_modified": "2026-09-27 15:38:31+00:00",
+   "tags": [
+    "modality:audio",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Darknsu/personaplex-helium-distillation-v3-500hr",
+   "sha": "a9cab9a860bec08322e3e01f8837810b580bf7a3",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 43,
+   "last_modified": "2026-09-30 15:19:22+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Darknsu/personaplex-helium-distillation-v3-100hr",
+   "sha": "a8226baba7b00d1d38770a38fcfa2ce86aede6f0",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 48,
+   "last_modified": "2026-10-01 19:54:36+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Darknsu/personaplex-helium-distillation-v3-100hr-train-model",
+   "sha": "d56ccd94862e4af012d6b81001aac5a46f7c53b3",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 101,
+   "last_modified": "2026-10-02 16:29:53+00:00",
+   "tags": [
+    "modality:audio",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Darknsu/personaplex-helium-distillation-v4-100hr-train-model",
+   "sha": "ed88a23a4c7c3468a706d7557d5330bfc5536f72",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 481,
+   "last_modified": "2026-10-04 04:43:05+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Darknsu/personaplex-helium-distillation-v5-100hr-train-model",
+   "sha": "13e280e0c26d1b2f6fa80ea4a804d299e2ea0f0c",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 119,
+   "last_modified": "2026-10-06 03:41:20+00:00",
+   "tags": [
+    "region:us"
+   ]
+  }
+ ],
+ "condensate": [
+  {
+   "id": "ynuwara/duvernay-condensate-pvt-report",
+   "sha": "f9b223b89bd288a0cdc6a2b2181c4688379c490d",
+   "license": [],
+   "downloads": 21,
+   "last_modified": "2024-12-20 18:50:03+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:imagefolder",
+    "modality:image",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us",
+    "created-with-pdfs-to-page-images-converter",
+    "pdf-to-image"
+   ]
+  },
+  {
+   "id": "ynuwara/Duvernay_Condensate_All",
+   "sha": "866ce023bd21f23681c5298e6f55865a1d679493",
+   "license": [],
+   "downloads": 2,
+   "last_modified": "2024-12-21 21:09:14+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:image",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  }
+ ],
+ "phonon": [
+  {
+   "id": "nimashoghi/matbench_phonons_fold0",
+   "sha": "e6b464363d1d3106b519f3e9fd373fd723a2bc74",
+   "license": [],
+   "downloads": 70,
+   "last_modified": "2025-03-12 19:29:02+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:tabular",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "nimashoghi/matbench_phonons_fold1",
+   "sha": "354a5c64a2e376df1e8e1b0a9f4618c757758841",
+   "license": [],
+   "downloads": 36,
+   "last_modified": "2025-03-12 19:29:04+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:tabular",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "nimashoghi/matbench_phonons_fold2",
+   "sha": "e2767c566c4c12e82eeb97d4f4723bd0baa47af0",
+   "license": [],
+   "downloads": 39,
+   "last_modified": "2025-03-12 19:29:07+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:tabular",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "nimashoghi/matbench_phonons_fold3",
+   "sha": "62116a78eb483d6ac8140c58171bf3293063ffdd",
+   "license": [],
+   "downloads": 35,
+   "last_modified": "2025-03-12 19:29:09+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:tabular",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "nimashoghi/matbench_phonons_fold4",
+   "sha": "bd0a754274a3c0381c66ffc793060c771e8060d8",
+   "license": [],
+   "downloads": 36,
+   "last_modified": "2025-03-12 19:29:11+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:tabular",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Infatoshi/phonon-youtube-cc-audio",
+   "sha": "9ca75d518cf95ff729f1ac2cd21c376625e7462b",
+   "license": [
+    "license:cc-by-4.0"
+   ],
+   "downloads": 78,
+   "last_modified": "2026-06-12 22:38:24+00:00",
+   "tags": [
+    "task_categories:automatic-speech-recognition",
+    "language:en",
+    "size_categories:1K<n<10K",
+    "format:audiofolder",
+    "modality:audio",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Infatoshi/phonon-youtube-technical",
+   "sha": "416890e65a292c36af607956cf9c1606a2d34a26",
+   "license": [
+    "license:cc-by-4.0"
+   ],
+   "downloads": 389,
+   "last_modified": "2026-06-12 22:30:44+00:00",
+   "tags": [
+    "task_categories:automatic-speech-recognition",
+    "language:en",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Infatoshi/phonon-synthetic-tts",
+   "sha": "6be46a8affae311b09d052157596b2db7a4488ec",
+   "license": [
+    "license:cc-by-4.0"
+   ],
+   "downloads": 33,
+   "last_modified": "2026-06-12 22:35:18+00:00",
+   "tags": [
+    "task_categories:automatic-speech-recognition",
+    "language:en",
+    "size_categories:1K<n<10K",
+    "format:audiofolder",
+    "modality:audio",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "danial199472/phonon",
+   "sha": "88b3fd38f2ddedf7121b28816d2c735fcbe564cf",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 118,
+   "last_modified": "2026-10-16 21:19:42+00:00",
+   "tags": [
+    "region:us"
+   ]
+  }
+ ],
+ "scattering": [
+  {
+   "id": "dangkhoadl/ICASSP2024-Acoustic_Scattering_AI-Noninvasive_Object_Classifications",
+   "sha": "f835ec3aebca598203dfeb4f057a9ac349a2fa5c",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 21,
+   "last_modified": "2023-11-22 10:40:22+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:webdataset",
+    "modality:audio",
+    "modality:text",
+    "library:datasets",
+    "library:webdataset",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "polymathic-ai/acoustic_scattering_discontinuous",
+   "sha": "1103c80a2975647674a07e08bcf5be0fe4c71ea1",
+   "license": [
+    "license:cc-by-4.0"
+   ],
+   "downloads": 772,
+   "last_modified": "2025-04-10 07:50:00+00:00",
+   "tags": [
+    "task_categories:time-series-forecasting",
+    "task_categories:other",
+    "task_ids:multivariate-time-series-forecasting",
+    "language:en",
+    "arxiv:2412.00568",
+    "region:us",
+    "physics"
+   ]
+  },
+  {
+   "id": "polymathic-ai/acoustic_scattering_inclusions",
+   "sha": "c17cd1d16fd351594ccea628e575650b404c4a91",
+   "license": [
+    "license:cc-by-4.0"
+   ],
+   "downloads": 1004,
+   "last_modified": "2025-04-10 07:50:02+00:00",
+   "tags": [
+    "task_categories:time-series-forecasting",
+    "task_categories:other",
+    "task_ids:multivariate-time-series-forecasting",
+    "language:en",
+    "arxiv:2412.00568",
+    "region:us",
+    "physics"
+   ]
+  },
+  {
+   "id": "polymathic-ai/acoustic_scattering_maze",
+   "sha": "8df383a3223f40f7ce66fe77b4ff4d7006dbc272",
+   "license": [
+    "license:cc-by-4.0"
+   ],
+   "downloads": 912,
+   "last_modified": "2025-04-10 07:50:04+00:00",
+   "tags": [
+    "task_categories:time-series-forecasting",
+    "task_categories:other",
+    "task_ids:multivariate-time-series-forecasting",
+    "language:en",
+    "arxiv:2412.00568",
+    "region:us",
+    "physics"
+   ]
+  },
+  {
+   "id": "joonhyukseow/Jennifer_Scattering",
+   "sha": "b49501c8df8e27df323ddbd03fe724a94355ce7b",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2026-05-05 01:12:47+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "format:optimized-parquet",
+    "modality:image",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "davidMis/hybrid-operator-learning-of-wave-scattering-maps-in-high-contrast-media",
+   "sha": "4bebb4502986b58e51f01a874362915a80a30d36",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 43,
+   "last_modified": "2026-06-02 19:39:02+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:polars",
+    "library:mlcroissant",
+    "arxiv:2602.11197",
+    "region:us",
+    "geophysics",
+    "helmholtz",
+    "wave-scattering"
+   ]
+  },
+  {
+   "id": "jma02/helmholtz-scattering-3d-pilot",
+   "sha": "be25352b9afc166e0a91278696ed88f06c9c9212",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 6,
+   "last_modified": "2026-06-17 02:18:01+00:00",
+   "tags": [
+    "task_categories:other",
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:timeseries",
+    "library:datasets",
+    "library:pandas",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us",
+    "helmholtz",
+    "inverse-scattering"
+   ]
+  },
+  {
+   "id": "jma02/helmholtz-scattering-3d",
+   "sha": "f6db10f08ba88a6777e7ced60c26c244b735b728",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 6,
+   "last_modified": "2026-06-17 05:37:37+00:00",
+   "tags": [
+    "task_categories:other",
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:timeseries",
+    "library:datasets",
+    "library:dask",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us",
+    "helmholtz",
+    "inverse-scattering"
+   ]
+  },
+  {
+   "id": "joonhyukseow/Jennifer_Scattering_Pairs",
+   "sha": "a7321e912f61cf75cd9a5a10ef42f00caf22d9dc",
+   "license": [],
+   "downloads": 3,
+   "last_modified": "2026-07-11 08:01:19+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "format:optimized-parquet",
+    "modality:tabular",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  }
+ ],
+ "neutron": [
+  {
+   "id": "neutronprawn/product_entity",
+   "sha": "606162502fdc161430c0ebb018f246bba62c803e",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 3,
+   "last_modified": "2024-09-14 22:57:45+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "polymathic-ai/post_neutron_star_merger",
+   "sha": "721253cd3220d158d3088c0cce4558dd444d1353",
+   "license": [
+    "license:cc-by-4.0"
+   ],
+   "downloads": 251,
+   "last_modified": "2025-04-10 07:50:12+00:00",
+   "tags": [
+    "task_categories:time-series-forecasting",
+    "task_categories:other",
+    "task_ids:multivariate-time-series-forecasting",
+    "language:en",
+    "arxiv:2412.00568",
+    "arxiv:1912.03378",
+    "arxiv:2212.10691",
+    "arxiv:2311.05796",
+    "region:us",
+    "physics"
+   ]
+  },
+  {
+   "id": "rli14/09182025_realsense_oceanstripedtable_neutronsmug",
+   "sha": "9ba7911f2e1bc55c829549c66463f7e5abc762cc",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 34,
+   "last_modified": "2025-09-19 08:41:27+00:00",
+   "tags": [
+    "task_categories:robotics",
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:image",
+    "modality:timeseries",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us",
+    "LeRobot"
+   ]
+  },
+  {
+   "id": "Neutron10/humanoid-network-training",
+   "sha": "485101134dbbe088b2967605655a1793c40b6f2c",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 7,
+   "last_modified": "2026-01-07 20:21:21+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "ClarusC64/fusion-tbr-neutron-breeder-coherence-baseline-mapping-v0.1",
+   "sha": "45bea84b00742abf0e26137759a24356922a5950",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 36,
+   "last_modified": "2026-02-11 11:56:35+00:00",
+   "tags": [
+    "task_categories:tabular-regression",
+    "task_categories:tabular-classification",
+    "language:en",
+    "size_categories:1K<n<10K",
+    "region:us",
+    "clarusc64",
+    "fusion",
+    "tritium",
+    "breeding-blanket",
+    "neutron-spectrum",
+    "predictive-maintenance"
+   ]
+  },
+  {
+   "id": "popoff4rtem/2D-Neutron-Diffraction-Dataset-for-Discriminative-Models",
+   "sha": "648119c2030c5352c37a305deb74aa8ec84a4402",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 4,
+   "last_modified": "2026-02-13 10:26:41+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "juliensimon/neutron-monitor-cosmic-rays",
+   "sha": "af21175f41d6866bdf0d3f52aeaeda24003a9961",
+   "license": [
+    "license:cc-by-4.0"
+   ],
+   "downloads": 533,
+   "last_modified": "2026-10-23 21:31:36+00:00",
+   "tags": [
+    "task_categories:time-series-forecasting",
+    "task_categories:tabular-regression",
+    "language:en",
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:tabular",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:polars",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  }
+ ],
+ "quantum-gas": [],
+ "cold-atom": [],
+ "ultracold-atoms": [],
+ "liquid-structure": [],
+ "SANS": [
+  {
+   "id": "surajp/sanskrit_classic",
+   "sha": "51c3f43064a38a0ff04263696b803243089a6ebe",
+   "license": [
+    "license:other"
+   ],
+   "downloads": 136,
+   "last_modified": "2024-01-18 11:15:19+00:00",
+   "tags": [
+    "task_categories:text-generation",
+    "task_categories:fill-mask",
+    "task_ids:language-modeling",
+    "task_ids:masked-language-modeling",
+    "annotations_creators:no-annotation",
+    "language_creators:found",
+    "multilinguality:monolingual",
+    "source_datasets:original",
+    "language:sa",
+    "size_categories:100K<n<1M",
+    "region:us"
+   ]
+  },
+  {
+   "id": "addy88/sanskrit-asr-84-eval",
+   "sha": "010880edbdcbd7ee756e82208068cca2107b0cf9",
+   "license": [],
+   "downloads": 196,
+   "last_modified": "2021-12-14 13:42:29+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "addy88/sanskrit-asr-84",
+   "sha": "5b275ead45f395188b3c5376aba9064d0e6f21f7",
+   "license": [],
+   "downloads": 376,
+   "last_modified": "2021-12-14 13:39:37+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:tabular",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "ramitsurana/sanskrit",
+   "sha": "8476c8d2f94392eb4203b7bfc918a6e57f80a1a6",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2021-12-26 11:44:08+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "ZhiyuanQiu/DD_sans_symbole",
+   "sha": "814f35b6d106733cc24f3384eabbab48a4cf7c47",
+   "license": [],
+   "downloads": 7,
+   "last_modified": "2022-08-12 13:35:24+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:json",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "AlienKevin/source_han_sans_ja_extra_light_left_right",
+   "sha": "217a35a927ac100438e4021b1edac8a53327c387",
+   "license": [
+    "license:cc0-1.0"
+   ],
+   "downloads": 8,
+   "last_modified": "2022-12-11 21:36:56+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:image",
+    "modality:text",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "AlienKevin/source_han_sans_ja_regular_left_right",
+   "sha": "9cd10776cbec2f0048ebcb2b3e6447e8a339b5c9",
+   "license": [
+    "license:cc0-1.0"
+   ],
+   "downloads": 19,
+   "last_modified": "2022-12-11 21:54:07+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:image",
+    "modality:text",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "PP04/Sanskrit-Text-Summary",
+   "sha": "025879d6b66ec442954e5e0e3cd70c04e7293a6e",
+   "license": [
+    "license:unknown"
+   ],
+   "downloads": 12,
+   "last_modified": "2023-01-04 18:46:51+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "sanshanya/eyesdiffusion",
+   "sha": "f4688c7ef0d8fc76e46878baee916a4186a793d9",
+   "license": [],
+   "downloads": 70,
+   "last_modified": "2023-03-19 03:49:50+00:00",
+   "tags": [
+    "region:us",
+    "biology"
+   ]
+  },
+  {
+   "id": "Harsit/xnli2.0_train_sanskrit",
+   "sha": "6b3c32d9645ae1d641c7a653e829c8993c695fa2",
+   "license": [],
+   "downloads": 10,
+   "last_modified": "2023-03-31 12:47:18+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "srinath1234456/sanskrit",
+   "sha": "2b66021bd5084d08edf6eb6254c7f01556e6d4d9",
+   "license": [],
+   "downloads": 4,
+   "last_modified": "2023-04-20 15:19:59+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-sandhi-split-sighum",
+   "sha": "25f3e07d15c315662dcbab8de46e899caec736cd",
+   "license": [],
+   "downloads": 23,
+   "last_modified": "2023-04-20 23:32:07+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-sandhi-split-hackathon",
+   "sha": "7d09275e4757864a5038e177c3dad4644dfc7439",
+   "license": [],
+   "downloads": 17,
+   "last_modified": "2023-04-20 23:32:57+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-monolingual-pretraining",
+   "sha": "5c377eb66102297209e87096ca2cb50609e21a14",
+   "license": [],
+   "downloads": 39,
+   "last_modified": "2023-04-22 01:16:55+00:00",
+   "tags": [
+    "size_categories:10M<n<100M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-monolingual-pretraining-corrupted",
+   "sha": "57f7d68c887501da37d11838237112cc879543c6",
+   "license": [],
+   "downloads": 91,
+   "last_modified": "2023-04-22 02:47:21+00:00",
+   "tags": [
+    "size_categories:10M<n<100M",
+    "format:parquet",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Harsit/xnli2.0_sanskrit",
+   "sha": "93d10a6ceca418eff702388f577ff58d0e7bc3fe",
+   "license": [],
+   "downloads": 6,
+   "last_modified": "2023-04-26 18:58:53+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "surajp/shrutilipi_sanskrit",
+   "sha": "bd01126007c74c2d8457f3d80135cd942cf1f59b",
+   "license": [],
+   "downloads": 243,
+   "last_modified": "2023-05-21 02:24:37+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:audio",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "SANSSWEEP/loli",
+   "sha": "efdf485fa3b99fd442dab94f57f8d9457303e1da",
+   "license": [],
+   "downloads": 20,
+   "last_modified": "2023-09-18 11:03:56+00:00",
+   "tags": [
+    "modality:audio",
+    "region:us"
+   ]
+  },
+  {
+   "id": "SANSSWEEP/PADORUPADORU",
+   "sha": "c0b4cac51c1236af81d05d266e8e1ff74c504032",
+   "license": [
+    "license:openrail"
+   ],
+   "downloads": 400,
+   "last_modified": "2023-10-16 06:20:09+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:audiofolder",
+    "modality:audio",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "leofto/sanshyne",
+   "sha": "0cd60e0d95a8b2acce1813ed8c39f708e4609c4f",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2023-08-29 04:55:09+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:imagefolder",
+    "modality:image",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Henil1/sanskrit",
+   "sha": "c753c5263f1c0eec8d6a385845e2c11446793aa3",
+   "license": [],
+   "downloads": 14,
+   "last_modified": "2023-09-14 15:32:13+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:text",
+    "modality:text",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "shunyasea/vedic-sanskrit",
+   "sha": "c66d1b8b6752a620bcf72710fc5258609df7889f",
+   "license": [],
+   "downloads": 11,
+   "last_modified": "2023-09-22 19:00:00+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "shunyasea/vedic-sanskrit-sources",
+   "sha": "e2e7a840e44509749e65b2b6d9c1e1555094456a",
+   "license": [],
+   "downloads": 4,
+   "last_modified": "2023-09-25 02:24:13+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Henil1/Sans-eng",
+   "sha": "a593acb2067a84c865441c9024a91c26818f651a",
+   "license": [],
+   "downloads": 11,
+   "last_modified": "2023-10-14 19:28:56+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "yashnbx/gita_supersite_sanskrit_tts",
+   "sha": "5970ff5edf986f793fe461ee8961cd376bcb7bb1",
+   "license": [],
+   "downloads": 20,
+   "last_modified": "2023-10-22 12:36:31+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:audio",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "mangeshdiyewar/sanskrit_eng",
+   "sha": "b6e44371b5a3c245250ea2db874cc0602a8fb3df",
+   "license": [],
+   "downloads": 17,
+   "last_modified": "2023-11-07 08:12:04+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "Sanspop/leagan",
+   "sha": "237a82abfc319644f7fba2f0d4747d5fc909f9b6",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 8,
+   "last_modified": "2023-11-14 01:45:25+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:audiofolder",
+    "modality:audio",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "MatsuoDochiai/Sans",
+   "sha": "1066b6a08ca3d9e44ad88a259f2848438ff5b12f",
+   "license": [
+    "license:openrail"
+   ],
+   "downloads": 14,
+   "last_modified": "2024-01-19 01:40:14+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:audiofolder",
+    "modality:audio",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+   ]
+  },
+  {
+   "id": "lingtrain/sanskrit-russian",
+   "sha": "b50253c325a97a4ae1d6026ed718ce0757f7dced",
+   "license": [],
+   "downloads": 8,
+   "last_modified": "2024-02-06 08:27:04+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "YaduvanshiAnkit/SanskritShloka",
+   "sha": "07a48d85b3e30c349eb7fcf43b0b062b519137f7",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 4,
+   "last_modified": "2024-01-31 12:46:45+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "YaduvanshiAnkit/SanskritShloka2",
+   "sha": "3dba3ef76cb858bb5169f4a9efb938cfcda46189",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 4,
+   "last_modified": "2024-01-31 13:06:40+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "YaduvanshiAnkit/SanskritShloka3",
+   "sha": "d3f3381ce6a58566e3462af55278021c06c61e52",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 4,
+   "last_modified": "2024-02-02 11:45:42+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "lingtrain/sanskrit-russian-short",
+   "sha": "d78944e36331eaec98a8c795b528d0a2f2effdac",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2024-02-03 08:33:50+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "himanshue2e/sanskrit",
+   "sha": "5a73843b0dc51524983006c415f792a9cc1ced6d",
+   "license": [],
+   "downloads": 1,
+   "last_modified": "2024-02-07 10:45:42+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "saucam/sans_data",
+   "sha": "504062eab33ad006b7a3f02b231b2fd3a518a6f7",
+   "license": [],
+   "downloads": 35,
+   "last_modified": "2024-03-30 02:54:19+00:00",
+   "tags": [
+    "language:sa",
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "gguichard/wsd_myriade_synth_data_gpt4turbo_sansdef",
+   "sha": "c34e2e0340a6e4b03a6bcb273475c21ea1e19afe",
+   "license": [],
+   "downloads": 7,
+   "last_modified": "2024-03-27 14:18:31+00:00",
+   "tags": [
+    "size_categories:1K<n<10K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "gguichard/wsd_myriade_synth_data_gpt4turbo_val_sansdef",
+   "sha": "d5ff0039035aa8fe84e618f27d0990649c8353c5",
+   "license": [],
+   "downloads": 8,
+   "last_modified": "2024-03-27 14:18:35+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "CyberHarem/sumireko_sanshokuin_areyoutheonlyonewholovesme",
+   "sha": "0daff4f2eb88f4cc236c90c678157bebb80f8fd3",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 37,
+   "last_modified": "2024-03-28 20:02:47+00:00",
+   "tags": [
+    "task_categories:text-to-image",
+    "size_categories:1K<n<10K",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us",
+    "art",
+    "not-for-all-audiences"
+   ]
+  },
+  {
+   "id": "buddhist-nlp/sanskrit_classification",
+   "sha": "7000268e258e87d1cfe660f9828b531ad0f3292d",
+   "license": [],
+   "downloads": 10,
+   "last_modified": "2024-04-05 01:42:08+00:00",
+   "tags": [
+    "size_categories:1M<n<10M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "buddhist-nlp/sanskrit_classification_new",
+   "sha": "77f88fffc08c60943a4bc70f3bda61445c23fd48",
+   "license": [],
+   "downloads": 6,
+   "last_modified": "2024-04-05 23:13:59+00:00",
+   "tags": [
+    "size_categories:1M<n<10M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "buddhist-nlp/sanskrit_classification2",
+   "sha": "14583a85cd4910ef9bdeee494d862b3440987ff9",
+   "license": [],
+   "downloads": 13,
+   "last_modified": "2024-04-05 23:21:53+00:00",
+   "tags": [
+    "size_categories:1M<n<10M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "bpHigh/iNLTK_Sanskrit_Shlokas_Dataset",
+   "sha": "5a79d6472db143690c7ce6e974995d3610eee7f0",
+   "license": [
+    "license:cc-by-sa-4.0"
+   ],
+   "downloads": 288,
+   "last_modified": "2024-04-23 20:41:22+00:00",
+   "tags": [
+    "size_categories:n<1K",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "shivam21mishra08/sanskrit-eng",
+   "sha": "7cc1eede53cb3d6b261e6654aab97ca8b1036a2a",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2024-04-28 06:36:38+00:00",
+   "tags": [
+    "region:us"
+   ]
+  },
+  {
+   "id": "Manoj2702/SanskritDataset",
+   "sha": "254d463177f34e6bc0e3f1865a079d2b01f08ae9",
+   "license": [
+    "license:mit"
+   ],
+   "downloads": 5,
+   "last_modified": "2024-04-30 17:56:51+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:csv",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "komalsai234/ASR-Sanskrit",
+   "sha": "400da6e434b9258f74a951fa265b4627151469ef",
+   "license": [
+    "license:apache-2.0"
+   ],
+   "downloads": 9,
+   "last_modified": "2024-05-05 16:30:06+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "saucam/wikipedia-sans",
+   "sha": "222185e9c59362f86010e860ccb0d6eb2d89e100",
+   "license": [],
+   "downloads": 11,
+   "last_modified": "2024-05-01 15:44:53+00:00",
+   "tags": [
+    "language:sa",
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-unsandhi-morphosyntax-tagging",
+   "sha": "583de0c94a6581d2e6e5b85e500a8032ef83c2f5",
+   "license": [],
+   "downloads": 5,
+   "last_modified": "2024-05-04 01:15:29+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-unsandhi-morphosyntax-tagging-paragraph",
+   "sha": "ede15d4c880af7f2014f68fb89df62e0896bf892",
+   "license": [],
+   "downloads": 8,
+   "last_modified": "2024-05-04 01:15:53+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-unsandhi-lemma-morphosyntax-tagging",
+   "sha": "cb53a62b018ad1a02ab0d2bbe91426566ad8ab30",
+   "license": [],
+   "downloads": 37,
+   "last_modified": "2024-05-04 01:17:23+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-unsandhi-lemma-morphosyntax-tagging-paragraph",
+   "sha": "15d7c09468abc0e766f7f7e3eac9c946206dacaa",
+   "license": [],
+   "downloads": 16,
+   "last_modified": "2024-05-04 01:17:53+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-unsandhi",
+   "sha": "3cd50e77cad0ba00b4940dcf5b4a0e053842d589",
+   "license": [],
+   "downloads": 9,
+   "last_modified": "2024-05-04 01:20:02+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-unsandhi-paragraph",
+   "sha": "64853f9ac7b37395509613f26622ccdd91557e02",
+   "license": [],
+   "downloads": 12,
+   "last_modified": "2024-05-04 01:20:24+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-lemma-morphosyntax",
+   "sha": "aff759e859eabad7cf2880e98af9edcaa3a08559",
+   "license": [],
+   "downloads": 4,
+   "last_modified": "2024-05-04 01:22:13+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-lemma-morphosyntax-paragraph",
+   "sha": "6263f064e98e548847ab0b1c638a760885b5a17c",
+   "license": [],
+   "downloads": 7,
+   "last_modified": "2024-05-04 01:22:36+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-lemma",
+   "sha": "e5346973bdbbee86862d051bbac71ed05c614f7a",
+   "license": [],
+   "downloads": 14,
+   "last_modified": "2024-05-04 01:23:35+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-lemma-paragraph",
+   "sha": "48fcd0844fef387bc3b9229e67458d525436a370",
+   "license": [],
+   "downloads": 34,
+   "last_modified": "2024-05-04 01:23:54+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-multitask",
+   "sha": "7c228e20bc0e6f5ad3e473695887f83f845e20ff",
+   "license": [],
+   "downloads": 26,
+   "last_modified": "2024-05-04 05:42:26+00:00",
+   "tags": [
+    "size_categories:1M<n<10M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-multitask-devanagari",
+   "sha": "27d12aff4ada68cdb45c27f17d7873ddf73a1af9",
+   "license": [],
+   "downloads": 29,
+   "last_modified": "2024-05-09 06:45:08+00:00",
+   "tags": [
+    "size_categories:1M<n<10M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:dask",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "chronbmm/sanskrit-ocr-postcorrection",
+   "sha": "96772bd9e1b026c464f97a2294591ab568e06c7c",
+   "license": [],
+   "downloads": 9,
+   "last_modified": "2024-05-15 00:56:54+00:00",
+   "tags": [
+    "size_categories:100K<n<1M",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  },
+  {
+   "id": "diabolic6045/Sanskrit-llama",
+   "sha": "e0755f52c712e20857987c8ca74bd2ca3d7aa032",
+   "license": [],
+   "downloads": 25,
+   "last_modified": "2025-03-06 07:57:29+00:00",
+   "tags": [
+    "size_categories:10K<n<100K",
+    "format:parquet",
+    "modality:text",
+    "library:datasets",
+    "library:pandas",
+    "library:mlcroissant",
+    "library:polars",
+    "region:us"
+   ]
+  }
+ ]
+}

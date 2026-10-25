@@ -65,3 +65,28 @@ are placed at fixed *fractions* of the box (`0.35 L`, `0.65 L`), halving `n` als
 and therefore halves the vortex separation in units of `xi` — a genuinely different physical
 setup, not just a smaller version of the same one. The core-formation test failed until the grid
 size was matched to Python's exactly. Left as a comment on the affected tests.
+
+## Bogoliubov dispersion by linear response (`linear_response`)
+
+`linear_response::measure` relaxes the uniform GP ground state in imaginary time, applies a weak
+phase (impulsive-potential) or density kick at one grid wavevector `k`, records the density
+Fourier component at `k` with `evolve_observe` (one shared FFT plan, an observer per step) and
+reads the oscillation frequency from zero crossings and a least-squares sinusoid. For a phase
+kick the amplitude gives a second, f-sum-rule estimate `S_amp = A/(2 n eps) = (k^2/2)/omega`.
+`examples/bogoliubov_dispersion.rs` runs the sweep and its controls; `tests/linear_response.rs`
+pins them.
+
+**A real finding this caught**: `step`/`evolve` reproduce the Python reference, which computes the
+nonlinear phase once from `|psi|^2` at the start of a step and applies it on both sides of the
+kinetic step. That is not the symmetric Strang composition. In the linear-response measurement the
+frequency still converges at second order, but the response amplitude converges only at first
+order (2.65e-2 relative error at `dt = max_dt(grid, 1)`, halving with `dt`), and a long-wavelength
+run (`k = 0.1`, 32x32) grows from round-off late in the record. `Splitting::Strang`, which
+recomputes the second half-step from the updated density, fixes both (frequency and amplitude
+second order; agreement with an independent numpy implementation to about 1e-12 in `omega`).
+`step` and `evolve` are unchanged so `tests/python_cross_check.rs` stays exact; `evolve_observe`
+takes the splitting explicitly.
+
+What it does not measure: a classical GP field has no quantum density fluctuations, so `S = eps0/omega`
+is the Bijl-Feynman identification, exact for Bogoliubov theory, not an independent measurement
+of the quantum static structure factor.
