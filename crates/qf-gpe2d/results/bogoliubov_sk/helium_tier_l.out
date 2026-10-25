@@ -1,0 +1,9 @@
+k_s = 3.003789624155227 1/A;  hbar^2/2m = 0.5221800757285504 meV A^2;  hbar c = 1.5685190934140107 meV A
+transcription {'n_rows': 73, 'roton_min_table': [np.float64(1.9), np.float64(0.7427)], 'maxon_max_table': [np.float64(1.1), np.float64(1.1907)], 'roton_ref_1802.08120_TableI': [1.926, 0.7416], 'maxon_ref_2012.09067_TableV': [1.103, 1.191]}
+phonon check {'eps_table_0.05': np.float64(0.0787), 'hbar_c_k_0.05': 0.07842595467070054, 'rel_diff': np.float64(0.0034943193289790437)}
+roton {'k': 1.95, 'sqrt_k_over_2ks': 0.5697279836287215, 'S_up_feynman': 2.6620052794715283, 'eps_over_epsB': 0.20454682536895097}
+silent k (S_up_cons < threshold): [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9]
+first undecided k: 0.95
+strict variant silent set unchanged: True {'S_up_strict': 0.16645639760494804, 'threshold': 0.28849297877500246, 'k': 0.5}
+controls {'bogoliubov_fires_anywhere': False, 'free_fires_for_all_k_lt_2ks': True}
+eps/eps_B min: 0.17629146556400732 at k = 3.6

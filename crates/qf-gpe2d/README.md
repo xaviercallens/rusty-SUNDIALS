@@ -19,8 +19,10 @@ i dpsi/dt = -1/2 Lap psi + g |psi|^2 psi - mu psi          (hbar = m = 1)
 ```
 
 `g = 1`, background density `n0 = 1`, so `mu = 1`, sound speed `c = 1`, healing length `xi =
-1/sqrt(2 mu)`. Strang splitting: a pointwise nonlinear phase half-step, a Fourier-diagonal linear
-step, then the nonlinear half-step again. Both are phase rotations, so the norm is conserved to
+1/sqrt(2 mu)`. Split step (the Python reference's composition): a pointwise nonlinear phase
+half-step, a Fourier-diagonal linear step, then the *same* nonlinear phase factor again (computed
+from `|psi|^2` at the start of the step, so this is not textbook Strang; see `Splitting` and the
+linear-response section below). Both are phase rotations, so the norm is conserved to
 machine precision *by construction* — it cannot fail as a test. Energy drift is the control that
 can, and does: a field with energy at the grid scale (white-noise phase) genuinely needs the
 `max_dt` bound (`dt * k_max^2 / 2 << 1`), and the upstream Python docs record 33% drift at ~3x too
@@ -36,7 +38,9 @@ own relaxation create the density dip, rather than assuming a core-profile ansat
 |---|---|
 | `Grid2D`, `healing_length`, `max_dt` | grid, `xi`, the accuracy-bound timestep |
 | `smooth_phase_noise` | a band-limited random phase (physical, not white-noise) |
-| `step` / `evolve` | one Strang step / `n_steps` of it, sharing one FFT plan (see below) |
+| `step` / `evolve` | one split step (Python-reference composition) / `n_steps` of it, sharing one FFT plan (see below) |
+| `evolve_observe`, `Splitting` | real-time evolution with a per-step observer; `Splitting::Strang` or `PythonReference` |
+| `linear_response` | Bogoliubov dispersion by linear response of the GP ground state |
 | `energy`, `norm` | `E = int[|grad psi|^2/2 + g|psi|^4/2]`, `int |psi|^2` |
 | `plant_vortices` | imprint a phase-only vortex configuration (charges must sum to zero) |
 | `radial_density_profile` | azimuthally averaged `|psi|^2`, for measuring a core size |
@@ -65,3 +69,28 @@ are placed at fixed *fractions* of the box (`0.35 L`, `0.65 L`), halving `n` als
 and therefore halves the vortex separation in units of `xi` — a genuinely different physical
 setup, not just a smaller version of the same one. The core-formation test failed until the grid
 size was matched to Python's exactly. Left as a comment on the affected tests.
+
+## Bogoliubov dispersion by linear response (`linear_response`)
+
+`linear_response::measure` relaxes the uniform GP ground state in imaginary time, applies a weak
+phase (impulsive-potential) or density kick at one grid wavevector `k`, records the density
+Fourier component at `k` with `evolve_observe` (one shared FFT plan, an observer per step) and
+reads the oscillation frequency from zero crossings and a least-squares sinusoid. For a phase
+kick the amplitude gives a second, f-sum-rule estimate `S_amp = A/(2 n eps) = (k^2/2)/omega`.
+`examples/bogoliubov_dispersion.rs` runs the sweep and its controls; `tests/linear_response.rs`
+pins them.
+
+**A real finding this caught**: `step`/`evolve` reproduce the Python reference, which computes the
+nonlinear phase once from `|psi|^2` at the start of a step and applies it on both sides of the
+kinetic step. That is not the symmetric Strang composition. In the linear-response measurement the
+frequency still converges at second order, but the response amplitude converges only at first
+order (2.65e-2 relative error at `dt = max_dt(grid, 1)`, halving with `dt`), and a long-wavelength
+run (`k = 0.1`, 32x32) grows from round-off late in the record. `Splitting::Strang`, which
+recomputes the second half-step from the updated density, fixes both (frequency and amplitude
+second order; agreement with an independent numpy implementation to about 1e-12 in `omega`).
+`step` and `evolve` are unchanged so `tests/python_cross_check.rs` stays exact; `evolve_observe`
+takes the splitting explicitly.
+
+What it does not measure: a classical GP field has no quantum density fluctuations, so `S = eps0/omega`
+is the Bijl-Feynman identification, exact for Bogoliubov theory, not an independent measurement
+of the quantum static structure factor.

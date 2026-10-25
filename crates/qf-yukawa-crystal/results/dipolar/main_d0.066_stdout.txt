@@ -1,0 +1,36 @@
+done job 11
+done job 10
+done job 9
+done job 8
+done job 6
+done job 7
+done job 5
+done job 4
+done job 3
+done job 2
+done job 1
+done job 0
+wrote /home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h1/crates/qf-yukawa-crystal/results/dipolar/main_d0.066.jsonl
+	Command being timed: "/home/callensxavier_gmail_com/rusty-target-ar/release/dipolar_crystal main /home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h1/crates/qf-yukawa-crystal 0.066 8 2"
+	User time (seconds): 4170.51
+	System time (seconds): 10.89
+	Percent of CPU this job got: 120%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 57:48.33
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 23900
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 5
+	Minor (reclaiming a frame) page faults: 1352329
+	Voluntary context switches: 268
+	Involuntary context switches: 1067560
+	Swaps: 0
+	File system inputs: 56
+	File system outputs: 104
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

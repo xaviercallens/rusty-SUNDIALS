@@ -1,0 +1,332 @@
+{
+ "gates": {
+  "pos_phase_g1_max_rel_err_vs_epsB": {
+   "value": 4.092646e-05,
+   "op": "<",
+   "threshold": 0.0001,
+   "pass": true,
+   "note": "phase kick, g=1, 200 steps/period: omega vs sqrt(eps0(eps0+2gn))"
+  },
+  "pos_density_g1_max_rel_err_vs_epsB": {
+   "value": 4.064132e-05,
+   "op": "<",
+   "threshold": 0.0001,
+   "pass": true,
+   "note": "density kick, g=1: independent frequency readout"
+  },
+  "pos_S_amp_vs_S_freq_max_rel": {
+   "value": 0.0001637885954554814,
+   "op": "<",
+   "threshold": 0.005,
+   "pass": true,
+   "note": "f-sum-rule amplitude estimator vs period estimator (eps=1e-3)"
+  },
+  "neg_g0_max_rel_err_vs_eps0": {
+   "value": 7.787174e-13,
+   "op": "<",
+   "threshold": 1e-09,
+   "pass": true,
+   "note": "g=0 control: omega = k^2/2 (split step exact for g=0)"
+  },
+  "neg_g0_min_rel_distance_from_epsB_for_x_lt_1": {
+   "value": 0.3355315,
+   "op": ">",
+   "threshold": 0.1,
+   "pass": true,
+   "note": "g=0 response is far from the g=1 Bogoliubov curve at small k"
+  },
+  "bound_g1_max_S_over_bound_minus_1": {
+   "value": -0.0013808433411811594,
+   "op": "<",
+   "threshold": 0.0001,
+   "pass": true,
+   "note": "measured S (g=1) never exceeds sqrt(k/2ks) beyond discretisation error"
+  },
+  "bound_g0_fires_on_all_x_lt_2": {
+   "value": 1.0,
+   "op": ">",
+   "threshold": 0.5,
+   "pass": true,
+   "note": "free S=1 exceeds sqrt(k/2ks) for every k < 2 ks (all such sweep points)"
+  },
+  "bound_g0_silent_on_all_x_gt_2": {
+   "value": 1.0,
+   "op": ">",
+   "threshold": 0.5,
+   "pass": true,
+   "note": "for k > 2 ks the free value 1 is below the threshold (the test is one-sided)"
+  },
+  "bound_g1_ratio_at_x_near_1_minus_1_abs": {
+   "value": 0.0013808433411811594,
+   "op": "<",
+   "threshold": 0.002,
+   "pass": true,
+   "note": "S/bound at the sweep point nearest x=1 (x=1.0772); exact Bogoliubov ratio 0.998619"
+  },
+  "neg_reference_splitting_S_amp_vs_S_freq_max_rel": {
+   "value": 0.24973417307869905,
+   "op": ">",
+   "threshold": 0.005,
+   "pass": true,
+   "note": "recorded failure mode: the Python-reference (first-order) splitting gives a visibly wrong amplitude"
+  },
+  "pos_dt_observed_order_min_first3": {
+   "value": 1.9998614535744113,
+   "op": ">",
+   "threshold": 1.8,
+   "pass": true,
+   "note": "Strang splitting: frequency error is second order in dt (first three halvings, eps=1e-4)"
+  },
+  "neg_reference_amp_order_max": {
+   "value": 1.0126382747409548,
+   "op": "<",
+   "threshold": 1.5,
+   "pass": true,
+   "note": "reference splitting: amplitude error converges at first order only"
+  },
+  "pos_isotropy_max_rel_err": {
+   "value": 1.777073e-07,
+   "op": "<",
+   "threshold": 0.0001,
+   "pass": true,
+   "note": "same |k| on modes (2,0),(1,1),(2,2)"
+  },
+  "gs_residual_max": {
+   "value": 4.307665e-14,
+   "op": "<",
+   "threshold": 1e-10,
+   "pass": true,
+   "note": "imaginary-time relaxed ground state is uniform"
+  }
+ },
+ "all_pass": true,
+ "dt_convergence": [
+  {
+   "x": 0.25,
+   "safety": [
+    1,
+    0.5,
+    0.25,
+    0.125,
+    0.0625
+   ],
+   "dt": [
+    0.0625,
+    0.03125,
+    0.015625,
+    0.0078125,
+    0.00390625
+   ],
+   "rel_err": [
+    3.829747e-05,
+    9.575287e-06,
+    2.391152e-06,
+    5.959929e-07,
+    1.471817e-07
+   ],
+   "observed_order": [
+    1.9998614535744113,
+    2.001609887822305,
+    2.0043387925202323,
+    2.017696840660544
+   ],
+   "S_amp_rel_err": [
+    0.00012447483568956254,
+    3.110387550677712e-05,
+    7.763254359389166e-06,
+    1.9247337364110434e-06,
+    4.597282376434689e-07
+   ],
+   "S_amp_observed_order": [
+    2.000687856209985,
+    2.002360887011944,
+    2.01200267732391,
+    2.065805692353825
+   ]
+  },
+  {
+   "x": 1.0,
+   "safety": [
+    1,
+    0.5,
+    0.25,
+    0.125,
+    0.0625
+   ],
+   "dt": [
+    0.00390625,
+    0.001953125,
+    0.0009765625,
+    0.00048828125,
+    0.000244140625
+   ],
+   "rel_err": [
+    1.270169e-06,
+    3.164668e-07,
+    7.806954e-08,
+    1.846844e-08,
+    3.561922e-09
+   ],
+   "observed_order": [
+    2.0048944029105886,
+    2.019222482691662,
+    2.079697759784198,
+    2.3743341799479434
+   ],
+   "S_amp_rel_err": [
+    8.897200404016772e-06,
+    2.2202138954216154e-06,
+    5.489858108834258e-07,
+    1.272367628128583e-07,
+    1.2153379652092434e-08
+   ],
+   "S_amp_observed_order": [
+    2.0026527760721478,
+    2.015857905668929,
+    2.1092532896631475,
+    3.388086107921715
+   ]
+  },
+  {
+   "x": 4.0,
+   "safety": [
+    1,
+    0.5,
+    0.25,
+    0.125,
+    0.0625
+   ],
+   "dt": [
+    0.000244140625,
+    0.0001220703125,
+    6.103515625e-05,
+    3.0517578125e-05,
+    1.52587890625e-05
+   ],
+   "rel_err": [
+    9.172614e-09,
+    2.164135e-09,
+    3.928074e-10,
+    4.356486e-11,
+    1.545723e-10
+   ],
+   "observed_order": [
+    2.083542431704642,
+    2.4618964845366396,
+    3.1725852964460683,
+    -1.8270449934326045
+   ],
+   "S_amp_rel_err": [
+    6.219812592955491e-07,
+    1.5224793048720953e-07,
+    3.553131633004827e-08,
+    6.28432356551157e-09,
+    1.126088985421688e-09
+   ],
+   "S_amp_observed_order": [
+    2.0304484940122474,
+    2.099259575297252,
+    2.4992617684982243,
+    2.4804366275464833
+   ]
+  }
+ ],
+ "dt_convergence_reference": [
+  {
+   "x": 1.0,
+   "safety": [
+    1,
+    0.5,
+    0.25,
+    0.125,
+    0.0625
+   ],
+   "dt": [
+    0.00390625,
+    0.001953125,
+    0.0009765625,
+    0.00048828125,
+    0.000244140625
+   ],
+   "rel_err": [
+    7.312954e-06,
+    1.829328e-06,
+    4.583874e-07,
+    1.156533e-07,
+    2.996195e-08
+   ],
+   "observed_order": [
+    1.9991405125273662,
+    1.9966744812431827,
+    1.9867609565373807,
+    1.9486030055504864
+   ],
+   "S_amp_rel_err": [
+    0.02649184221724671,
+    0.01313039116641436,
+    0.006536569765725125,
+    0.0032611541172975077,
+    0.001628783520171075
+   ],
+   "S_amp_observed_order": [
+    1.0126382747409548,
+    1.0063042482502917,
+    1.0031511203973484,
+    1.0015877527300132
+   ]
+  }
+ ],
+ "informational": {
+  "uncapped_strang_max_rel_err_vs_epsB": 4.092646e-05,
+  "uncapped_strang_S_amp_vs_S_freq_max_rel": 0.0001637885954554814,
+  "reference_max_rel_err_vs_epsB": 0.01227853,
+  "S_freq_over_bound_minus_1_at_exactly_x1_finest_dt": -3.561922312655952e-09,
+  "S_freq_over_bound_minus_1_at_exactly_x1_eps_scan_eps1e-3": 6.068702806949489e-08,
+  "exact_SB_over_bound_minus_1_at_sweep_x_nearest_1": -0.0013809122808523533
+ },
+ "eps_scan": [
+  {
+   "eps": 0.001,
+   "rel_err": -6.068702e-08,
+   "S_amp_minus_S_freq": 1.4774870793488049e-07
+  },
+  {
+   "eps": 0.003,
+   "rel_err": -1.181964e-06,
+   "S_amp_minus_S_freq": -2.2661012475388986e-06
+  },
+  {
+   "eps": 0.01,
+   "rel_err": -1.393606e-05,
+   "S_amp_minus_S_freq": -2.9723665733394355e-05
+  },
+  {
+   "eps": 0.03,
+   "rel_err": -0.0001254451,
+   "S_amp_minus_S_freq": -0.00027063008905414687
+  }
+ ],
+ "diagonal_mode": [
+  {
+   "mode": [
+    2,
+    0
+   ],
+   "rel_err": -6.068702e-08
+  },
+  {
+   "mode": [
+    1,
+    1
+   ],
+   "rel_err": -1.202929e-07
+  },
+  {
+   "mode": [
+    2,
+    2
+   ],
+   "rel_err": 1.777073e-07
+  }
+ ]
+}
