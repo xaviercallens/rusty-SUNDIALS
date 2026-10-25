@@ -1,0 +1,163 @@
+{
+ "colabfit_jarvis": [
+  "colabfit/JARVIS-Polymer-Genome",
+  "colabfit/JARVIS_AGRA_CHO",
+  "colabfit/JARVIS_AGRA_CO",
+  "colabfit/JARVIS_AGRA_O",
+  "colabfit/JARVIS_AGRA_OH",
+  "colabfit/JARVIS_C2DB",
+  "colabfit/JARVIS_DFT_3D_8_18_2021",
+  "colabfit/JARVIS_EPC_2D",
+  "colabfit/JARVIS_OMDB",
+  "colabfit/JARVIS_Open_Catalyst_10K",
+  "colabfit/JARVIS_QMOF",
+  "colabfit/JARVIS_SNUMAT",
+  "colabfit/JARVIS_TinNet_N",
+  "colabfit/JARVIS_TinNet_OH",
+  "colabfit/JARVIS_2DMatPedia",
+  "colabfit/JARVIS_AGRA_COOH",
+  "colabfit/JARVIS_CFID_3D_8_18_2022",
+  "colabfit/JARVIS_DFT_2D_3_12_2021",
+  "colabfit/JARVIS_DFT_3D_12_12_2022",
+  "colabfit/JARVIS_MEGNet2",
+  "colabfit/JARVIS_Open_Catalyst_All",
+  "colabfit/JARVIS_TinNet_O",
+  "colabfit/JARVIS_mlearn",
+  "colabfit/JARVIS_CFID_OQMD",
+  "colabfit/JARVIS_OQMD_no_CFID",
+  "colabfit/JARVIS_Open_Catalyst_100K",
+  "colabfit/JARVIS_QE_TB",
+  "colabfit/JARVIS-QM9-DGL",
+  "colabfit/JARVIS_Materials_Project_2020",
+  "colabfit/JARVIS_QM9_STD_JCTC",
+  "colabfit/JARVIS_Materials_Project_84K",
+  "colabfit/JARVIS_ALIGNN_FF",
+  "colabfit/JARVIS_MEGNet",
+  "colabfit/In2Se3_2D_DPGEN",
+  "colabfit/JARVIS_EPC_2D",
+  "colabfit/JARVIS_2DMatPedia",
+  "colabfit/JARVIS_DFT_2D_3_12_2021",
+  "colabfit/Alexandria_geometry_optimization_paths_PBE_2D"
+ ],
+ "candidates": {
+  "colabfit/JARVIS_C2DB": {
+   "sha": "432aeba9e505b59d0b3605c6346ac3816c754c02",
+   "card": {
+    "license": "cc-by-4.0",
+    "pretty_name": "JARVIS C2DB",
+    "configs": [
+     {
+      "config_name": "default",
+      "data_files": "co/*.parquet"
+     },
+     {
+      "config_name": "info",
+      "data_files": "ds.parquet"
+     }
+    ],
+    "tags": [
+     "molecular dynamics",
+     "mlip",
+     "interatomic potential"
+    ]
+   },
+   "files": [
+    [
+     ".gitattributes",
+     2461
+    ],
+    [
+     "README.md",
+     3273
+    ],
+    [
+     "co/co_0.parquet",
+     1976979
+    ],
+    [
+     "ds.parquet",
+     18924
+    ]
+   ]
+  },
+  "HZPM/C2DBench": {
+   "sha": "11a09f0e6d959dbda98fc01515c2f902cdcc001f",
+   "card": {
+    "license": "cc-by-4.0",
+    "task_categories": [
+     "feature-extraction",
+     "question-answering"
+    ],
+    "extra_gated_heading": "Access C2DBench",
+    "extra_gated_prompt": "C2DBench is derived from public sources (Norman et al. 2019, GEO GSE133344, via scPerturb; DGIdb 5.0). It contains no raw sequencing data and no human-subject data \u2014 K562 is an immortalised cell line. Please confirm the following before access.",
+    "extra_gated_fields": {
+     "Full name": "text",
+     "Email": "text",
+     "Affiliation": "text",
+     "Intended use": "text",
+     "I will cite Norman et al 2019 and DGIdb alongside this dataset": "checkbox",
+     "I understand drug_reference lists are computational nominations, not evidence of efficacy, and will not be used to inform clinical or treatment decisions": "checkbox"
+    },
+    "extra_gated_button_content": "Request access",
+    "tags": [
+     "single-cell",
+     "perturb-seq",
+     "crispra",
+     "drug-discovery",
+     "agents",
+     "biology"
+    ],
+    "configs": [
+     {
+      "config_name": "default",
+      "data_files": [
+       {
+        "split": "eval",
+        "path": "data/eval.parquet"
+       },
+       {
+        "split": "reference_library",
+        "path": "data/reference_library.parquet"
+       }
+      ]
+     }
+    ]
+   },
+   "files": [
+    [
+     ".gitattributes",
+     3244
+    ],
+    [
+     "README.md",
+     5940
+    ],
+    [
+     "data/eval.parquet",
+     20022389
+    ],
+    [
+     "data/reference_library.parquet",
+     1121444
+    ],
+    [
+     "panel.json",
+     21954
+    ],
+    [
+     "run_baseline.py",
+     1145
+    ]
+   ]
+  },
+  "colabfit/JARVIS_DFT_3D": {
+   "error": "RepositoryNotFoundError('401 Client Error. (Request ID: Root=1-6adde059-30c6bdd6703f72cf3fe8d36b;bf96ea33-500e-4fb6-9b8b-6a1512663633)\\n\\nRepository Not Found for url: https://huggingface.co/api/datasets/colabfit/JARVIS_DFT_3D?blobs=true.\\nPlease make sure you specified the correct `repo_id` and `repo_type`.\\nIf you are trying to access a private or gated repo, make sure you are authenticated and your token has the required permissions.\\nFor more details, see https://huggingface.co/docs/huggingface_hub/authentication\\nInvalid username or password.')"
+  },
+  "colabfit/JARVIS-DFT-3D": {
+   "error": "RepositoryNotFoundError('401 Client Error. (Request ID: Root=1-6adde059-3258943007c745b846deb5b5;76067923-bd87-4d8b-95c0-95abc76db6b1)\\n\\nRepository Not Found for url: https://huggingface.co/api/datasets/colabfit/JARVIS-DFT-3D?blobs=true.\\nPlease make sure you specified the correct `repo_id` and `repo_type`.\\nIf you are trying to access a private or gated repo, make sure you are authenticated and your token has the required permissions.\\nFor more details, see https://huggingface.co/docs/huggingface_hub/authentication\\nInvalid username or password.')"
+  },
+  "colabfit/JARVIS_DFT_2D": {
+   "error": "RepositoryNotFoundError('401 Client Error. (Request ID: Root=1-6adde059-7d9c819061c5a6507245b695;0e819718-4d27-4462-a64a-e2c35c461cab)\\n\\nRepository Not Found for url: https://huggingface.co/api/datasets/colabfit/JARVIS_DFT_2D?blobs=true.\\nPlease make sure you specified the correct `repo_id` and `repo_type`.\\nIf you are trying to access a private or gated repo, make sure you are authenticated and your token has the required permissions.\\nFor more details, see https://huggingface.co/docs/huggingface_hub/authentication\\nInvalid username or password.')"
+  }
+ }
+}

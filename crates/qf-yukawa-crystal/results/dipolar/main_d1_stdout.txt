@@ -1,0 +1,28 @@
+RESULT {"label":"uniform_01","family":"uniform","d":1,"n":288,"quench":{"e_exact":3.355596439147379e0,"gap_exact":-7.771561e-14,"rel_gap_exact":-2.316000e-14,"e_sf":2.581514632868350e0,"gap_sf":3.819167e-14,"e_full_R32":3.355597101012444e0,"gap_full_R32":-1.154632e-13,"e_full_R64":3.355556503145988e0,"gap_full_R64":-1.092459e-13,"defects":0,"psi6_global":1.000000,"psi6_local":1.000000,"max_force":2.467e-13,"t":5.120e2,"cvode_steps":9173,"rhs_evals":27094,"converged":true,"wall_s":528.04,"hess_lowest":[3.108e-16,3.482e-16,6.136e-2],"hess_negative":0}}
+done job 1
+RESULT {"label":"uniform_00","family":"uniform","d":1,"n":288,"quench":{"e_exact":3.358063873400142e0,"gap_exact":2.467434e-3,"rel_gap_exact":7.353191e-4,"e_sf":2.583981233934160e0,"gap_sf":2.466601e-3,"e_full_R32":3.358052601352132e0,"gap_full_R32":2.455500e-3,"e_full_R64":3.358055861468987e0,"gap_full_R64":2.499358e-3,"defects":8,"psi6_global":0.906442,"psi6_local":0.958891,"max_force":2.704e-12,"t":1.638e4,"cvode_steps":8103,"rhs_evals":23977,"converged":true,"wall_s":315.22,"hess_lowest":[-5.778e-16,2.346e-15,8.747e-4],"hess_negative":0}}
+done job 0
+wrote /home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h1/crates/qf-yukawa-crystal/results/dipolar/main_d1.jsonl
+	Command being timed: "/home/callensxavier_gmail_com/rusty-target-ar/release/dipolar_crystal main /home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h1/crates/qf-yukawa-crystal 1 2 0 0"
+	User time (seconds): 649.20
+	System time (seconds): 2.18
+	Percent of CPU this job got: 75%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 14:24.29
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 13156
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 298153
+	Voluntary context switches: 69
+	Involuntary context switches: 124643
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 24
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
