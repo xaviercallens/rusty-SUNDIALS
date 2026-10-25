@@ -1,0 +1,38 @@
+{
+  "id": "DIP-TRI-1",
+  "date": "2026-10-25",
+  "stage": "preregistration, committed before the dipolar solver code (src/dipolar.rs, src/bin/dipolar_crystal.rs) is written",
+  "question": "Numerical (Tier X) check of the Lean every-density corollary triangular_dipolar_optimal_any_density (AutoevolveAI formal_cert/Autoresearch/DipolarExcitonMultipolar.lean, conditional on openai/math universal_energy_minimum) for the classical bilayer dipolar-exciton interaction, with this repository's CVODE.",
+  "potential": {
+    "lean": "g d t = 2 * (t^(-1/2) - (t + d^2)^(-1/2)), t = r^2",
+    "physical": "V(r) = g_d(r^2) = 2 (1/r - 1/sqrt(r^2 + d^2)) = 2 d^2 / (r s (r + s)), s = sqrt(r^2 + d^2); tail ~ d^2 / r^3",
+    "units": "density 1 (lengths in units of n^(-1/2)); d below is d_tilde = d sqrt(n). Dynamics and reported energies use U = V / d^2 = 2 / (r s (r + s)) (same minima as V; energies in units of d^2). The physical energy is d^2 U.",
+    "dynamics_potential": "shifted-force truncation of U at r_c = 8 (minimum image, r_c < min(Lx, Ly)/2). It is NOT completely monotone; used only to generate competitor configurations.",
+    "reported_potential": "full untruncated U: periodic image sum to radius R plus the analytic uniform-density tail per particle (n/2) int_R^inf 2 pi r U dr = 2 pi n / (sqrt(R^2 + d^2) + R). The tail is configuration-independent at fixed density and cancels in every gap; the discrete-minus-continuum residual beyond R is quantified by a convergence table R in {8, 16, 32, 64, 128}. V(r_c) is never used as a truncation error (erratum of the Yukawa paper)."
+  },
+  "d_tilde_values": [0.0209, 0.066, 0.114, 0.3, 1.0],
+  "d_tilde_origin": "0.0209, 0.066, 0.114 = d sqrt(n) for d = 0.66 nm (JARVIS-DFT OptB88vdW metal-plane spacing of stacked MoSe2/WSe2, from the Hugging Face dataset colabfit/JARVIS_DFT_3D_12_12_2022; final value set in NUMERICS.md) at n = 1e11, 1e12, 3e12 cm^-2 (free interlayer-exciton gas window and Mott density reported in arXiv:2001.03812); 0.3 and 1.0 are larger mathematical values",
+  "setup": {
+    "system": "N = 288, periodic rectangle 16 a x 9 sqrt(3) a, a = sqrt(2/sqrt(3)) (density 1, holds the 16 x 18 triangular lattice)",
+    "dynamics": "overdamped gradient flow with CVODE (BDF, analytic Jacobian = -Hessian) until max|F| < 1e-9 (U units); Langevin annealing (Euler-Maruyama, T 0.05 -> 1e-5 in U units, 300000 steps, dt 0.002) then CVODE quench",
+    "initial_conditions": "uniform random, minimum separation 0.5 a; seeds fixed in the binary",
+    "runs_per_d": "8 uniform quenches, 2 annealed runs, 2 incommensurate-box quenches (square box, N = 289)"
+  },
+  "predictions": {
+    "P1_no_undercut_full": "No relaxed configuration has full-potential energy e_full < e_tri_full - 1e-9 |e_tri_full| (same R), at every d_tilde.",
+    "P1b_no_undercut_truncated": "Same with the shifted-force potential used in the dynamics (descriptive; that potential is not completely monotone).",
+    "P3_quench_glassy": "Most T = 0 quenches end defected, above e_tri (descriptive)."
+  },
+  "controls": {
+    "positive": [
+      "Rust e_tri_full(R) (periodic box image sum + tail) agrees with an independent Python triangular lattice sum (direct sum to large R plus tail, and an Ewald-type integral representation) within the measured residual",
+      "perfect triangular start stays put; triangular + 0.1 a noise relaxes back (gap < 1e-9 relative)"
+    ],
+    "negative": [
+      "incommensurate square box (N = 289): relaxed states stay defected and above e_tri",
+      "square lattice is a saddle of the truncated potential (negative Hessian eigenvalues) and e_square_full > e_tri_full"
+    ]
+  },
+  "lattice_gaps": "e_square/e_tri - 1 and e_honeycomb/e_tri - 1 with the full potential versus d_tilde in [0.01, 3] (exact lattice sums, Tier X), with the physical d_tilde band marked",
+  "not_claimed": "Classical rigid point dipoles only: no quantum kinetic energy, no moire potential, no dielectric (hBN / Keldysh) screening, no electron-hole plasma above the Mott density. Floating-point numerics never support a claim (Tier X)."
+}

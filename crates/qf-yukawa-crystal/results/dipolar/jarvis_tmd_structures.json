@@ -1,0 +1,886 @@
+[
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 6,
+  "names": [
+   "cfid_3d-8-18-2021_25471",
+   "jdft_3d-8-18-2021_25471",
+   "jdft_3d-12-12-2022_25473"
+  ],
+  "configuration_id": "CO_1726267081142349141446788",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -4.64652,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -1.92462,
+  "chemical_formula_hill": "Mo2S4",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 5.074284249162229,
+  "a_in_plane": [
+   5.238025576731485,
+   5.2380235628279515
+  ],
+  "metal_planes_z": [
+   0.0,
+   2.5371413133669294
+  ],
+  "metal_plane_spacings": [
+   2.5371413133669294,
+   2.5371429357952997
+  ],
+  "t_XX": [
+   2.5371413357578123,
+   2.5371418321270287
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoSe2",
+  "natoms": 3,
+  "names": [
+   "cfid_3d-8-18-2021_55400",
+   "jdft_3d-8-18-2021_55400",
+   "jdft_3d-12-12-2022_55405"
+  ],
+  "configuration_id": "CO_8672344488899577429112844",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -4.34944,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -1.3743,
+  "chemical_formula_hill": "MoSe2",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 6.5744346851382485,
+  "a_in_plane": [
+   3.323489251265329,
+   3.3206843871408926
+  ],
+  "metal_planes_z": [
+   1.0957383842710418
+  ],
+  "metal_plane_spacings": [
+   6.5744346851382485
+  ],
+  "t_XX": [
+   3.4199399720262695
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "WS2",
+  "natoms": 6,
+  "names": [
+   "cfid_3d-8-18-2021_19178",
+   "jdft_3d-8-18-2021_19178",
+   "jdft_3d-12-12-2022_19179"
+  ],
+  "configuration_id": "CO_2655698680361282159446952",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.14907,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -0.9953400000000001,
+  "chemical_formula_hill": "S4W2",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 4.956850798071967,
+  "a_in_plane": [
+   5.2473569078489986,
+   5.247354832969058
+  ],
+  "metal_planes_z": [
+   0.0,
+   2.478423190105423
+  ],
+  "metal_plane_spacings": [
+   2.478423190105423,
+   2.478427607966544
+  ],
+  "t_XX": [
+   2.478427601453115,
+   2.4784223168667285
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "WS2",
+  "natoms": 12,
+  "names": [
+   "cfid_3d-8-18-2021_9716",
+   "jdft_3d-8-18-2021_9716",
+   "jdft_3d-12-12-2022_9717"
+  ],
+  "configuration_id": "CO_4574353231108399292591999",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.89262,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -10.91328,
+  "chemical_formula_hill": "S8W4",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 5.986711555291046,
+  "a_in_plane": [
+   6.603771895281018,
+   6.604277047968581
+  ],
+  "metal_planes_z": [
+   2.922672999212283,
+   2.9226732234238586,
+   3.0640381004957407,
+   3.064038324707316
+  ],
+  "metal_plane_spacings": [
+   2.2421157552798832e-07,
+   0.14136487707188206,
+   2.2421157552798832e-07,
+   5.8453462297960135
+  ],
+  "t_XX": [
+   2.5989432899590823,
+   2.5989432899590823,
+   2.5989432899590814,
+   2.5989432899590814
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "WS2",
+  "natoms": 12,
+  "names": [
+   "cfid_3d-8-18-2021_9716",
+   "jdft_3d-8-18-2021_9716",
+   "jdft_3d-12-12-2022_9717"
+  ],
+  "configuration_id": "CO_4574353231108399292591999",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.89262,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -10.91328,
+  "chemical_formula_hill": "S8W4",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 5.986711555291046,
+  "a_in_plane": [
+   6.603771895281018,
+   6.604277047968581
+  ],
+  "metal_planes_z": [
+   2.922672999212283,
+   2.9226732234238586,
+   3.0640381004957407,
+   3.064038324707316
+  ],
+  "metal_plane_spacings": [
+   2.2421157552798832e-07,
+   0.14136487707188206,
+   2.2421157552798832e-07,
+   5.8453462297960135
+  ],
+  "t_XX": [
+   2.5989432899590823,
+   2.5989432899590823,
+   2.5989432899590814,
+   2.5989432899590814
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 3,
+  "names": [
+   "cfid_3d-8-18-2021_48095",
+   "jdft_3d-8-18-2021_48095",
+   "jdft_3d-12-12-2022_48102"
+  ],
+  "configuration_id": "CO_1026846155755860549963738",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.0301,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -2.0791500000000003,
+  "chemical_formula_hill": "MoS2",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 6.031039420373728,
+  "a_in_plane": [
+   3.2247503881359587,
+   3.2247503881359587
+  ],
+  "metal_planes_z": [
+   3.01552
+  ],
+  "metal_plane_spacings": [
+   6.031039420373727
+  ],
+  "t_XX": [
+   3.1408761023723786
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "WSe2",
+  "natoms": 12,
+  "names": [
+   "cfid_3d-8-18-2021_35815",
+   "jdft_3d-8-18-2021_35815",
+   "jdft_3d-12-12-2022_35821"
+  ],
+  "configuration_id": "CO_1114500911969241970045731",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.0734,
+  "electronic_band_gap": 1.092,
+  "formation_energy": -6.29556,
+  "chemical_formula_hill": "Se8W4",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 35.411505783317196,
+  "a_in_plane": [
+   3.3276484263030714,
+   3.327648438884204
+  ],
+  "metal_planes_z": [
+   3.371804118956805,
+   9.987990733969205,
+   16.60106025312074,
+   23.21724686813314
+  ],
+  "metal_plane_spacings": [
+   6.616186615012401,
+   6.613069519151534,
+   6.616186615012403,
+   15.566063034140857
+  ],
+  "t_XX": [
+   3.363097102460049,
+   3.3647273764074335,
+   3.3647273764071883,
+   3.3630971024597756
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 3,
+  "names": [
+   "cfid_3d-8-18-2021_48095",
+   "jdft_3d-8-18-2021_48095",
+   "jdft_3d-12-12-2022_48102"
+  ],
+  "configuration_id": "CO_1026846155755860549963738",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.0301,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -2.0791500000000003,
+  "chemical_formula_hill": "MoS2",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 6.031039420373728,
+  "a_in_plane": [
+   3.2247503881359587,
+   3.2247503881359587
+  ],
+  "metal_planes_z": [
+   3.01552
+  ],
+  "metal_plane_spacings": [
+   6.031039420373727
+  ],
+  "t_XX": [
+   3.1408761023723786
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "WS2",
+  "natoms": 6,
+  "names": [
+   "cfid_3d-8-18-2021_19178",
+   "jdft_3d-8-18-2021_19178",
+   "jdft_3d-12-12-2022_19179"
+  ],
+  "configuration_id": "CO_2655698680361282159446952",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.14907,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -0.9953400000000001,
+  "chemical_formula_hill": "S4W2",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 4.956850798071967,
+  "a_in_plane": [
+   5.2473569078489986,
+   5.247354832969058
+  ],
+  "metal_planes_z": [
+   0.0,
+   2.478423190105423
+  ],
+  "metal_plane_spacings": [
+   2.478423190105423,
+   2.478427607966544
+  ],
+  "t_XX": [
+   2.478427601453115,
+   2.4784223168667285
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 12,
+  "names": [
+   "cfid_3d-8-18-2021_28051",
+   "jdft_3d-8-18-2021_28051",
+   "jdft_3d-12-12-2022_28053"
+  ],
+  "configuration_id": "CO_1261860833729907176179489",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.05251,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -8.721,
+  "chemical_formula_hill": "Mo4S8",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 5.535767413699261,
+  "a_in_plane": [
+   6.779869597929677,
+   6.7798702785239735
+  ],
+  "metal_planes_z": [
+   2.1929389150536047,
+   2.1929390553896715,
+   2.1931409019539805,
+   4.587749906997564
+  ],
+  "metal_plane_spacings": [
+   1.4033606676733257e-07,
+   0.00020184656430899395,
+   2.3946090050435833,
+   3.140956421755302
+  ],
+  "t_XX": [
+   2.648356217699749,
+   2.648356217699749,
+   2.648356217699749,
+   2.533562585966698
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoSe2",
+  "natoms": 12,
+  "names": [
+   "cfid_3d-8-18-2021_27267",
+   "jdft_3d-8-18-2021_27267",
+   "jdft_3d-12-12-2022_27269"
+  ],
+  "configuration_id": "CO_3818104148691522390860544",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -4.54254,
+  "electronic_band_gap": 1.061,
+  "formation_energy": -7.8144,
+  "chemical_formula_hill": "Mo4Se8",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 34.70213084549991,
+  "a_in_plane": [
+   3.3274934950642066,
+   3.327493367823719
+  ],
+  "metal_planes_z": [
+   3.235751101624304,
+   9.817550385212142,
+   16.400533468127925,
+   22.98233275171552
+  ],
+  "metal_plane_spacings": [
+   6.581799283587838,
+   6.582983082915783,
+   6.581799283587596,
+   14.95554919540869
+  ],
+  "t_XX": [
+   3.345298848709982,
+   3.34693197298164,
+   3.346931972981663,
+   3.34529884870998
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoSe2",
+  "natoms": 6,
+  "names": [
+   "cfid_3d-8-18-2021_15444",
+   "jdft_3d-8-18-2021_15444",
+   "jdft_3d-12-12-2022_15445"
+  ],
+  "configuration_id": "CO_3423589954252039515764859",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -4.52254,
+  "electronic_band_gap": 1.218,
+  "formation_energy": -3.7872,
+  "chemical_formula_hill": "Mo2Se4",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 22.266238683000967,
+  "a_in_plane": [
+   3.3261251593821406,
+   3.3261251053650653
+  ],
+  "metal_planes_z": [
+   3.4667829303091193,
+   10.05094004249091
+  ],
+  "metal_plane_spacings": [
+   6.58415711218179,
+   15.682081570819177
+  ],
+  "t_XX": [
+   3.346212958533364,
+   3.346212958533348
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 12,
+  "names": [
+   "cfid_3d-8-18-2021_33237",
+   "jdft_3d-8-18-2021_33237",
+   "jdft_3d-12-12-2022_33239"
+  ],
+  "configuration_id": "CO_1670468883093595270935984",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.28735,
+  "electronic_band_gap": 0.921,
+  "formation_energy": -11.539200000000001,
+  "chemical_formula_hill": "Mo4S8",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 24.94828377233961,
+  "a_in_plane": [
+   3.191585950993822,
+   3.191585356560843
+  ],
+  "metal_planes_z": [
+   6.216924366161512,
+   12.456314351678458,
+   18.692469343019248,
+   24.929078095440243
+  ],
+  "metal_plane_spacings": [
+   6.2393899855169455,
+   6.23615499134079,
+   6.236608752420995,
+   6.236130043060879
+  ],
+  "t_XX": [
+   3.1333805038744913,
+   3.133355555594582,
+   3.1333682907679794,
+   3.1333682907679794
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoSe2",
+  "natoms": 9,
+  "names": [
+   "cfid_3d-8-18-2021_24838",
+   "jdft_3d-8-18-2021_24838",
+   "jdft_3d-12-12-2022_24840"
+  ],
+  "configuration_id": "CO_2346514921117518660845305",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -4.53573,
+  "electronic_band_gap": 1.1230000000000002,
+  "formation_energy": -5.7996,
+  "chemical_formula_hill": "Mo3Se6",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 28.515684329254764,
+  "a_in_plane": [
+   3.327024000787458,
+   3.327024535213848
+  ],
+  "metal_planes_z": [
+   3.3776719777319935,
+   9.960355929920011,
+   16.543011366427898
+  ],
+  "metal_plane_spacings": [
+   6.582683952188018,
+   6.582655436507887,
+   15.350344940558859
+  ],
+  "t_XX": [
+   3.3455902853937705,
+   3.3471229323253944,
+   3.3455902853937634
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 6,
+  "names": [
+   "cfid_3d-8-18-2021_3798",
+   "jdft_3d-8-18-2021_3798",
+   "jdft_3d-12-12-2022_3799"
+  ],
+  "configuration_id": "CO_8246305616061111641725162",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.02484,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -4.19454,
+  "chemical_formula_hill": "Mo2S4",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 6.1253917793638,
+  "a_in_plane": [
+   5.553060624505136,
+   3.2059434952670087
+  ],
+  "metal_planes_z": [
+   0.0,
+   6.125390286896547
+  ],
+  "metal_plane_spacings": [
+   6.125390286896547,
+   1.492467252894869e-06
+  ],
+  "t_XX": [
+   3.164482731777311,
+   3.1644827317773108
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 12,
+  "names": [
+   "cfid_3d-8-18-2021_28051",
+   "jdft_3d-8-18-2021_28051",
+   "jdft_3d-12-12-2022_28053"
+  ],
+  "configuration_id": "CO_1261860833729907176179489",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.05251,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -8.721,
+  "chemical_formula_hill": "Mo4S8",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 5.535767413699261,
+  "a_in_plane": [
+   6.779869597929677,
+   6.7798702785239735
+  ],
+  "metal_planes_z": [
+   2.1929389150536047,
+   2.1929390553896715,
+   2.1931409019539805,
+   4.587749906997564
+  ],
+  "metal_plane_spacings": [
+   1.4033606676733257e-07,
+   0.00020184656430899395,
+   2.3946090050435833,
+   3.140956421755302
+  ],
+  "t_XX": [
+   2.648356217699749,
+   2.648356217699749,
+   2.648356217699749,
+   2.533562585966698
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_3D_12_12_2022/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 6,
+  "names": [
+   "cfid_3d-8-18-2021_3798",
+   "jdft_3d-8-18-2021_3798",
+   "jdft_3d-12-12-2022_3799"
+  ],
+  "configuration_id": "CO_8246305616061111641725162",
+  "dataset_id": "DS_t02h9eraswtv_0",
+  "energy": -5.02484,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -4.19454,
+  "chemical_formula_hill": "Mo2S4",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 6.1253917793638,
+  "a_in_plane": [
+   5.553060624505136,
+   3.2059434952670087
+  ],
+  "metal_planes_z": [
+   0.0,
+   6.125390286896547
+  ],
+  "metal_plane_spacings": [
+   6.125390286896547,
+   1.492467252894869e-06
+  ],
+  "t_XX": [
+   3.164482731777311,
+   3.1644827317773108
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_2D_3_12_2021/co/co_0.parquet",
+  "formula": "WSe2",
+  "natoms": 3,
+  "names": [
+   "d2-12-12-2022_573"
+  ],
+  "configuration_id": "CO_5374424997494322369313575",
+  "dataset_id": "DS_4ml1yrigmar0_0",
+  "energy": -5.01376,
+  "electronic_band_gap": 1.334,
+  "formation_energy": -1.39497,
+  "chemical_formula_hill": "Se2W",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 35.068951,
+  "a_in_plane": [
+   3.3242773118230096,
+   3.3242773118230096
+  ],
+  "metal_planes_z": [
+   3.7672468848000595
+  ],
+  "metal_plane_spacings": [
+   35.068951
+  ],
+  "t_XX": [
+   3.3641686321468782
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_2D_3_12_2021/co/co_0.parquet",
+  "formula": "MoSe2",
+  "natoms": 3,
+  "names": [
+   "d2-12-12-2022_374"
+  ],
+  "configuration_id": "CO_1149491458620237450972412",
+  "dataset_id": "DS_4ml1yrigmar0_0",
+  "energy": -4.48259,
+  "electronic_band_gap": 1.4460000000000002,
+  "formation_energy": -1.77378,
+  "chemical_formula_hill": "MoSe2",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 35.451423,
+  "a_in_plane": [
+   3.32351687638242,
+   3.32351687638242
+  ],
+  "metal_planes_z": [
+   11.588572878120063
+  ],
+  "metal_plane_spacings": [
+   35.451423
+  ],
+  "t_XX": [
+   3.346199623558583
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_2D_3_12_2021/co/co_0.parquet",
+  "formula": "WS2",
+  "natoms": 3,
+  "names": [
+   "d2-12-12-2022_285"
+  ],
+  "configuration_id": "CO_2436433776386051947883734",
+  "dataset_id": "DS_4ml1yrigmar0_0",
+  "energy": -5.80172,
+  "electronic_band_gap": 1.337,
+  "formation_energy": -2.45562,
+  "chemical_formula_hill": "S2W",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 30.202402,
+  "a_in_plane": [
+   3.1911968746783743,
+   3.1911968746783743
+  ],
+  "metal_planes_z": [
+   10.651812634399906
+  ],
+  "metal_plane_spacings": [
+   30.202402000000003
+  ],
+  "t_XX": [
+   3.1496486958681107
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_2D_3_12_2021/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 3,
+  "names": [
+   "d2-12-12-2022_790"
+  ],
+  "configuration_id": "CO_1189988940421900705545361",
+  "dataset_id": "DS_4ml1yrigmar0_0",
+  "energy": -5.21029,
+  "electronic_band_gap": 1.658,
+  "formation_energy": -2.65362,
+  "chemical_formula_hill": "MoS2",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 34.879004,
+  "a_in_plane": [
+   3.187963136085104,
+   3.187963136085104
+  ],
+  "metal_planes_z": [
+   3.7197407130000837
+  ],
+  "metal_plane_spacings": [
+   34.879004
+  ],
+  "t_XX": [
+   3.133273209830543
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_2D_3_12_2021/co/co_0.parquet",
+  "formula": "MoSe2",
+  "natoms": 3,
+  "names": [
+   "d2-12-12-2022_327",
+   "d2-12-12-2022_51"
+  ],
+  "configuration_id": "CO_1006813092000681047573135",
+  "dataset_id": "DS_4ml1yrigmar0_0",
+  "energy": -4.48271,
+  "electronic_band_gap": 1.249,
+  "formation_energy": -1.7741099999999999,
+  "chemical_formula_hill": "MoSe2",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 23.345615,
+  "a_in_plane": [
+   3.323431919993966,
+   3.323431919993966
+  ],
+  "metal_planes_z": [
+   1.672760364240007
+  ],
+  "metal_plane_spacings": [
+   23.345615
+  ],
+  "t_XX": [
+   3.346513450811628
+  ]
+ },
+ {
+  "shard": "/home/callensxavier_gmail_com/hf-data/dipolar_exciton/colabfit__JARVIS_DFT_2D_3_12_2021/co/co_0.parquet",
+  "formula": "MoS2",
+  "natoms": 6,
+  "names": [
+   "d2-12-12-2022_955"
+  ],
+  "configuration_id": "CO_3579533821360700150234622",
+  "dataset_id": "DS_4ml1yrigmar0_0",
+  "energy": -4.93542,
+  "electronic_band_gap": 0.0,
+  "formation_energy": -3.6580200000000005,
+  "chemical_formula_hill": "Mo2S4",
+  "pbc": [
+   true,
+   true,
+   true
+  ],
+  "stacking_period": 36.325314,
+  "a_in_plane": [
+   5.538715117716454,
+   3.1976655745486164
+  ],
+  "metal_planes_z": [
+   4.216859936660102,
+   4.216859936660102
+  ],
+  "metal_plane_spacings": [
+   0.0,
+   36.325314
+  ],
+  "t_XX": [
+   3.1734022455565487,
+   3.1734022455565487
+  ]
+ }
+]

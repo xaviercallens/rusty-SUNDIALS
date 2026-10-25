@@ -9,6 +9,8 @@
 //! predicts that no density-1 configuration has a lower energy per particle than the triangular lattice. The
 //! truncation makes the potential not exactly completely monotone beyond `rc`; its size is `~exp(-kappa rc)`.
 
+pub mod dipolar;
+pub mod dipolar_ewald;
 pub mod global_opt;
 pub mod jellium;
 
