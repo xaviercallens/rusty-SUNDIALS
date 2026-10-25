@@ -4,7 +4,9 @@
 //! uniform state `psi = sqrt(n0)` with `mu = g n0` is the ground state on a periodic box; the
 //! measurement relaxes to it in imaginary time from a perturbed start, then applies a weak
 //! kick at one grid wavevector `k` and records the density Fourier component `A(t)` at `k`
-//! while evolving in real time with the crate's Strang split step:
+//! while evolving in real time with the split step chosen by `ResponseConfig::splitting` (the
+//! recorded measurements use [`crate::Splitting::Strang`]; the crate's own [`crate::step`] /
+//! [`crate::evolve`] keep the Python-reference composition):
 //!
 //! * [`Kick::Phase`]: `psi -> psi * exp(i eps cos(k.r))` (an impulsive potential, as in the
 //!   short-Bragg-pulse technique). Continuity gives `A(t) = (n0 k^2 eps / omega) sin(omega t)`
