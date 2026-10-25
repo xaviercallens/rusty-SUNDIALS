@@ -11,6 +11,7 @@
 
 pub mod dipolar;
 pub mod dipolar_ewald;
+pub mod exact;
 pub mod global_opt;
 pub mod jellium;
 
