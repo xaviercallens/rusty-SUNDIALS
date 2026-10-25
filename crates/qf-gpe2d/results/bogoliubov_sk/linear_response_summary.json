@@ -279,7 +279,10 @@
  "informational": {
   "uncapped_strang_max_rel_err_vs_epsB": 4.092646e-05,
   "uncapped_strang_S_amp_vs_S_freq_max_rel": 0.0001637885954554814,
-  "reference_max_rel_err_vs_epsB": 0.01227853
+  "reference_max_rel_err_vs_epsB": 0.01227853,
+  "S_freq_over_bound_minus_1_at_exactly_x1_finest_dt": -3.561922312655952e-09,
+  "S_freq_over_bound_minus_1_at_exactly_x1_eps_scan_eps1e-3": 6.068702806949489e-08,
+  "exact_SB_over_bound_minus_1_at_sweep_x_nearest_1": -0.0013809122808523533
  },
  "eps_scan": [
   {

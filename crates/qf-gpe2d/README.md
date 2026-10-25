@@ -19,8 +19,10 @@ i dpsi/dt = -1/2 Lap psi + g |psi|^2 psi - mu psi          (hbar = m = 1)
 ```
 
 `g = 1`, background density `n0 = 1`, so `mu = 1`, sound speed `c = 1`, healing length `xi =
-1/sqrt(2 mu)`. Strang splitting: a pointwise nonlinear phase half-step, a Fourier-diagonal linear
-step, then the nonlinear half-step again. Both are phase rotations, so the norm is conserved to
+1/sqrt(2 mu)`. Split step (the Python reference's composition): a pointwise nonlinear phase
+half-step, a Fourier-diagonal linear step, then the *same* nonlinear phase factor again (computed
+from `|psi|^2` at the start of the step, so this is not textbook Strang; see `Splitting` and the
+linear-response section below). Both are phase rotations, so the norm is conserved to
 machine precision *by construction* — it cannot fail as a test. Energy drift is the control that
 can, and does: a field with energy at the grid scale (white-noise phase) genuinely needs the
 `max_dt` bound (`dt * k_max^2 / 2 << 1`), and the upstream Python docs record 33% drift at ~3x too
@@ -36,7 +38,9 @@ own relaxation create the density dip, rather than assuming a core-profile ansat
 |---|---|
 | `Grid2D`, `healing_length`, `max_dt` | grid, `xi`, the accuracy-bound timestep |
 | `smooth_phase_noise` | a band-limited random phase (physical, not white-noise) |
-| `step` / `evolve` | one Strang step / `n_steps` of it, sharing one FFT plan (see below) |
+| `step` / `evolve` | one split step (Python-reference composition) / `n_steps` of it, sharing one FFT plan (see below) |
+| `evolve_observe`, `Splitting` | real-time evolution with a per-step observer; `Splitting::Strang` or `PythonReference` |
+| `linear_response` | Bogoliubov dispersion by linear response of the GP ground state |
 | `energy`, `norm` | `E = int[|grad psi|^2/2 + g|psi|^4/2]`, `int |psi|^2` |
 | `plant_vortices` | imprint a phase-only vortex configuration (charges must sum to zero) |
 | `radial_density_profile` | azimuthally averaged `|psi|^2`, for measuring a core size |

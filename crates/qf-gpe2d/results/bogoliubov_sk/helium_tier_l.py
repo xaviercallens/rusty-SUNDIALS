@@ -108,6 +108,11 @@ def main(out: str) -> None:
     s_up = eps0 / ee
     s_up_cons = eps0 / np.maximum(ee - er, 1e-12)  # conservative (largest) upper bound
     silent = s_up_cons < thr
+    # Stricter variant: in the anomalous-dispersion range (eps > hbar c k) multi-phonon states may
+    # lie near hbar c k, below the measured branch; take omega_min = min(eps - err, hbar c k).
+    omega_min = np.minimum(ee - er, hbar_c * kk)
+    s_up_strict = eps0 / omega_min
+    silent_strict = s_up_strict < thr
     eps_b = np.sqrt((hbar_c * kk) ** 2 + eps0 ** 2)
     s_b = eps0 / eps_b
 
@@ -142,6 +147,9 @@ def main(out: str) -> None:
         "silent_k_range_inv_A": [float(silent_ks.min()), float(silent_ks.max())] if silent.any() else None,
         "silent_all_k_up_to": float(kk[np.argmin(silent)] - 0.05) if (~silent).any() else float(kk[-1]),
         "first_undecided_k": first_undecided,
+        "silent_strict_k": [float(x) for x in kk[silent_strict]],
+        "silent_set_unchanged_under_strict_variant": bool(np.array_equal(silent, silent_strict)),
+        "margin_at_k_0.5": {"S_up_strict": float(s_up_strict[9]), "threshold": float(thr[9]), "k": float(kk[9])},
         "n_silent": int(silent.sum()), "n_undecided": int((~silent).sum()),
         "controls": {"bogoliubov_fires_anywhere": bool(ctl_bog_fires.any()),
                      "free_fires_for_all_k_lt_2ks": bool(ctl_free_fires[kk < 2 * ks].all())},
@@ -158,6 +166,7 @@ def main(out: str) -> None:
     print("roton", res["threshold_at_roton"])
     print("silent k (S_up_cons < threshold):", [float(x) for x in silent_ks])
     print("first undecided k:", first_undecided)
+    print("strict variant silent set unchanged:", bool(np.array_equal(silent, silent_strict)), res["margin_at_k_0.5"])
     print("controls", res["controls"])
     print("eps/eps_B min:", float((ee / eps_b).min()), "at k =", float(kk[np.argmin(ee / eps_b)]))
 

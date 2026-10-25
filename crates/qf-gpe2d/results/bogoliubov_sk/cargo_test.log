@@ -12,7 +12,7 @@ test tests::relaxation_builds_a_core_of_size_xi ... ok
 test tests::over_relaxation_destroys_the_vortices has been running for over 60 seconds
 test tests::over_relaxation_destroys_the_vortices ... ok
 
-test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 152.86s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 146.95s
 
 
 running 5 tests
@@ -22,7 +22,7 @@ test positive_control_strang_reproduces_bogoliubov_and_the_f_sum_amplitude ... o
 test measured_bogoliubov_s_stays_under_the_dual_scale_bound ... ok
 test reference_splitting_amplitude_converges_only_at_first_order ... ok
 
-test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.43s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.92s
 
 
 running 1 test
@@ -35,16 +35,8 @@ running 0 tests
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-   Compiling autocfg v1.5.1
-   Compiling strength_reduce v0.2.4
-   Compiling num-traits v0.2.19
-   Compiling num-integer v0.1.47
-   Compiling num-complex v0.4.6
-   Compiling primal-check v0.3.4
-   Compiling transpose v0.2.3
-   Compiling rustfft v6.4.1
    Compiling qf-gpe2d v6.4.0 (/home/callensxavier_gmail_com/rusty-SUNDIALS-wt-ar-h8/crates/qf-gpe2d)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 33.68s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.11s
      Running unittests src/lib.rs (/home/callensxavier_gmail_com/rusty-target-ar/debug/deps/qf_gpe2d-939ac373e689daaa)
      Running tests/linear_response.rs (/home/callensxavier_gmail_com/rusty-target-ar/debug/deps/linear_response-7dfe1a7cd6c3562f)
      Running tests/python_cross_check.rs (/home/callensxavier_gmail_com/rusty-target-ar/debug/deps/python_cross_check-432423d980b4be48)

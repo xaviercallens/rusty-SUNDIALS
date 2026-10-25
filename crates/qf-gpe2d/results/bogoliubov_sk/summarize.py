@@ -60,6 +60,12 @@ def main(inp: str, out: str) -> None:
         "uncapped_strang_max_rel_err_vs_epsB": max_abs(unc, "rel_err_vs_eps_B_g1"),
         "uncapped_strang_S_amp_vs_S_freq_max_rel": max(abs(r["S_amp"] - r["S_freq"]) / r["S_freq"] for r in unc),
         "reference_max_rel_err_vs_epsB": max_abs(ref, "rel_err_vs_eps_B_g1"),
+        "S_freq_over_bound_minus_1_at_exactly_x1_finest_dt": [
+            r["S_freq"] / r["bound"] - 1.0 for r in d["dt_convergence"]
+            if abs(r["x"] - 1.0) < 1e-12 and r["safety"] == 0.0625][0],
+        "S_freq_over_bound_minus_1_at_exactly_x1_eps_scan_eps1e-3": [
+            r["S_freq"] / r["bound"] - 1.0 for r in d["eps_scan"] if r["eps"] == 0.001][0],
+        "exact_SB_over_bound_minus_1_at_sweep_x_nearest_1": near["S_B_g1"] / near["bound"] - 1.0,
     }
 
     def conv_table(rows: list[dict[str, float]]) -> list[dict[str, object]]:
