@@ -1,0 +1,109 @@
+{
+ "rust_vs_mpmath_V_max_rel_err": {
+  "dlmf": 1.7969779014701344e-16,
+  "mixture": 2.4484818521414146e-15,
+  "n_points": 28
+ },
+ "coulomb_positive_control": {
+  "lattice_tri_minus_jellium_rs_box": 6.94999613415348e-14,
+  "lattice_tri_minus_literature": 5.048119700035159e-10,
+  "lattice_sq_minus_literature": -8.346721092067355e-10,
+  "r0_1e-9_dE_tri": 3.1415923196220774e-09,
+  "slope_over_pi_at_r0": {
+   "1e-10": 0.9999989041889,
+   "1e-09": 0.9999998936948,
+   "1e-08": 0.9999999785096,
+   "1e-06": 0.9999985846491,
+   "1e-04": 0.9998584675716,
+   "1e-03": 0.9985846824196,
+   "1e-02": 0.9858535034157
+  }
+ },
+ "alpha_independence_max_rel_spread": 3.470774861111754e-15,
+ "neg_wrong_sign_recip_min_rel_spread": 0.05334629752843893,
+ "neg_no_background_min_rel_spread": 0.21601493717501682,
+ "neg_wrong_sign_kernel": {
+  "E": 1.9605157861782994,
+  "deviation_from_coulomb": 3.921032
+ },
+ "scaling_n4": {
+  "E_n4_r0_0.7": -1.3739474230519872,
+  "2_E_n1_r0_1.4": -1.3739474230519886,
+  "rel_diff": 9.697e-16
+ },
+ "kernel_identity_max_rel_err": 1.781111e-15,
+ "log_gas_limit": {
+  "eta_formula_W_sq_minus_W_tri": 0.005292251258264199,
+  "r0_times_gap": [
+   [
+    100.0,
+    0.005274457985225689,
+    -0.0033621368620252445
+   ],
+   [
+    1000.0,
+    0.005290467526114853,
+    -0.00033704600599981926
+   ],
+   [
+    10000.0,
+    0.005292072840895048,
+    -3.371294378207157e-05
+   ],
+   [
+    100000.0,
+    0.005292233416084803,
+    -3.371377987337887e-06
+   ],
+   [
+    1000000.0,
+    0.005292249474042752,
+    -3.3713846148142323e-07
+   ]
+  ]
+ },
+ "min_gap_over_scan": 5.274457985225689e-05,
+ "all_gaps_positive": true,
+ "hf_2h_rows": [
+  {
+   "material": "MoSe2",
+   "c2db_name": [
+    "c2db_atoms_3150"
+   ],
+   "a_pbe_A": 3.3197487878576672,
+   "a_table2_A": 3.3,
+   "band_gap_pbe_eV": 1.3214381859138422,
+   "method": "DFT-PBE"
+  },
+  {
+   "material": "WS2",
+   "c2db_name": [
+    "c2db_atoms_3223"
+   ],
+   "a_pbe_A": 3.185945949661419,
+   "a_table2_A": 3.16,
+   "band_gap_pbe_eV": 1.5336240776237322,
+   "method": "DFT-PBE"
+  },
+  {
+   "material": "WSe2",
+   "c2db_name": [
+    "c2db_atoms_3118"
+   ],
+   "a_pbe_A": 3.3190066244679373,
+   "a_table2_A": 3.29,
+   "band_gap_pbe_eV": 1.237876337239032,
+   "method": "DFT-PBE"
+  },
+  {
+   "material": "MoS2",
+   "c2db_name": [
+    "c2db_atoms_3238"
+   ],
+   "a_pbe_A": 3.1840664646845926,
+   "a_table2_A": 3.16,
+   "band_gap_pbe_eV": 1.580389439677671,
+   "method": "DFT-PBE"
+  }
+ ]
+}
