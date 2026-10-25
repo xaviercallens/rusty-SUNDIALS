@@ -17,8 +17,10 @@
 //! formalised; this crate is therefore a floating-point (Tier X) cross-check and never supports a
 //! claim. What it adds is an independent integrator (BDF with the exact linear Jacobian) and a
 //! *fail-closed* certificate: a run is accepted only if the kernel is a valid absorbing kernel, the
-//! total mass is conserved, the interior mass has decayed below a tolerance, and the absorption
-//! mass matches the target within a tolerance. Anything else is an error, never a silent pass.
+//! total mass is conserved, *every component* of the state stays non-negative (up to a tolerance;
+//! a signed sum alone can hide cancelling entries), the interior mass has decayed below a
+//! tolerance, and the absorption mass matches the target within a tolerance. Anything else is an
+//! error, never a silent pass.
 
 use cvode::{Cvode, DenseMat, Method, Task};
 use nvector::SerialVector;
@@ -45,6 +47,13 @@ pub enum CertError {
     MassDrift {
         /// Largest `|sum pi - 1|` observed.
         drift: f64,
+    },
+    /// A component of the state fell below `-tol.negative` (probabilities cannot be negative).
+    NegativeMass {
+        /// State index of the most negative component.
+        state: usize,
+        /// Its value.
+        value: f64,
     },
     /// The interior mass did not fall below the tolerance by `t_max`.
     NotAbsorbed {
@@ -182,6 +191,8 @@ pub struct Tolerances {
     pub value: f64,
     /// Largest accepted `|sum pi - 1|` along the run.
     pub mass: f64,
+    /// Most negative component accepted: every `pi_k(t)` must be `>= -negative` at every output.
+    pub negative: f64,
 }
 
 impl Default for Tolerances {
@@ -190,6 +201,7 @@ impl Default for Tolerances {
             interior: 1e-9,
             value: 1e-8,
             mass: 1e-9,
+            negative: 1e-12,
         }
     }
 }
@@ -209,8 +221,30 @@ pub struct Certificate {
     pub interior: f64,
     /// Largest `|sum pi - 1|` over the outputs.
     pub mass_drift: f64,
+    /// Smallest component `min_k pi_k(t)` seen at any output (accepted only if `>= -tol.negative`).
+    pub min_component: f64,
     /// `(t, pi_N(t), interior(t))` at the doubling output times.
     pub trace: Vec<(f64, f64, f64)>,
+}
+
+/// Componentwise non-negativity check: returns the smallest component of `y`, or
+/// [`CertError::NegativeMass`] if it is below `-tol`.
+///
+/// The total-mass and interior-mass tests use *signed* sums, so a state such as
+/// `(0.5, -0.25, 0.25, 0.5)` has total mass `1` and interior mass `0`; this check refuses it.
+pub fn check_nonnegative(y: &[f64], tol: f64) -> Result<f64, CertError> {
+    let mut state = 0usize;
+    let mut min = f64::INFINITY;
+    for (k, &v) in y.iter().enumerate() {
+        if v < min {
+            min = v;
+            state = k;
+        }
+    }
+    if min < -tol {
+        return Err(CertError::NegativeMass { state, value: min });
+    }
+    Ok(min)
 }
 
 /// Integrate `d pi/dt = pi (P - I)` from the point mass at `start`, stopping when the interior mass
@@ -261,6 +295,7 @@ pub fn certify_absorption(
 
     let mut trace = Vec::new();
     let mut drift: f64 = 0.0;
+    let mut min_component = f64::INFINITY;
     let mut t_out = 1.0_f64;
     loop {
         let (t, y) = solver
@@ -269,6 +304,7 @@ pub fn certify_absorption(
         if !y.iter().all(|v| v.is_finite()) {
             return Err(CertError::NonFinite);
         }
+        min_component = min_component.min(check_nonnegative(y, tol.negative)?);
         let total: f64 = y.iter().sum();
         drift = drift.max((total - 1.0).abs());
         let interior: f64 = y[1..m - 1].iter().sum();
@@ -290,6 +326,7 @@ pub fn certify_absorption(
                 p_loss: y[0],
                 interior,
                 mass_drift: drift,
+                min_component,
                 trace,
             });
         }
@@ -374,6 +411,30 @@ mod tests {
             run(&d, 2, 0.5, 1e4),
             Err(CertError::InvalidKernel(_))
         ));
+    }
+
+    #[test]
+    fn nonnegativity_check_refuses_cancelling_entries_that_the_signed_sums_accept() {
+        // Negative control: total mass 1 and interior mass 0, so the signed tests pass, but a
+        // component is negative.
+        let bad = [0.5, -0.25, 0.25, 0.5];
+        let total: f64 = bad.iter().sum();
+        let interior: f64 = bad[1..3].iter().sum();
+        assert!((total - 1.0).abs() < 1e-15 && interior.abs() < 1e-15);
+        assert!(matches!(
+            check_nonnegative(&bad, 1e-12),
+            Err(CertError::NegativeMass { state: 1, .. })
+        ));
+        // Positive control: a probability vector and one with round-off-level negativity pass.
+        assert_eq!(check_nonnegative(&[0.25, 0.25, 0.0, 0.5], 1e-12), Ok(0.0));
+        assert!(check_nonnegative(&[0.5, -1e-14, 0.5], 1e-12).is_ok());
+    }
+
+    #[test]
+    fn accepted_runs_record_a_nonnegative_minimum_component() {
+        let c = moran_kernel(10, 1.5);
+        let cert = run(&c, 3, moran_fix(10, 1.5, 3), 1e6).expect("certified");
+        assert!(cert.min_component >= -Tolerances::default().negative);
     }
 
     #[test]

@@ -28,11 +28,17 @@ fn trace_json(c: &Certificate) -> String {
     s
 }
 
+/// JSON for the fitness field: a number, or `null` when the row has no meaningful fitness
+/// (the identity-kernel control is not a Moran chain).
+fn r_json(r: Option<f64>) -> String {
+    r.map_or_else(|| "null".to_string(), |v| format!("{v}"))
+}
+
 fn accepted(
     kind: &str,
     label: &str,
     n: usize,
-    r: f64,
+    r: Option<f64>,
     i: usize,
     target: f64,
     c: &Certificate,
@@ -40,12 +46,14 @@ fn accepted(
     Row {
         ok: true,
         json: format!(
-            "{{\"kind\":\"{kind}\",\"label\":\"{label}\",\"N\":{n},\"r\":{r},\"i\":{i},\"verdict\":\"accepted\",\"target\":{target:.17e},\"p_fix\":{:.17e},\"abs_err\":{:e},\"p_loss\":{:.17e},\"interior\":{:e},\"mass_drift\":{:e},\"t_stop\":{:e},\"trace\":{}}}",
+            "{{\"kind\":\"{kind}\",\"label\":\"{label}\",\"N\":{n},\"r\":{},\"i\":{i},\"verdict\":\"accepted\",\"target\":{target:.17e},\"p_fix\":{:.17e},\"abs_err\":{:e},\"p_loss\":{:.17e},\"interior\":{:e},\"mass_drift\":{:e},\"min_component\":{:e},\"t_stop\":{:e},\"trace\":{}}}",
+            r_json(r),
             c.p_fix,
             (c.p_fix - target).abs(),
             c.p_loss,
             c.interior,
             c.mass_drift,
+            c.min_component,
             c.t_stop,
             trace_json(c)
         ),
@@ -57,7 +65,7 @@ fn refused(
     kind: &str,
     label: &str,
     n: usize,
-    r: f64,
+    r: Option<f64>,
     i: usize,
     target: f64,
     e: &CertError,
@@ -71,7 +79,8 @@ fn refused(
     Row {
         ok,
         json: format!(
-            "{{\"kind\":\"{kind}\",\"label\":\"{label}\",\"N\":{n},\"r\":{r},\"i\":{i},\"verdict\":\"refused\",\"target\":{target:.17e},\"reason\":\"{reason}\"}}"
+            "{{\"kind\":\"{kind}\",\"label\":\"{label}\",\"N\":{n},\"r\":{},\"i\":{i},\"verdict\":\"refused\",\"target\":{target:.17e},\"reason\":\"{reason}\"}}",
+            r_json(r)
         ),
     }
 }
@@ -101,10 +110,10 @@ fn main() {
         for i in 1..n {
             let target = moran_fix(n, r, i);
             match certify_absorption(&chain, i, target, t_max, tol, set) {
-                Ok(c) => rows.push(accepted("moran", label, n, r, i, target, &c)),
+                Ok(c) => rows.push(accepted("moran", label, n, Some(r), i, target, &c)),
                 Err(e) => {
                     failures += 1;
-                    rows.push(refused("moran", label, n, r, i, target, &e, false));
+                    rows.push(refused("moran", label, n, Some(r), i, target, &e, false));
                 }
             }
         }
@@ -118,7 +127,7 @@ fn main() {
                     "wright_fisher",
                     "wf_neutral",
                     n,
-                    1.0,
+                    Some(1.0),
                     i,
                     target,
                     &c,
@@ -129,7 +138,7 @@ fn main() {
                         "wright_fisher",
                         "wf_neutral",
                         n,
-                        1.0,
+                        Some(1.0),
                         i,
                         target,
                         &e,
@@ -144,12 +153,12 @@ fn main() {
     let neg_chain = moran_kernel(10, 1.5);
     let mut negative = |label: &str,
                         chain: &Chain,
+                        r: Option<f64>,
                         i: usize,
                         target: f64,
                         t_max: f64,
                         expect_mismatch: bool,
                         rows: &mut Vec<Row>| {
-        let r = 1.5;
         match certify_absorption(chain, i, target, t_max, tol, set) {
             Ok(c) => {
                 failures += 1;
@@ -179,6 +188,7 @@ fn main() {
         negative(
             "flipped_exponent_formula",
             &neg_chain,
+            Some(1.5),
             i,
             flipped_fix(10, 1.5, i),
             1e6,
@@ -188,6 +198,7 @@ fn main() {
         negative(
             "neutral_i_over_N_under_selection",
             &neg_chain,
+            Some(1.5),
             i,
             i as f64 / 10.0,
             1e6,
@@ -198,6 +209,7 @@ fn main() {
     negative(
         "identity_kernel_no_absorption",
         &identity_kernel(2),
+        None,
         1,
         0.5,
         1e4,
@@ -207,6 +219,7 @@ fn main() {
     negative(
         "horizon_too_short",
         &neg_chain,
+        Some(1.5),
         3,
         moran_fix(10, 1.5, 3),
         4.0,
@@ -218,6 +231,7 @@ fn main() {
     negative(
         "corrupted_row_sum",
         &bad,
+        Some(1.5),
         3,
         moran_fix(10, 1.5, 3),
         1e6,

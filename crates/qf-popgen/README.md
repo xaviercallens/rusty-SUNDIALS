@@ -3,8 +3,10 @@
 Absorbing Markov chains on `{0, ..., N}` (Moran with selection, neutral Wright-Fisher) as the linear stiff ODE
 `d pi / dt = pi (P - I)` integrated with this repository's CVODE (BDF, exact analytic Jacobian), and a
 **fail-closed absorption certificate**: a run is accepted only if the kernel is a valid absorbing kernel, total mass
-is conserved, the interior mass has decayed below a tolerance, and the absorption mass at `N` matches the target.
-Every other outcome is an `Err` (`InvalidKernel`, `MassDrift`, `NotAbsorbed`, `ValueMismatch`, `Solver`, `NonFinite`).
+is conserved, every component of the state stays non-negative (`NegativeMass` otherwise: the signed mass sums alone
+cannot see cancelling entries), the interior mass has decayed below a tolerance, and the absorption mass at `N` matches
+the target. Every other outcome is an `Err` (`InvalidKernel`, `MassDrift`, `NegativeMass`, `NotAbsorbed`,
+`ValueMismatch`, `Solver`, `NonFinite`).
 
 Scope: Tier X (floating point). It cross-checks closed forms that are kernel-checked in Lean in the AutoevolveAI
 repository (`formal_cert/Programmes/PopGen/`: `P^n(i,N) -> i/N` for Wright-Fisher and for Moran with `r = 1`,
