@@ -13,3 +13,7 @@ libm = "0.2"
 [[bin]]
 name = "yukawa_crystal"
 path = "src/main.rs"
+
+[[bin]]
+name = "keldysh_jellium"
+path = "src/bin/keldysh_jellium.rs"
