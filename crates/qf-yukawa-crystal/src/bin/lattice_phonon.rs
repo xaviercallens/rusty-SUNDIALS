@@ -4,6 +4,8 @@
 //! * `lattice_phonon scan POT N1,N2,.. RC TAUFILE OUT.csv` does the same for every `x y` line of TAUFILE with two threads.
 //! * `lattice_phonon ewald_static d x y` compares the dipolar static energy with the Ewald sum.
 //! * `lattice_phonon frozen POT x y n i j ex ey RC` prints the frozen-phonon second difference and `(1/2) e^T D e`.
+//! * `lattice_phonon duffy a x y N` prints the spectral (Poisson + Duffy-Gauss) `E_zp` of `exp(-pi a r^2)`.
+//! * `lattice_phonon curv a N h` prints `c = Lap E_zp(rho)/4` at the triangular point for `exp(-pi a r^2)`.
 //!
 //! Potential specs: `gauss:a`, `yukawa:kappa`, `riesz:s`, `dipolar:d`, `ring:r0,w`, `morse:alpha,r0`, `lj:sigma`,
 //! `gdiff:a1,a2,c`. CSV columns: `pot,x,y,n,rc,e_static,e_zp,e_zp_clip,lam_min,n_unstable`.
@@ -13,6 +15,7 @@ use qf_yukawa_crystal::phonon::{
     Analysis, Pot, analyze, dynamical_grid, frozen_phonon_dipolar_ewald, frozen_phonon_pair_sum,
     static_energy,
 };
+use qf_yukawa_crystal::phonon_spectral::{GaussPoisson, curvature_at_rho_gauss, ezp_gauss_duffy};
 use std::fmt::Write as _;
 use std::io::Write as _;
 
@@ -162,6 +165,27 @@ fn main() -> Result<(), String> {
             println!(
                 "{{\"d\":{d},\"x\":{x},\"y\":{y},\"ewald\":{exact:.15e},\"direct_tail_rc400\":{mine:.15e},\"diff\":{:.3e}}}",
                 mine - exact
+            );
+        }
+        "duffy" => {
+            // spectral (reciprocal-space + Duffy-Gauss) E_zp of the Gaussian exp(-pi a r^2)
+            let (a, x, y) = (f(2)?, f(3)?, f(4)?);
+            let n = arg(5)?.parse::<usize>().map_err(|e| e.to_string())?;
+            let r = ezp_gauss_duffy(a, x, y, n);
+            let exact = GaussPoisson::new(a, x, y).mean_trace_exact();
+            println!(
+                "{{\"a\":{a},\"x\":{x},\"y\":{y},\"n\":{n},\"e_zp\":{:.15e},\"mean_trace\":{:.15e},\"mean_trace_exact\":{exact:.15e},\"min_ratio\":{:.9e}}}",
+                r.e_zp, r.mean_trace, r.min_ratio
+            );
+        }
+        "curv" => {
+            // c = Lap E_zp(rho)/4 at the triangular point for the Gaussian exp(-pi a r^2)
+            let a = f(2)?;
+            let n = arg(3)?.parse::<usize>().map_err(|e| e.to_string())?;
+            let h = f(4)?;
+            println!(
+                "{{\"a\":{a},\"n\":{n},\"h\":{h},\"c\":{:.12e}}}",
+                curvature_at_rho_gauss(a, n, h)
             );
         }
         other => return Err(format!("unknown command {other}")),
