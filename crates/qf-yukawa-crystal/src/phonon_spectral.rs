@@ -122,6 +122,10 @@ impl GaussPoisson {
 }
 
 /// `sqrt(lam1) + sqrt(lam2)` of the symmetric `2 x 2` matrix `[[d0, d1], [d1, d2]]` (negative parts clipped).
+///
+/// Clipping makes the result finite for a dynamically unstable matrix, so a value from this function is not evidence of
+/// stability. Callers that report an energy must also check the stability ratio, as [`ezp_gauss_duffy`] does with
+/// [`DuffyResult::min_ratio`] and [`ezp_gauss_duffy_stable`] does by returning `None`.
 pub fn omega_sum(d: [f64; 3]) -> f64 {
     let t = d[0] + d[2];
     let p = d[0] * d[2] - d[1] * d[1];
@@ -139,7 +143,19 @@ pub struct DuffyResult {
     pub min_ratio: f64,
 }
 
+impl DuffyResult {
+    /// `true` when `lam_min(D(k)) / |k|^2 > 0` at every node of the rule. A node check is necessary, not sufficient,
+    /// for dynamical stability (the exact long-wave elastic tensor covers the `k -> 0` limit).
+    pub fn is_stable(&self) -> bool {
+        self.min_ratio > 0.0
+    }
+}
+
 /// Duffy-Gauss `E_zp` of the Gaussian `exp(-pi a r^2)` with `4 n^2` nodes.
+///
+/// For a dynamically unstable shape `e_zp` is computed with the negative eigenvalues clipped to zero, which favours the
+/// unstable lattice. It must not be reported or compared without checking [`DuffyResult::is_stable`] (or `min_ratio`);
+/// [`ezp_gauss_duffy_stable`] does that check and returns `None` instead.
 pub fn ezp_gauss_duffy(a: f64, x: f64, y: f64, n: usize) -> DuffyResult {
     let gp = GaussPoisson::new(a, x, y);
     let (s, w) = gauss_legendre01(n);
@@ -171,9 +187,18 @@ pub fn ezp_gauss_duffy(a: f64, x: f64, y: f64, n: usize) -> DuffyResult {
     }
 }
 
+/// Like [`ezp_gauss_duffy`] but returns `Some(e_zp)` only if the shape is stable on every node and `None` otherwise, so a
+/// caller cannot use a clipped energy of an unstable lattice by accident (the P2 policy: unstable shapes are excluded,
+/// never clipped).
+pub fn ezp_gauss_duffy_stable(a: f64, x: f64, y: f64, n: usize) -> Option<f64> {
+    let r = ezp_gauss_duffy(a, x, y, n);
+    r.is_stable().then_some(r.e_zp)
+}
+
 /// `c = Lap E_zp(rho) / 4` at the triangular point for the Gaussian `exp(-pi a r^2)` (central differences with steps
 /// `h` and `h/2`, Richardson-combined; `n` Gauss nodes per Duffy direction). `c < 0` means the triangular lattice is a
-/// local maximum of `E_zp`, `c > 0` a local minimum.
+/// local maximum of `E_zp`, `c > 0` a local minimum. The stencil does not check stability of the displaced shapes;
+/// use it for `h` small compared with the stable neighbourhood of `rho` (check with [`ezp_gauss_duffy_stable`]).
 pub fn curvature_at_rho_gauss(a: f64, n: usize, h: f64) -> f64 {
     let (x0, y0) = (0.5, 0.75f64.sqrt());
     let e = |x: f64, y: f64| ezp_gauss_duffy(a, x, y, n).e_zp;
@@ -267,6 +292,19 @@ mod tests {
         assert!((d + 1.307_403e-2).abs() < 1e-7, "{d}");
         // negative control: the square lattice is dynamically unstable
         assert!(ezp_gauss_duffy(1.0, 0.0, 1.0, 32).min_ratio < -0.1);
+    }
+
+    #[test]
+    fn stable_wrapper_refuses_unstable_shapes() {
+        // positive control: a stable shape returns the same energy as the unchecked rule
+        let tri =
+            ezp_gauss_duffy_stable(1.0, 0.5, TRI_Y, 32).expect("triangular lattice is stable");
+        let tri_raw = ezp_gauss_duffy(1.0, 0.5, TRI_Y, 32);
+        assert!(tri_raw.is_stable() && tri_raw.e_zp == tri);
+        // negative control: the square lattice is unstable; the unchecked energy is finite (clipped) but not returned
+        let sq = ezp_gauss_duffy(1.0, 0.0, 1.0, 32);
+        assert!(sq.e_zp.is_finite() && !sq.is_stable());
+        assert!(ezp_gauss_duffy_stable(1.0, 0.0, 1.0, 32).is_none());
     }
 
     #[test]
