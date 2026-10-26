@@ -25,7 +25,7 @@ fn random_start(lx: f64, ly: f64, n: usize, dmin: f64, seed: u64) -> Vec<f64> {
     let mut x: Vec<f64> = Vec::with_capacity(2 * n);
     while x.len() < 2 * n {
         let (px, py) = (rng.uniform() * lx, rng.uniform() * ly);
-        let far = x.chunks_exact(2).all(|q| {
+        let far = x.as_chunks::<2>().0.iter().all(|q| {
             let dx = (px - q[0]) - lx * ((px - q[0]) / lx).round();
             let dy = (py - q[1]) - ly * ((py - q[1]) / ly).round();
             dx * dx + dy * dy >= dmin * dmin
@@ -51,7 +51,7 @@ fn save(out: &Path, name: &str, x: &[f64], trace: &[(f64, f64, f64)]) {
     }
     std::fs::write(out.join(format!("yukawa_{name}_trace.csv")), csv).expect("write trace");
     let mut csv = String::from("x,y\n");
-    for p in x.chunks_exact(2) {
+    for p in x.as_chunks::<2>().0 {
         let _ = writeln!(csv, "{:.10},{:.10}", p[0], p[1]);
     }
     std::fs::write(out.join(format!("yukawa_{name}_final.csv")), csv).expect("write final");
