@@ -6,6 +6,8 @@
 //! * `lattice_phonon frozen POT x y n i j ex ey RC` prints the frozen-phonon second difference and `(1/2) e^T D e`.
 //! * `lattice_phonon duffy a x y N` prints the spectral (Poisson + Duffy-Gauss) `E_zp` of `exp(-pi a r^2)`.
 //! * `lattice_phonon curv a N h` prints `c = Lap E_zp(rho)/4` at the triangular point for `exp(-pi a r^2)`.
+//! * `lattice_phonon scha a x y lam N` prints the T = 0 self-consistent-harmonic energy of `exp(-pi a r^2)` and the
+//!   harmonic `E_static + lam E_zp` on the same zone rule.
 //!
 //! Potential specs: `gauss:a`, `yukawa:kappa`, `riesz:s`, `dipolar:d`, `ring:r0,w`, `morse:alpha,r0`, `lj:sigma`,
 //! `gdiff:a1,a2,c`. CSV columns: `pot,x,y,n,rc,e_static,e_zp,e_zp_clip,lam_min,n_unstable`.
@@ -16,6 +18,7 @@ use qf_yukawa_crystal::phonon::{
     static_energy,
 };
 use qf_yukawa_crystal::phonon_spectral::{GaussPoisson, curvature_at_rho_gauss, ezp_gauss_duffy};
+use qf_yukawa_crystal::scha::{harmonic_energy, scha_solve};
 use std::fmt::Write as _;
 use std::io::Write as _;
 
@@ -186,6 +189,22 @@ fn main() -> Result<(), String> {
             println!(
                 "{{\"a\":{a},\"n\":{n},\"h\":{h},\"c\":{:.12e}}}",
                 curvature_at_rho_gauss(a, n, h)
+            );
+        }
+        "scha" => {
+            // T = 0 self-consistent harmonic approximation for the Gaussian exp(-pi a r^2)
+            let (a, x, y, lam) = (f(2)?, f(3)?, f(4)?, f(5)?);
+            let n = arg(6)?.parse::<usize>().map_err(|e| e.to_string())?;
+            let r = scha_solve(a, x, y, lam, n, 1e-14, 2000);
+            println!(
+                "{{\"a\":{a},\"x\":{x},\"y\":{y},\"lam\":{lam},\"n\":{n},\"e_scha\":{:.15e},\"kinetic\":{:.15e},\"u2\":{:.15e},\"iterations\":{},\"converged\":{},\"min_ratio\":{:.9e},\"e_harmonic\":{:.15e}}}",
+                r.energy,
+                r.kinetic,
+                r.u2,
+                r.iterations,
+                r.converged,
+                r.min_ratio,
+                harmonic_energy(a, x, y, lam, n)
             );
         }
         other => return Err(format!("unknown command {other}")),
