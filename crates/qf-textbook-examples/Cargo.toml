@@ -1,0 +1,29 @@
+[package]
+name = "qf-textbook-examples"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Worked examples for the textbook \"De la conjecture au noyau Lean\" (2026, appendix F): a stiff ODE and the Moran Kolmogorov forward equation with this repository's CVODE (BDF), a small exact-Yukawa crystal relaxation (qf-yukawa-crystal), and the sigma = 3 shell-model invariants (qf-shell-cascade). Floating-point illustrations (Tier X) only."
+
+[dependencies]
+cvode = { path = "../cvode" }
+nvector = { path = "../nvector" }
+qf-yukawa-crystal = { path = "../qf-yukawa-crystal" }
+qf-shell-cascade = { path = "../qf-shell-cascade" }
+num-complex = "0.4"
+
+[[bin]]
+name = "tb_stiff"
+path = "src/bin/tb_stiff.rs"
+
+[[bin]]
+name = "tb_moran_forward"
+path = "src/bin/tb_moran_forward.rs"
+
+[[bin]]
+name = "tb_yukawa_relax"
+path = "src/bin/tb_yukawa_relax.rs"
+
+[[bin]]
+name = "tb_shell_sigma3"
+path = "src/bin/tb_shell_sigma3.rs"
