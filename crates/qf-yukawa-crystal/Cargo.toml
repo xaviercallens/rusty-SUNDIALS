@@ -21,3 +21,7 @@ path = "src/bin/dipolar_crystal.rs"
 [[bin]]
 name = "keldysh_jellium"
 path = "src/bin/keldysh_jellium.rs"
+
+[[bin]]
+name = "lattice_phonon"
+path = "src/bin/lattice_phonon.rs"
