@@ -1,0 +1,14 @@
+[package]
+name = "qf-sandier-serfaty-table"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Tier-X cross-check, with this repository's CVODE (BDF), of the table-propagation stage of the openai/math interval certificate for triangular minimality of the planar Coulomb renormalized energy (Sandier-Serfaty): the f64 CVODE solution of the propagation ODE (s1' = t b, s2' = -2 b~ + t b~^2, ps_k' = b~ - k ps_k / t) is compared with the certificate's exact 144-bit interval enclosures."
+
+[dependencies]
+cvode = { path = "../cvode" }
+nvector = { path = "../nvector" }
+
+[[bin]]
+name = "ss_table_cvode"
+path = "src/bin/ss_table_cvode.rs"
