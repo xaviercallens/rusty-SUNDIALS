@@ -15,6 +15,9 @@ pub mod exact;
 pub mod global_opt;
 pub mod jellium;
 pub mod keldysh;
+pub mod phonon;
+pub mod phonon_spectral;
+pub mod scha;
 
 use cvode::{Cvode, DenseMat, Method, Task};
 use nvector::SerialVector;
