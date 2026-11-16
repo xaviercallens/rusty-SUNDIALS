@@ -44,8 +44,10 @@ impl Sha256 {
 
     fn compress(state: &mut [u32; 8], block: &[u8; 64]) {
         let mut w = [0u32; 64];
-        for (i, chunk) in block.chunks_exact(4).enumerate() {
-            w[i] = u32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
+        // Plain indexing: newer clippy versions reject chunks_exact with a constant size.
+        for (i, wi) in w.iter_mut().enumerate().take(16) {
+            let j = 4 * i;
+            *wi = u32::from_be_bytes([block[j], block[j + 1], block[j + 2], block[j + 3]]);
         }
         for i in 16..64 {
             let s0 = w[i - 15].rotate_right(7) ^ w[i - 15].rotate_right(18) ^ (w[i - 15] >> 3);
