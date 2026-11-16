@@ -95,6 +95,43 @@ fn git(dir: &Path, args: &[&str]) -> Result<Vec<u8>, bool> {
     }
 }
 
+/// Arguments for the dirty-tree diff whose SHA-256 is recorded. Every option that can change what `git diff`
+/// prints is pinned here (flags, plus `-c` overrides that older git versions simply ignore), so the same
+/// tracked change hashes the same under different user or repository diff settings (external diff tools,
+/// prefixes, colour, rename detection, algorithm, context size, relative paths, text conversion).
+/// `core.autocrlf` and `core.eol` are NOT overridden: they change what a working-tree file means and stay part of
+/// the repository state.
+const DIFF_ARGS: &[&str] = &[
+    "-c",
+    "core.quotepath=off",
+    "-c",
+    "color.ui=false",
+    "-c",
+    "diff.relative=false",
+    "-c",
+    "diff.noprefix=false",
+    "-c",
+    "diff.mnemonicPrefix=false",
+    "-c",
+    "diff.renames=false",
+    "-c",
+    "diff.algorithm=myers",
+    "-c",
+    "diff.context=3",
+    "-c",
+    "diff.interHunkContext=0",
+    "diff",
+    "HEAD",
+    "--binary",
+    "--full-index",
+    "--no-ext-diff",
+    "--no-textconv",
+    "--no-color",
+    "--no-renames",
+    "--src-prefix=a/",
+    "--dst-prefix=b/",
+];
+
 /// Collect git state for the checkout containing `dir`.
 pub fn collect(dir: &Path) -> GitInfo {
     match git(dir, &["rev-parse", "--git-dir"]) {
@@ -121,7 +158,7 @@ pub fn collect(dir: &Path) -> GitInfo {
         }
     }
     let dirty_diff_sha256 = if dirty {
-        match git(dir, &["diff", "HEAD", "--binary"]) {
+        match git(dir, DIFF_ARGS) {
             Ok(diff) => Some(sha256::hex_digest(&diff)),
             Err(_) => return GitInfo::failed(GitStatus::GitUnavailable),
         }
@@ -229,6 +266,42 @@ mod tests {
         let c = collect(&d);
         assert_eq!(c.untracked_count, 1);
         assert_eq!(c.dirty_diff_sha256, b.dirty_diff_sha256);
+        let _ = fs::remove_dir_all(&d);
+    }
+
+    #[test]
+    fn dirty_hash_does_not_depend_on_diff_configuration() {
+        need_git!();
+        let d = committed_repo("cfg");
+        fs::write(d.join("f.txt"), "one\ntwo\nthree\n").unwrap();
+        let before = collect(&d);
+        assert!(before.dirty, "setup: tree must be dirty");
+        let h = before.dirty_diff_sha256.clone().expect("hash when dirty");
+        // Every one of these settings changes what a plain `git diff` prints, or makes it fail outright
+        // (diff.external pointing at a program that does not exist).
+        for (k, v) in [
+            ("diff.noprefix", "true"),
+            ("diff.mnemonicPrefix", "true"),
+            ("diff.algorithm", "histogram"),
+            ("diff.context", "9"),
+            ("diff.renames", "copies"),
+            ("diff.external", "/nonexistent/diff-program"),
+            ("color.ui", "always"),
+            ("core.quotepath", "true"),
+        ] {
+            run(&d, &["config", k, v]);
+        }
+        let after = collect(&d);
+        assert_eq!(
+            after.status,
+            GitStatus::Ok,
+            "collect must not fail under odd diff settings"
+        );
+        assert_eq!(
+            after.dirty_diff_sha256,
+            Some(h),
+            "dirty-diff hash must ignore diff settings"
+        );
         let _ = fs::remove_dir_all(&d);
     }
 
