@@ -1,0 +1,12 @@
+[package]
+name = "sundials-provenance"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Build-time provenance (git SHA, dirty-tree hash, toolchain, preregistration hash) for rusty-SUNDIALS binaries and JSON outputs"
+build = "build.rs"
+
+[dependencies]
+
+[dev-dependencies]
+serde_json = "1"
