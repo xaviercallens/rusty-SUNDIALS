@@ -100,12 +100,21 @@
   },
   {
     "id": "LEAN-CI-JOB",
-    "claim": "CI job 'Verify Lean 4 Proofs' checks the proofs: it runs only lean --run cvode.lean with no axiom check, and that file fails the axiom gate (native_decide)",
+    "claim": "CI job 'Verify Lean 4 Proofs' runs scripts/lean_gate.py: a static ratchet (sorry, admit, native_decide, axiom declarations, vacuity/forgery patterns) over all 72 .lean files in proofs/lean4 against GATE_BASELINE.json, plus a compile with #print axioms and an axiom whitelist for the 44 files that import nothing; 68 files are baselined as known failing and stay failing; the old one-file 'lean --run cvode.lean' step was removed",
     "readme_line": "54",
     "tier": "C",
-    "status": "NOT_SUPPORTED",
-    "evidence": "cvode.lean FAIL-AXIOM in docs/verification/lean_gate_2026-11-15.md; .github/workflows/ci.yml job lean_proofs",
-    "checked_on": "2026-11-15"
+    "status": "SUPPORTED",
+    "evidence": "scripts/lean_gate.py and proofs/lean4/GATE_BASELINE.json; command: python3 -I scripts/lean_gate.py --selftest and --check (local run, Lean 4.34.0-rc2); the GitHub Actions run of this job on the pull request is the real test",
+    "checked_on": "2026-11-17"
+  },
+  {
+    "id": "LEAN-CI-MATHLIB",
+    "claim": "Mathlib-dependent Lean files are not compiled in CI: the 28 files with imports (Mathlib or local modules), including 2 of the 4 gate-passing files, get only the static pass there",
+    "readme_line": "54",
+    "tier": "X",
+    "status": "NOT_RUN",
+    "evidence": "scripts/lean_gate.py prints \"compile not run in CI: needs Mathlib\"; GATE_BASELINE.json field compiled_in_ci=false",
+    "checked_on": "2026-11-17"
   },
   {
     "id": "PROVENANCE-CRATE",
