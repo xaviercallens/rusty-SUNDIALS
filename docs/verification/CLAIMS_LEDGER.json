@@ -10,30 +10,30 @@
   },
   {
     "id": "PY-TESTS",
-    "claim": "134 Python tests (80 + 54) in autoresearch_agent/tests",
+    "claim": "230 Python tests in autoresearch_agent/tests pass (the earlier README figure of 134 was wrong)",
     "readme_line": "45",
-    "tier": "X",
-    "status": "UNVERIFIED",
-    "evidence": "not run; autoresearch_agent/tests",
-    "checked_on": "2026-11-15"
+    "tier": "C",
+    "status": "SUPPORTED",
+    "evidence": "python -m pytest -q at d94055a: 230 passed, 0 failed; negative control (divergence gate disabled) fails exactly test_div_b_violation_caught; details in docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md; not run in CI",
+    "checked_on": "2026-11-18"
   },
   {
     "id": "COVERAGE",
-    "claim": "Line coverage 98.4%",
+    "claim": "Line coverage of autoresearch_agent is 98.4%",
     "readme_line": "46",
-    "tier": "X",
-    "status": "UNVERIFIED",
-    "evidence": "no coverage tool was run; the README badge says not re-measured",
-    "checked_on": "2026-11-15"
+    "tier": "C",
+    "status": "NOT_SUPPORTED",
+    "evidence": "pytest --cov=autoresearch_agent (coverage.py 7.16.1) at d94055a: 49.0% including test files, 37.5% for source files only (2,002 of 5,338 statements); details in docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md",
+    "checked_on": "2026-11-18"
   },
   {
     "id": "BENCHMARKS",
-    "claim": "10 benchmarks",
+    "claim": "The README performance table (10 benchmarks, e.g. Lorenz 3,819 steps and 14,498 RHS evals) reproduces",
     "readme_line": "47",
-    "tier": "X",
-    "status": "NOT_RUN",
-    "evidence": "not re-run",
-    "checked_on": "2026-11-15"
+    "tier": "C",
+    "status": "NOT_SUPPORTED",
+    "evidence": "the ten examples were run at d94055a: step and RHS counts lower in all ten (Lorenz 686 and 2,111); cause not established; details in docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md",
+    "checked_on": "2026-11-18"
   },
   {
     "id": "NO-UNSAFE",
@@ -142,5 +142,14 @@
     "status": "SUPPORTED",
     "evidence": "command: python3 -I scripts/check_claims_ledger.py --selftest",
     "checked_on": "2026-11-17"
+  },
+  {
+    "id": "BENCH-RUN",
+    "claim": "The ten benchmark examples build and run to completion in release mode on Linux",
+    "readme_line": "47",
+    "tier": "C",
+    "status": "SUPPORTED",
+    "evidence": "cargo build --release -p examples (rustc 1.96.1) and one run each at d94055a: all ten exit 0; completion only, correctness of the results not checked; details in docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md",
+    "checked_on": "2026-11-18"
   }
 ]
