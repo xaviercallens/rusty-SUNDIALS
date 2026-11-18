@@ -11,10 +11,10 @@ Translated from [SUNDIALS CVODE](https://computing.llnl.gov/projects/sundials) (
 
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/cargo%20tests-344%20passed-brightgreen)](#verification-status)
-[![Coverage](https://img.shields.io/badge/coverage-not%20re--measured-lightgrey)](#verification-status)
+[![Coverage](https://img.shields.io/badge/python%20coverage-37.5%25%20of%20source-orange)](#verification-status)
 [![Lean 4](https://img.shields.io/badge/strict%20Lean%20gate-4%20files%20pass-orange)](#verification-status)
 [![v10 Experimental](https://img.shields.io/badge/v10--experimental-3%2F3%20proposals%20confirmed-success)](docs/SOC_v10_Peer_Review_Reproduction.md)
-[![Benchmarks](https://img.shields.io/badge/benchmarks-not%20re--run-lightgrey)](#verification-status)
+[![Benchmarks](https://img.shields.io/badge/benchmarks-run%2C%20table%20not%20reproduced-orange)](#verification-status)
 
 ---
 
@@ -42,9 +42,9 @@ Rusty-SUNDIALS is a **production-quality ODE solver** in pure Rust, born from a 
 | Claim | What was measured | Status |
 |---|---|---|
 | Rust tests | `cargo test --workspace --no-fail-fast` at commit `4e3e32d`, rustc/cargo 1.96.1: **344 passed, 0 failed, 6 ignored**, summed over all crates (an earlier run at `af4886f` gave 137 passed) | measured |
-| 134 tests | These are Python tests (80 + 54) in `autoresearch_agent/tests`; they were **not run** | not verified |
-| Line coverage 98.4% | no coverage tool was run | not verified |
-| 10 benchmarks | not re-run | not verified |
+| Python tests | `pytest` at `d94055a`: **230 passed, 0 failed** (228 s, 7 files, Python 3.11 venv not built from `requirements.txt`); the earlier count of 134 was wrong. One negative control: disabling the divergence gate makes exactly its test fail. `test_v10_suite.py` fails to collect when run alone. Not run in CI. Details: [docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md](docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md) | measured |
+| Line coverage 98.4% | `pytest --cov=autoresearch_agent` (coverage.py 7.16.1): **49.0%** of 6,548 statements including the test files, **37.5%** for the 39 source files alone; 24 files (2,709 statements) at 0%. No command giving 98.4% was found | claim **not supported**; see [docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md](docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md) |
+| 10 benchmarks | The ten examples were built in release mode and run once each at `d94055a` (Linux, rustc 1.96.1): all exit 0. The performance table's step and RHS counts **do not reproduce** (Lorenz: 686 steps and 2,111 RHS evals, table 3,819 and 14,498) and `run_benchmarks.sh` only runs on macOS. Why is not established. Details: [docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md](docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md) | runs: measured; table: **not reproduced** |
 | "zero `unsafe`" | no `unsafe` block, fn or impl in the workspace crates; two `#![forbid(unsafe_code)]` attributes in `sundials-mcp`; dependencies and macro expansions (for example PyO3) were not audited | measured for the workspace crates |
 | Lean 4 proofs | strict gate = compile plus `#print axioms`; reject `sorryAx` and any axiom outside `propext`, `Classical.choice`, `Quot.sound`; the gate's guard rejects vacuous statements. Of the **58 top-level files** in `proofs/lean4` at `af4886f`: **4 pass**, 1 fails on `sorry`, 6 on non-whitelisted axioms (mostly `native_decide`), 4 on imports, 43 fail to compile (18 of those are rejected by the gate's own vacuity/forgery guard). After a check for trivial statements, **3 files are candidates for kernel-checked status** | measured |
 
@@ -60,7 +60,9 @@ Per-file results: [`docs/verification/lean_gate_2026-11-15.md`](docs/verificatio
 
 ## 🚀 Performance on Apple Silicon
 
-All 10 scientific benchmarks complete on Apple M2 Pro (10 cores, 32 GB):
+> **Historical numbers, not reproduced.** The table below was reported for an Apple M2 Pro. When the ten examples were re-run on 2026-11-18 (commit `d94055a`, Linux) all ten completed, but the step and RHS counts were lower in every case and the run times far shorter; see [Verification status](#verification-status). Treat the table as unverified until its source is found.
+
+Reported on Apple M2 Pro (10 cores, 32 GB):
 
 | # | Benchmark | ODEs | Time | Steps | RHS Evals |
 |---|-----------|------|------|-------|-----------|
@@ -436,7 +438,7 @@ We welcome contributions! Here's the evidence-based roadmap grounded in academic
 ### v10.0 — Full Autonomous Research Pipeline *(Current — Shipped)*
 - [x] **7-Gate Research Loop**: Hypothesis → Neuro-Symbolic → Simulation → Analysis → Lean 4 → Peer Review → Publish
 - [x] **Multi-LLM Consensus**: Gemini DeepThink + Gwen + Mistral peer review (consensus ≥ 0.75 required)
-- [x] **134 Python tests** (80 core + 54 experimental) in `autoresearch_agent/tests`; not re-run in the 2026-11-15 audit
+- [x] **230 Python tests** in `autoresearch_agent/tests`, all passing at `d94055a` (measured 2026-11-18; the earlier "134" was wrong; line coverage of the source files is 37.5%, not 98.4%)
 - [ ] **Lean 4 Formal Certs**: theorems in `proofs/lean4/v10_experimental.lean`. The file does **not** compile under the strict gate (13 uses of `native_decide`; one `native_decide` proposition evaluates to false at line 141), so it is not a certificate
 - [x] **SHAP Explainability**: `speedup ≈ 77.9 + 19.1·n_dof + 9.0·block_size − 8.0·krylov_restart` (R²=0.966)
 
