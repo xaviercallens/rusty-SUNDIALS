@@ -131,10 +131,17 @@ jobs:
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
-      - name: Verify Proofs
+      - name: Pin the Lean toolchain
         run: |
-          cd proofs/lean4
-          lean --run cvode.lean
+          elan toolchain install leanprover/lean4:v4.34.0-rc2
+          elan default leanprover/lean4:v4.34.0-rc2
+          lean --version
+
+      - name: Lean gate self-test (negative and positive controls)
+        run: python3 -I scripts/lean_gate.py --selftest
+
+      - name: Lean strict gate (ratchet against proofs/lean4/GATE_BASELINE.json)
+        run: python3 -I scripts/lean_gate.py --check
 
   robertson_benchmark:
     name: Robertson Benchmark (CPU-only, no GCP)

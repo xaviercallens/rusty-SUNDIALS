@@ -1,0 +1,1285 @@
+{
+ "files": {
+  "AutoTactics.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "AutoTactics.Basic",
+    "AutoTactics.FloatBounds",
+    "AutoTactics.Convergence"
+   ],
+   "raw_sorry_incl_comments": 1,
+   "reason_class": "FAIL-IMPORT",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "AutoTactics/Basic.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 1,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 2,
+    "vacuity": 0
+   }
+  },
+  "AutoTactics/Convergence.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 1,
+    "vacuity": 0
+   }
+  },
+  "AutoTactics/FloatBounds.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 4,
+    "vacuity": 0
+   }
+  },
+  "audit_unsoundness_demo.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Data.Real.Basic",
+    "Mathlib.MeasureTheory.MeasurableSpace.Instances",
+    "Mathlib.Tactic.Linarith"
+   ],
+   "note": "measured at rusty-SUNDIALS 4e3e32d (lean_gate_head_2026-11-15.md)",
+   "raw_sorry_incl_comments": 3,
+   "reason_class": "FAIL-AXIOM",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 2,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "cvode.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-AXIOM",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 1,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 7,
+    "vacuity": 0
+   }
+  },
+  "cvode_bandpre.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "cvode_bbdpre.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "cvode_diag.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 2,
+    "vacuity": 0
+   }
+  },
+  "cvode_io.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "cvode_ls.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 1,
+    "vacuity": 0
+   }
+  },
+  "cvode_newton_convergence.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 2,
+    "vacuity": 1
+   }
+  },
+  "cvode_nls.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 1,
+    "vacuity": 0
+   }
+  },
+  "cvode_proj.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "equiv_cvode.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "equiv_cvode_bandpre.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 1
+   }
+  },
+  "equiv_cvode_bbdpre.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 2
+   }
+  },
+  "equiv_cvode_diag.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 2
+   }
+  },
+  "equiv_cvode_io.lean": {
+   "compile_expected_ok": true,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 3
+   }
+  },
+  "equiv_cvode_ls.lean": {
+   "compile_expected_ok": true,
+   "compiled_in_ci": true,
+   "expected": "PASS",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "equiv_cvode_nls.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 1
+   }
+  },
+  "equiv_cvode_proj.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 2
+   }
+  },
+  "equiv_sundials_band.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 2,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 2,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 2
+   }
+  },
+  "equiv_sundials_context.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 1
+   }
+  },
+  "equiv_sundials_dense.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 1
+   }
+  },
+  "equiv_sundials_direct.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "equiv_sundials_iterative.lean": {
+   "compile_expected_ok": true,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-AXIOM",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 3,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "equiv_sundials_linearsolver.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 1
+   }
+  },
+  "equiv_sundials_math.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "equiv_sundials_matrix.lean": {
+   "compile_expected_ok": true,
+   "compiled_in_ci": true,
+   "expected": "PASS",
+   "imports": [],
+   "note": "PASS under the full gate but flagged by the earlier triviality heuristics (conclusion True on some statement); see docs/verification/lean_gate_2026-11-15.md",
+   "raw_sorry_incl_comments": 0,
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "equiv_sundials_nonlinearsolver.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "equiv_sundials_nvector.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 1
+   }
+  },
+  "fogno_fgmres_convergence.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.InnerProductSpace.Basic",
+    "Mathlib.Analysis.Calculus.FDeriv.Basic",
+    "Mathlib.LinearAlgebra.Eigenspace.Basic"
+   ],
+   "raw_sorry_incl_comments": 2,
+   "reason_class": "FAIL-SORRY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 2,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "fusion_sop_flagno.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.LinearAlgebra.Matrix.Spectrum",
+    "Mathlib.Analysis.SpecialFunctions.Log.Basic"
+   ],
+   "note": "measured at rusty-SUNDIALS 4e3e32d (lean_gate_head_2026-11-15.md)",
+   "raw_sorry_incl_comments": 2,
+   "reason_class": "FAIL-IMPORT",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 1,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "fusion_sop_lss_hdc.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Dynamics.Ergodic.Basic",
+    "Mathlib.Analysis.MeanInequalities"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-IMPORT",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "fusion_sop_monopole.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.InnerProductSpace.Basic",
+    "Mathlib.Topology.Algebra.Module.Basic"
+   ],
+   "note": "measured at rusty-SUNDIALS 4e3e32d (lean_gate_head_2026-11-15.md)",
+   "raw_sorry_incl_comments": 3,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 2,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "geo_optimization_safety.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-AXIOM",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 2,
+    "vacuity": 0
+   }
+  },
+  "gray_scott.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Data.Real.Basic",
+    "Mathlib.Analysis.Calculus.FDeriv.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "jfnk_autodiff.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Data.Real.Basic",
+    "Mathlib.Analysis.Calculus.FDeriv.Basic",
+    "Mathlib.Analysis.Calculus.Deriv.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 1,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "master_spec.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Data.Real.Basic",
+    "Mathlib.Analysis.Calculus.FDeriv.Basic",
+    "Mathlib.Analysis.Calculus.ODE.Basic",
+    "Mathlib.LinearAlgebra.Matrix.LDU",
+    "Mathlib.Topology.MetricSpace.Cauchy",
+    "roadmap.v2_upgrades"
+   ],
+   "raw_sorry_incl_comments": 2,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 2,
+    "code_sorry": 1,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "nvector_parallel.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 2,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "photonics_safety.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-AXIOM",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 1,
+    "vacuity": 0
+   }
+  },
+  "psc_sop_biochem.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.MeanInequalities",
+    "Mathlib.Topology.Algebra.Module.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "psc_sop_ph_lyapunov.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.ODE.Gronwall",
+    "Mathlib.Analysis.SpecialFunctions.Exp"
+   ],
+   "raw_sorry_incl_comments": 1,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 1,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "psc_sop_rubisco.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.SpecialFunctions.Pow.Real"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "roadmap/v2_upgrades.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Data.Real.Basic",
+    "Mathlib.Analysis.Calculus.FDeriv.Basic",
+    "Mathlib.Analysis.Calculus.ODE.Basic",
+    "Mathlib.LinearAlgebra.Matrix.LDU",
+    "Mathlib.Topology.MetricSpace.Cauchy",
+    "Mathlib.LinearAlgebra.Matrix.DotProduct"
+   ],
+   "raw_sorry_incl_comments": 2,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 3,
+    "code_sorry": 2,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "roadmap/v3_adjoint.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.Calculus.FDeriv.Basic",
+    "Mathlib.Analysis.InnerProductSpace.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 1,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "roadmap/v3_advanced_solvers.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.Calculus.FDeriv.Basic",
+    "Mathlib.Analysis.InnerProductSpace.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 1,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "roadmap/v3_ida.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.Calculus.FDeriv.Basic",
+    "Mathlib.Analysis.InnerProductSpace.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 1,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "roadmap/v4_verified_sciml.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.Calculus.FDeriv.Basic",
+    "Mathlib.Analysis.InnerProductSpace.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "roadmap/v5_experimental_sciml.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.Calculus.FDeriv.Basic",
+    "Mathlib.Analysis.InnerProductSpace.Basic",
+    "Mathlib.Topology.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "roadmap/v6_autodiscovery.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Topology.Basic",
+    "Mathlib.Analysis.InnerProductSpace.Basic",
+    "Mathlib.MeasureTheory.Measure.MeasureSpace",
+    "Mathlib.LinearAlgebra.Matrix.NonsingularInverse"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 2,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 2
+   }
+  },
+  "roadmap/v7_edge_hardware.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Topology.Basic",
+    "Mathlib.Analysis.Calculus.FDeriv.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 2,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "roadmap/v8_phase4_disruptive.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "RustySundials"
+   ],
+   "raw_sorry_incl_comments": 3,
+   "reason_class": "FAIL-IMPORT",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 4,
+    "code_sorry": 3,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "roadmap/v8_serverless_autoresearch.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "RustySundials"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-IMPORT",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "sop1_cvode_baseline.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Mathlib.Analysis.InnerProductSpace.Basic",
+    "Mathlib.MeasureTheory.Integral.Bochner.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "sop2_flagno_scaling.lean": {
+   "compiled_in_ci": false,
+   "expected": "PASS",
+   "imports": [
+    "Mathlib.LinearAlgebra.Matrix.PosDef",
+    "Mathlib.Analysis.SpecialFunctions.Log.Basic"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "sop3_cloud_economics.lean": {
+   "compiled_in_ci": false,
+   "expected": "PASS",
+   "imports": [
+    "Mathlib.Analysis.SpecialFunctions.Pow.Real"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "sundials_band.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Std"
+   ],
+   "raw_sorry_incl_comments": 6,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 6,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "sundials_context.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 1
+   }
+  },
+  "sundials_dense.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 1,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 1,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "sundials_direct.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "Std"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "sundials_iterative.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "sundials_linearsolver.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "sundials_math.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 4,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 6
+   }
+  },
+  "sundials_matrix.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 4
+   }
+  },
+  "sundials_nonlinearsolver.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 1
+   }
+  },
+  "sundials_nvector.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 1
+   }
+  },
+  "symbiotic_cycle_safety.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-AXIOM",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 3,
+    "vacuity": 0
+   }
+  },
+  "unified_master_spec.lean": {
+   "compiled_in_ci": false,
+   "expected": "KNOWN_FAIL",
+   "imports": [
+    "AutoTactics",
+    "cvode",
+    "cvode_bandpre",
+    "cvode_bbdpre",
+    "cvode_diag",
+    "cvode_io",
+    "cvode_ls",
+    "cvode_newton_convergence",
+    "cvode_nls",
+    "cvode_proj",
+    "equiv_cvode",
+    "equiv_cvode_bandpre",
+    "equiv_cvode_bbdpre",
+    "equiv_cvode_diag",
+    "equiv_cvode_io",
+    "equiv_cvode_ls",
+    "equiv_cvode_nls",
+    "equiv_cvode_proj",
+    "equiv_sundials_band",
+    "equiv_sundials_context",
+    "equiv_sundials_dense",
+    "equiv_sundials_direct",
+    "equiv_sundials_iterative",
+    "equiv_sundials_linearsolver",
+    "equiv_sundials_math",
+    "equiv_sundials_matrix",
+    "equiv_sundials_nonlinearsolver",
+    "equiv_sundials_nvector",
+    "fogno_fgmres_convergence",
+    "fusion_sop_flagno",
+    "fusion_sop_lss_hdc",
+    "fusion_sop_monopole",
+    "geo_optimization_safety",
+    "gray_scott",
+    "jfnk_autodiff",
+    "master_spec",
+    "nvector_parallel",
+    "photonics_safety",
+    "psc_sop_biochem",
+    "psc_sop_ph_lyapunov",
+    "psc_sop_rubisco",
+    "sop1_cvode_baseline",
+    "sop2_flagno_scaling",
+    "sop3_cloud_economics",
+    "sundials_band",
+    "sundials_context",
+    "sundials_dense",
+    "sundials_direct",
+    "sundials_iterative",
+    "sundials_linearsolver",
+    "sundials_math",
+    "sundials_matrix",
+    "sundials_nonlinearsolver",
+    "sundials_nvector",
+    "symbiotic_cycle_safety",
+    "v10_experimental",
+    "v8_experimental"
+   ],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-IMPORT",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 0,
+    "vacuity": 0
+   }
+  },
+  "v10_experimental.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 1,
+   "reason_class": "FAIL-COMPILE",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 13,
+    "vacuity": 0
+   }
+  },
+  "v8_experimental.lean": {
+   "compile_expected_ok": false,
+   "compiled_in_ci": true,
+   "expected": "KNOWN_FAIL",
+   "imports": [],
+   "raw_sorry_incl_comments": 0,
+   "reason_class": "FAIL-AXIOM",
+   "static": {
+    "admit": 0,
+    "axiom_decls": 0,
+    "code_sorry": 0,
+    "forgery": 0,
+    "native_decide": 4,
+    "vacuity": 0
+   }
+  }
+ },
+ "meta": {
+  "generated_at_commit": "6b6070050b914008fe746013d2346116492dc9a0",
+  "generated_utc": "2026-11-17",
+  "lean_version": "Lean (version 4.34.0-rc2, x86_64-unknown-linux-gnu, commit 6a10ac8c22beadecabdbb0919c2b50214762f91d, Release)",
+  "reason_classes_source": "docs/verification/lean_gate_2026-11-15.md (full Lean gate with a Mathlib build, 2026-11-15); audit_unsoundness_demo/fusion_sop_flagno/fusion_sop_monopole from lean_gate_head_2026-11-15.md",
+  "rules": "see scripts/lean_gate.py --check",
+  "tool": "scripts/lean_gate.py --write-baseline"
+ },
+ "schema": 1
+}
