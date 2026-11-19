@@ -17,6 +17,7 @@ mod adjoint;
 mod builder;
 mod constants;
 mod error;
+mod monitor;
 mod nordsieck;
 mod solver;
 mod step;
@@ -25,6 +26,7 @@ pub use adjoint::{AdjointSolver, Checkpoint};
 pub use builder::CvodeBuilder;
 pub use constants::{Method, Task};
 pub use error::CvodeError;
+pub use monitor::{AtolMonitorReport, ComponentReport};
 pub use solver::Cvode;
 /// Re-exported for use in analytical Jacobian closures passed to `.jacobian()`.
 pub use sundials_core::generated::sundials_dense::DenseMat;
