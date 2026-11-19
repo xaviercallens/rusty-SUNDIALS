@@ -151,5 +151,14 @@
     "status": "SUPPORTED",
     "evidence": "cargo build --release -p examples (rustc 1.96.1) and one run each at d94055a: all ten exit 0; completion only, correctness of the results not checked; details in docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md",
     "checked_on": "2026-11-18"
+  },
+  {
+    "id": "FORMAL-PROOFS-DIR",
+    "claim": "The separate formal_proofs/ Lean project contains verified proofs about the solver",
+    "readme_line": "51",
+    "tier": "C",
+    "status": "NOT_SUPPORTED",
+    "evidence": "RustySundialsProofs.lean is 'theorem test : 1 + 1 = 2 := by sorry': compiled with Lean 4.34.0-rc2, exit 0, '#print axioms' gives [sorryAx], so the strict gate rejects it; RustySundials.lean defines is_divergence_free as True (its only theorem reads True -> True and is proved by sorry) and is not a target of the lakefile, which requires only repl; an earlier audit (docs/audit/fusion-2026-09-27) found the same and a parse error in that file; the directory was removed in this change",
+    "checked_on": "2026-11-18"
   }
 ]
