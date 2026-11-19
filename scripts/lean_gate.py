@@ -93,7 +93,10 @@ _FORGERY_PATTERNS = (
     r"(?:^|\s)(?:macro_rules|(?:local|scoped)\s+notation)\b",
 )
 _VACUITY_PATTERNS = (
-    r"\b(?:theorem|lemma)\s+([^\s:({\[]+)(?:(?!:=)[\s\S])*:\s*True\s*:=",
+    # The text between the name and ': True :=' may contain ':=' (for example 'let a := ...' in a
+    # hypothesis), so it is bounded by the next declaration keyword, not by the first ':='.
+    r"\b(?:theorem|lemma)\s+([^\s:({\[]+)"
+    r"(?:(?!\b(?:theorem|lemma|def|abbrev|instance|structure|inductive|namespace|end)\b)[\s\S])*?:\s*True\s*:=",
     r"\b(?:abbrev|def)\s+([^\s:({\[]+)(?:(?!:=)[^\n])*:=\s*(?:True|Trivial)\b",
 )
 _AXIOM_DECL = r"(?m)^\s*(?:@\[[^\]]*\]\s*)*(?:(?:private|protected|noncomputable|unsafe)\s+)*axiom\b"
@@ -410,6 +413,9 @@ def cmd_selftest(lean: str) -> int:
         "theorem proved with native_decide": "theorem nd : 2 + 2 = 4 := by native_decide\n",
         "custom axiom used by a theorem": "axiom foo : False\ntheorem t : 1 = 2 := foo.elim\n",
         "vacuous 'theorem t : True := trivial'": "theorem t : True := trivial\n",
+        # regression (2026-11-19): a ':=' inside a hypothesis used to hide the ': True :=' conclusion
+        "vacuous True conclusion after a hypothesis containing ':='":
+            "theorem t (h : (let a := 1; a) = 1) : True := by trivial\n",
         "sorry in code after a comment mentioning it": "/- not sorry here -/\ntheorem s : 1 = 2 := by sorry\n",
     }
     for label, src in reject.items():
@@ -444,6 +450,16 @@ def cmd_selftest(lean: str) -> int:
     print(f"selftest {'ok  ' if ok else 'FAIL'} ACCEPT expected: theorem two : 1 + 1 = 2 := rfl  [{why}]")
     if not ok:
         failures.append("rejected the good theorem")
+    # the widened vacuity rule must not over-match: a ':=' in a hypothesis with a real conclusion, and a
+    # True hypothesis followed by further declarations, are fine
+    for label, src in (
+        ("a ':=' inside a hypothesis with a real conclusion", "theorem u (h : (let a := 1; a) = 1) : 2 = 2 := rfl\n"),
+        ("a True hypothesis with a real conclusion", "theorem v (h : True) : 3 = 3 := rfl\ntheorem w : 4 = 4 := rfl\n"),
+    ):
+        ok, why = judge(src)
+        print(f"selftest {'ok  ' if ok else 'FAIL'} ACCEPT expected: {label}  [{why}]")
+        if not ok:
+            failures.append(f"rejected: {label}")
     # namespace-aware naming must produce a name Lean accepts
     ns_src = "namespace A\nnamespace B\ntheorem inner : 1 + 1 = 2 := rfl\nend B\ntheorem outer : 2 = 2 := rfl\nend A\n"
     ok, why = compile_file(ns_src, lean)

@@ -473,17 +473,18 @@
   "equiv_sundials_matrix.lean": {
    "compile_expected_ok": true,
    "compiled_in_ci": true,
-   "expected": "PASS",
+   "expected": "KNOWN_FAIL",
    "imports": [],
-   "note": "PASS under the full gate but flagged by the earlier triviality heuristics (conclusion True on some statement); see docs/verification/lean_gate_2026-11-15.md",
+   "note": "theorem new_empty_post_ops_null has the conclusion True (proved by trivial); the first version of scripts/lean_gate.py missed it because a ':=' inside the theorem's hypothesis ended the pattern early; fixed 2026-11-19, so this file is no longer a gate-passing file",
    "raw_sorry_incl_comments": 0,
+   "reason_class": "VACUITY",
    "static": {
     "admit": 0,
     "axiom_decls": 0,
     "code_sorry": 0,
     "forgery": 0,
     "native_decide": 0,
-    "vacuity": 0
+    "vacuity": 1
    }
   },
   "equiv_sundials_nonlinearsolver.lean": {
@@ -1274,8 +1275,8 @@
   }
  },
  "meta": {
-  "generated_at_commit": "6b6070050b914008fe746013d2346116492dc9a0",
-  "generated_utc": "2026-11-17",
+  "generated_at_commit": "b85156b1558d1f3b265ef44e4a327de1e8001f0b",
+  "generated_utc": "2026-11-19",
   "lean_version": "Lean (version 4.34.0-rc2, x86_64-unknown-linux-gnu, commit 6a10ac8c22beadecabdbb0919c2b50214762f91d, Release)",
   "reason_classes_source": "docs/verification/lean_gate_2026-11-15.md (full Lean gate with a Mathlib build, 2026-11-15); audit_unsoundness_demo/fusion_sop_flagno/fusion_sop_monopole from lean_gate_head_2026-11-15.md",
   "rules": "see scripts/lean_gate.py --check",
