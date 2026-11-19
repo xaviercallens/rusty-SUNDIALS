@@ -169,5 +169,14 @@
     "status": "SUPPORTED",
     "evidence": "scripts/lean_gate.py --selftest: the new control 'vacuous True conclusion after a hypothesis containing :=' reported static=clean, compile=ok (accepted) on the old pattern and is rejected (vacuity=1) on the fixed one; two accept controls guard against over-matching; --check shows only equiv_sundials_matrix.lean changing; regenerated baseline 3 PASS and 69 KNOWN_FAIL",
     "checked_on": "2026-11-19"
+  },
+  {
+    "id": "ATOL-MONITOR",
+    "claim": "An opt-in read-only monitor in the cvode crate flags Robertson y2 (atol-dominated error test with a stiff Jacobian column) at the four published tolerances, does not flag y2 when atol is small, and flagged 1 of 10 well-posed example runs (hires y8); it does not estimate the global error and does not reproduce the 169x/486x table",
+    "readme_line": "none",
+    "tier": "C",
+    "status": "SUPPORTED",
+    "evidence": "preregistered in docs/verification/PREREG_ATOL_MONITOR_2026-11-19.md (commit 0b4939f); results in docs/verification/ATOL_MONITOR_RESULTS_2026-11-19.md at 95ca3a9: positive 4/4, small-atol negative not flagged, 1/10 well-posed runs flagged (0.64% of component-steps), monitor-on solution bit-identical in all 16 runs; 4 of the 10 controls use Adams and cannot flag by construction; one problem class of positive evidence",
+    "checked_on": "2026-11-19"
   }
 ]
