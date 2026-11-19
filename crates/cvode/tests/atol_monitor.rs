@@ -93,10 +93,11 @@ fn adams_run_is_bit_identical_and_cannot_flag() -> Result<(), CvodeError> {
             f[1] = 1e-6 * y[0] - y[1];
             Ok(())
         };
-        let mut solver = Cvode::builder(Method::Adams)
-            .rtol(1e-4)
-            .atol(1e-7)
-            .build(rhs, 0.0, SerialVector::from_slice(&[1.0, 0.0]))?;
+        let mut solver = Cvode::builder(Method::Adams).rtol(1e-4).atol(1e-7).build(
+            rhs,
+            0.0,
+            SerialVector::from_slice(&[1.0, 0.0]),
+        )?;
         if monitor {
             solver.enable_atol_monitor();
         }

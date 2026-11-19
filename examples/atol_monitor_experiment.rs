@@ -225,7 +225,13 @@ fn problems() -> Vec<Problem> {
         analytic_robertson_jac: false,
     };
     let mut v = Vec::new();
-    for &(rtol, atol) in &[(1e-4, 1e-7), (1e-6, 1e-9), (1e-8, 1e-11), (1e-10, 1e-10), (1e-10, 1e-13)] {
+    for &(rtol, atol) in &[
+        (1e-4, 1e-7),
+        (1e-6, 1e-9),
+        (1e-8, 1e-11),
+        (1e-10, 1e-10),
+        (1e-10, 1e-13),
+    ] {
         let mut p = mk(
             &format!("robertson rtol={rtol:e} atol={atol:e}"),
             "positive",
@@ -255,8 +261,28 @@ fn problems() -> Vec<Problem> {
     v.push(p);
     let (r, a) = (1e-3, 1e-5);
     let neg = "negative";
-    v.push(mk("lorenz", neg, Method::Bdf, r, a, Some(1), vec![1.0, 1.0, 1.0], grid(0.25, 20), lorenz_rhs));
-    v.push(mk("hodgkin_huxley", neg, Method::Bdf, r, a, None, hh_y0, grid(0.5, 20), hh_rhs));
+    v.push(mk(
+        "lorenz",
+        neg,
+        Method::Bdf,
+        r,
+        a,
+        Some(1),
+        vec![1.0, 1.0, 1.0],
+        grid(0.25, 20),
+        lorenz_rhs,
+    ));
+    v.push(mk(
+        "hodgkin_huxley",
+        neg,
+        Method::Bdf,
+        r,
+        a,
+        None,
+        hh_y0,
+        grid(0.5, 20),
+        hh_rhs,
+    ));
     v.push(mk(
         "sir_epidemic",
         neg,
@@ -268,7 +294,17 @@ fn problems() -> Vec<Problem> {
         vec![5.0, 10.0, 20.0, 30.0, 50.0, 75.0, 100.0, 150.0, 200.0],
         sir_rhs,
     ));
-    v.push(mk("lotka_volterra", neg, Method::Adams, r, a, None, vec![10.0, 5.0], grid(0.5, 20), lv_rhs));
+    v.push(mk(
+        "lotka_volterra",
+        neg,
+        Method::Adams,
+        r,
+        a,
+        None,
+        vec![10.0, 5.0],
+        grid(0.5, 20),
+        lv_rhs,
+    ));
     v.push(mk(
         "hires",
         neg,
@@ -280,10 +316,50 @@ fn problems() -> Vec<Problem> {
         vec![0.5, 1.0, 5.0, 10.0, 50.0, 100.0],
         hires_rhs,
     ));
-    v.push(mk("double_pendulum", neg, Method::Bdf, r, a, None, vec![1.5, 0.0, 1.0, 0.0], grid(0.25, 20), dp_rhs));
-    v.push(mk("rigid_body", neg, Method::Adams, r, a, None, vec![1.0, 0.0, 0.9], grid(0.5, 20), rb_rhs));
-    v.push(mk("rossler", neg, Method::Bdf, r, a, None, vec![1.0, 1.0, 0.0], grid(1.0, 20), rossler_rhs));
-    v.push(mk("fitzhugh_nagumo", neg, Method::Adams, r, a, None, vec![-1.0, 1.0], grid(5.0, 20), fn_rhs));
+    v.push(mk(
+        "double_pendulum",
+        neg,
+        Method::Bdf,
+        r,
+        a,
+        None,
+        vec![1.5, 0.0, 1.0, 0.0],
+        grid(0.25, 20),
+        dp_rhs,
+    ));
+    v.push(mk(
+        "rigid_body",
+        neg,
+        Method::Adams,
+        r,
+        a,
+        None,
+        vec![1.0, 0.0, 0.9],
+        grid(0.5, 20),
+        rb_rhs,
+    ));
+    v.push(mk(
+        "rossler",
+        neg,
+        Method::Bdf,
+        r,
+        a,
+        None,
+        vec![1.0, 1.0, 0.0],
+        grid(1.0, 20),
+        rossler_rhs,
+    ));
+    v.push(mk(
+        "fitzhugh_nagumo",
+        neg,
+        Method::Adams,
+        r,
+        a,
+        None,
+        vec![-1.0, 1.0],
+        grid(5.0, 20),
+        fn_rhs,
+    ));
     v.push(mk(
         "three_body",
         neg,
@@ -291,7 +367,9 @@ fn problems() -> Vec<Problem> {
         r,
         a,
         None,
-        vec![-0.5, 0.0, 0.5, 0.0, 0.0, 0.866, 0.0, 0.5, 0.0, -0.5, -0.5, 0.0],
+        vec![
+            -0.5, 0.0, 0.5, 0.0, 0.0, 0.866, 0.0, 0.5, 0.0, -0.5, -0.5, 0.0,
+        ],
         grid(0.25, 20),
         three_body_rhs,
     ));
@@ -303,7 +381,9 @@ fn main() {
     let mut ten_runs = 0usize;
     let (mut ten_hits, mut ten_cs, mut ten_atol_dom) = (0usize, 0usize, 0usize);
     let mut all_identical = true;
-    println!("RUN | group | status | steps | nfe | bit_identical | flagged_components | per-component hit/atol_dom/jac_stiff/monitored");
+    println!(
+        "RUN | group | status | steps | nfe | bit_identical | flagged_components | per-component hit/atol_dom/jac_stiff/monitored"
+    );
     for p in problems() {
         let off = run(&p, false);
         let on = run(&p, true);
@@ -329,7 +409,12 @@ fn main() {
         let comps: Vec<String> = rep
             .components
             .iter()
-            .map(|c| format!("{}/{}/{}/{}", c.steps_hit, c.steps_atol_dominated, c.steps_jac_stiff, c.steps_monitored))
+            .map(|c| {
+                format!(
+                    "{}/{}/{}/{}",
+                    c.steps_hit, c.steps_atol_dominated, c.steps_jac_stiff, c.steps_monitored
+                )
+            })
             .collect();
         println!(
             "{} | {} | ok | {} | {} | {} | {:?} | {}",
