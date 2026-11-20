@@ -1,0 +1,9 @@
+# Python coverage for the autoresearch_agent package. The test files are excluded:
+# counting them made the old README figure (98.4%) meaningless, because tests cover themselves.
+[run]
+source = autoresearch_agent
+omit =
+    autoresearch_agent/tests/*
+
+[report]
+show_missing = False
