@@ -2,11 +2,13 @@
 rusty-SUNDIALS v10 — Full Validation Test Suite
 Run: pytest tests/test_v10_suite.py -v -p no:xvfb
 """
-import json, sys, math
+import json, sys, math, os
 import numpy as np
 import pytest
 
-sys.path.insert(0, "..")
+# Relative to this file, not to the current directory: the old `".."` only worked
+# when other test files had already added the package directory to sys.path.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Component 1 — Physics Validator (5-gate)

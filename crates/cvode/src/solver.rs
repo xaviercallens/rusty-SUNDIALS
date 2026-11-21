@@ -26,6 +26,7 @@ use crate::constants::{
 #[cfg(feature = "experimental-nls-v2")]
 use crate::constants::{NLS_COEF, NLS_MIN_TOL};
 use crate::error::CvodeError;
+use crate::monitor::{AtolMonitor, AtolMonitorReport};
 use crate::nordsieck::NordsieckArray;
 use crate::step;
 use sundials_core::generated::sundials_dense::DenseMat;
@@ -136,6 +137,9 @@ pub struct Cvode<F> {
     // --- Optional analytical Jacobian ---
     jac: Option<Box<dyn FnMut(Real, &[Real], &mut DenseMat) -> Result<(), String> + Send + Sync>>,
 
+    // --- Optional read-only atol-dominance monitor (off by default) ---
+    atol_monitor: Option<AtolMonitor>,
+
     // --- Status ---
     initialized: bool,
 
@@ -223,6 +227,7 @@ where
             etamax: ETA_MAX_FIRST,
             rhs,
             jac,
+            atol_monitor: None,
             initialized: false,
             #[cfg(feature = "experimental-nls-v2")]
             prev_acor_norm: NLS_TOL, // H6: start with standard tol until first step
@@ -242,6 +247,19 @@ where
             Task::Normal => self.solve_normal(tout),
             Task::OneStep => self.solve_one_step(tout),
         }
+    }
+
+    /// Enable the opt-in atol-dominance monitor (off by default).
+    ///
+    /// Read-only: it never changes a step, a result or any solver state, and
+    /// triggers no extra Jacobian or RHS evaluation. Counters restart from zero.
+    pub fn enable_atol_monitor(&mut self) {
+        self.atol_monitor = Some(AtolMonitor::new(self.n));
+    }
+
+    /// Per-component counters and flags, or `None` if the monitor is not enabled.
+    pub fn atol_monitor_report(&self) -> Option<AtolMonitorReport> {
+        self.atol_monitor.as_ref().map(AtolMonitor::report)
     }
 
     pub fn t(&self) -> Real {
@@ -715,6 +733,15 @@ where
                     self.atol,
                     self.ewt.as_mut_slice(),
                 );
+
+                if let Some(mon) = self.atol_monitor.as_mut() {
+                    mon.observe(
+                        self.zn.solution().as_slice(),
+                        self.rtol,
+                        self.atol,
+                        self.jac_mat.as_ref().map(|j| j.cols.as_slice()),
+                    );
+                }
 
                 if self.method == Method::Adams {
                     self.adams_complete_step(err_norm, l_0);

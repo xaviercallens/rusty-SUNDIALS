@@ -4,17 +4,17 @@
 
 ### *"From Formal Specification to Fearless Computation"*
 
-**A neuro-symbolic AI-generated, formally verified ODE solver in pure Rust**
+**A neuro-symbolic AI-generated ODE solver in pure Rust, with partial Lean 4 specifications** (see [Verification status](#verification-status))
 Translated from [SUNDIALS CVODE](https://computing.llnl.gov/projects/sundials) (44K LOC C → idiomatic Rust)
 
 [![Live Dashboard](https://img.shields.io/badge/Mission_Control-LIVE-00e5ff?style=flat&logo=googlecloud)](https://rusty-sundials-autoresearch-1003063861791.europe-west1.run.app)
 
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-134%20passed-brightgreen)](autoresearch_agent/tests/)
-[![Coverage](https://img.shields.io/badge/coverage-98.4%25%20lines-brightgreen)]()
-[![Lean 4](https://img.shields.io/badge/proofs-34%20Lean%204%20specs-blueviolet)](proofs/lean4/)
+[![Tests](https://img.shields.io/badge/cargo%20tests-344%20passed-brightgreen)](#verification-status)
+[![Coverage](https://img.shields.io/badge/python%20coverage-37.5%25%20of%20source-orange)](#verification-status)
+[![Lean 4](https://img.shields.io/badge/strict%20Lean%20gate-4%20files%20pass-orange)](#verification-status)
 [![v10 Experimental](https://img.shields.io/badge/v10--experimental-3%2F3%20proposals%20confirmed-success)](docs/SOC_v10_Peer_Review_Reproduction.md)
-[![Benchmarks](https://img.shields.io/badge/benchmarks-10%2F10%20✓-success)]()
+[![Benchmarks](https://img.shields.io/badge/benchmarks-run%2C%20table%20not%20reproduced-orange)](#verification-status)
 
 ---
 
@@ -27,17 +27,42 @@ Translated from [SUNDIALS CVODE](https://computing.llnl.gov/projects/sundials) (
 Rusty-SUNDIALS is a **production-quality ODE solver** in pure Rust, born from a complete neuro-symbolic migration of Lawrence Livermore National Laboratory's legendary SUNDIALS CVODE solver. It combines:
 
 - 🧠 **AI-assisted code generation** via the SocrateAI SpecToRust pipeline
-- 📐 **Formal verification** with 20 Lean 4 proof specifications
-- 🦀 **Rust's safety guarantees** — zero `unsafe`, memory-safe, thread-safe
+- 📐 **Lean 4 specifications**: partial. Only a few files pass a strict, axiom-checked gate (see [Verification status](#verification-status))
+- 🦀 **Rust's safety guarantees**: no `unsafe` code in the workspace crates (dependencies not audited)
 - ⚡ **Modern hardware optimization** — SIMD NEON, 10-core parallelism, BDF orders 1-5
 
 > **Motto:** *"From Formal Specification to Fearless Computation"*
 >
-> We believe scientific software should be **proven correct before it runs**, not debugged after it fails. Rusty-SUNDIALS demonstrates that AI can generate code that is not only fast, but formally grounded in mathematical truth.
+> We believe scientific software should be **proven correct before it runs**, not debugged after it fails. Rusty-SUNDIALS is an attempt in that direction; what is and is not checked today is stated in [Verification status](#verification-status).
+
+## Verification status
+
+*Independent audit of 2026-11-15 by an AI agent under the repository owner's direction; not a human audit. Earlier statements in this README that claimed more than the measurements below were corrected in the same change.*
+
+| Claim | What was measured | Status |
+|---|---|---|
+| Rust tests | `cargo test --workspace --no-fail-fast` at commit `4e3e32d`, rustc/cargo 1.96.1: **344 passed, 0 failed, 6 ignored**, summed over all crates (an earlier run at `af4886f` gave 137 passed) | measured |
+| Python tests | `pytest` at `d94055a`: **230 passed, 0 failed** (228 s, 7 files, Python 3.11 venv not built from `requirements.txt`); the earlier count of 134 was wrong. One negative control: disabling the divergence gate makes exactly its test fail. `test_v10_suite.py` fails to collect when run alone. Not run in CI. Details: [docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md](docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md) | measured |
+| Line coverage 98.4% | `pytest --cov=autoresearch_agent` (coverage.py 7.16.1): **49.0%** of 6,548 statements including the test files, **37.5%** for the 39 source files alone; 24 files (2,709 statements) at 0%. No command giving 98.4% was found | claim **not supported**; see [docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md](docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md) |
+| 10 benchmarks | The ten examples were built in release mode and run once each at `d94055a` (Linux, rustc 1.96.1): all exit 0. The performance table's step and RHS counts **do not reproduce** (Lorenz: 686 steps and 2,111 RHS evals, table 3,819 and 14,498) and `run_benchmarks.sh` only runs on macOS. Why is not established. Details: [docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md](docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md) | runs: measured; table: **not reproduced** |
+| "zero `unsafe`" | no `unsafe` block, fn or impl in the workspace crates; two `#![forbid(unsafe_code)]` attributes in `sundials-mcp`; dependencies and macro expansions (for example PyO3) were not audited | measured for the workspace crates |
+| Lean 4 proofs | strict gate = compile plus `#print axioms`; reject `sorryAx` and any axiom outside `propext`, `Classical.choice`, `Quot.sound`; the gate's guard rejects vacuous statements. Of the **58 top-level files** in `proofs/lean4` at `af4886f`: **4 pass**, 1 fails on `sorry`, 6 on non-whitelisted axioms (mostly `native_decide`), 4 on imports, 43 fail to compile (18 of those are rejected by the gate's own vacuity/forgery guard). After a check for trivial statements, 3 files remained candidates; a statement review on 2026-11-19 ([docs/verification/LEAN_STATEMENT_REVIEW_2026-11-19.md](docs/verification/LEAN_STATEMENT_REVIEW_2026-11-19.md)) found that they prove nothing about the solver's numerics (two are vacuous or arithmetic on constants, one relates two hand-written three-branch models), so **none is called Tier A** | measured |
+
+**What this does not show.** A failing file is not necessarily a wrong proof: the gate ran Lean 4.34.0-rc2 with a partial Mathlib, `proofs/lean4` pins no toolchain (a separate `formal_proofs/` template project, which held only a `sorry` placeholder and a specification whose divergence-free predicate was defined as `True`, was gated on 2026-11-18 and removed; see the claims ledger), and some failures are missing modules. Statement fidelity to the C code was not assessed. Non-vacuity was checked only by simple heuristics.
+
+**Specific findings.**
+- The CI job "Verify Lean 4 Proofs" (previously `lean --run cvode.lean` on one file, with no axiom check) now runs `python3 -I scripts/lean_gate.py`: a self-test with negative controls, then a ratchet over every `.lean` file in `proofs/lean4` against `proofs/lean4/GATE_BASELINE.json`. Static pass for all files (`sorry`, `admit`, `native_decide`, `axiom` declarations, vacuous `: True` statements, output-forgery constructs); compile with `#print axioms` and the axiom whitelist only for the files that import nothing. **Files that import Mathlib or local modules are not compiled in CI** (that needs a Mathlib build): 28 of 72, including 2 of the 3 files that pass the full gate. The baseline lists 69 known-failing files; they are not hidden and may not get worse, and any new file must be clean. The gate checks axioms and obvious vacuity, not whether a statement means what its name claims. A first version missed one vacuous `: True` theorem when a hypothesis contained `:=`; fixed on 2026-11-19, which moved `equiv_sundials_matrix.lean` from passing to known failing.
+- `v10_experimental.lean` has 30 theorems, 17 flagged as trivial or vacuous, and does not compile (a `native_decide` proposition evaluates to false at line 141).
+- `fusion_sop_flagno.lean` and `fusion_sop_monopole.lean` depend on "telemetry oracle" axioms; `audit_unsoundness_demo.lean` in this repository derives `False` from them. They are not verified results.
+- `sorry`: 27 raw occurrences in 13 of the 71 Lean files (17 in code, 10 in comments).
+
+Per-file results: [`docs/verification/lean_gate_2026-11-15.md`](docs/verification/lean_gate_2026-11-15.md) and [`docs/verification/lean_gate_head_2026-11-15.md`](docs/verification/lean_gate_head_2026-11-15.md). Method: the gate is `anse/formal/lean_runner.py` of [AutoevolveAI](https://github.com/xaviercallens/AutoevolveAI) (commit `f55ccdf`), run on staged copies with `#print axioms` appended; the files were not modified.
 
 ## 🚀 Performance on Apple Silicon
 
-All 10 scientific benchmarks complete on Apple M2 Pro (10 cores, 32 GB):
+> **Historical numbers, not reproduced.** The table below was reported for an Apple M2 Pro. When the ten examples were re-run on 2026-11-18 (commit `d94055a`, Linux) all ten completed, but the step and RHS counts were lower in every case and the run times far shorter; see [Verification status](#verification-status). Treat the table as unverified until its source is found.
+
+Reported on Apple M2 Pro (10 cores, 32 GB):
 
 | # | Benchmark | ODEs | Time | Steps | RHS Evals |
 |---|-----------|------|------|-------|-----------|
@@ -185,7 +210,7 @@ rusty-sundials/
 ├── mission-control/       # React/Vite NASA-style dashboard (live on Cloud Run)
 ├── examples/              # 10 scientific benchmarks
 ├── proofs/lean4/
-│   ├── v10_experimental.lean    # 20 theorems: Gate 2b + P2 + P3 + SHAP (zero sorry)
+│   ├── v10_experimental.lean    # theorems for Gate 2b + P2 + P3 + SHAP; does not compile under the strict gate (see Verification status)
 │   └── ...                      # 14 prior formal specifications
 ├── docs/
 │   ├── v10_AutoResearch_Roadmap.md
@@ -238,7 +263,7 @@ graph LR
 | Traditional Migration | SocrateAI SpecToRust |
 |----------------------|---------------------|
 | Manual line-by-line rewrite | AI-assisted with formal guidance |
-| No formal guarantees | 20 Lean 4 specifications |
+| No formal guarantees | Lean 4 specifications (partial; see Verification status) |
 | Preserves C idioms | Idiomatic Rust (traits, RAII, Result) |
 | Manual memory management | Ownership-based safety |
 | Hope-based testing | Proof-grounded trust certificates |
@@ -246,7 +271,7 @@ graph LR
 
 ### Formal Specifications (Lean 4)
 
-20 formal proof files cover the complete solver stack:
+The Lean files below are specifications of parts of the solver stack. Most do not pass the strict gate (see [Verification status](#verification-status)); the table lists intended pairings, not verified results:
 
 | Module | Lean File | Equivalence Proof |
 |--------|-----------|-------------------|
@@ -275,14 +300,10 @@ Each module has a JSON trust certificate in `docs/verification/`:
 
 ```bash
 cargo test --workspace
-# test result: ok. 104 passed; 0 failed
+# 2026-11-15, commit 4e3e32d, rustc 1.96.1: 344 passed; 0 failed; 6 ignored (summed over all crates)
 ```
 
-| Crate | Tests | Coverage |
-|-------|-------|----------|
-| `cvode` | 4 | Exponential decay, linear growth, BDF convergence, step control |
-| `nvector` | 10 | Serial, SIMD, Parallel: dot, wrms_norm, linear_sum |
-| `sundials-core` | 90 | 98.38% line / 99.53% function — all modules ≥90% |
+Per-crate counts and the earlier 98.38% line-coverage figure were not re-derived in the 2026-11-15 audit; see [Verification status](#verification-status).
 
 ## 🌐 Interactive Web Lab — 30 Use Cases
 
@@ -417,8 +438,8 @@ We welcome contributions! Here's the evidence-based roadmap grounded in academic
 ### v10.0 — Full Autonomous Research Pipeline *(Current — Shipped)*
 - [x] **7-Gate Research Loop**: Hypothesis → Neuro-Symbolic → Simulation → Analysis → Lean 4 → Peer Review → Publish
 - [x] **Multi-LLM Consensus**: Gemini DeepThink + Gwen + Mistral peer review (consensus ≥ 0.75 required)
-- [x] **81/81 → 134/134 Tests Passing**: Full v10 + experimental suites
-- [x] **Lean 4 Formal Certs**: 20 new theorems in `proofs/lean4/v10_experimental.lean` (zero `sorry`)
+- [x] **230 Python tests** in `autoresearch_agent/tests`, all passing at `d94055a` (measured 2026-11-18; the earlier "134" was wrong; line coverage of the source files is 37.5%, not 98.4%)
+- [ ] **Lean 4 Formal Certs**: theorems in `proofs/lean4/v10_experimental.lean`. The file does **not** compile under the strict gate (13 uses of `native_decide`; one `native_decide` proposition evaluates to false at line 141), so it is not a certificate
 - [x] **SHAP Explainability**: `speedup ≈ 77.9 + 19.1·n_dof + 9.0·block_size − 8.0·krylov_restart` (R²=0.966)
 
 ### v11.0 Release — ITER Disruption Visualizations & Education Kit 🚀
@@ -435,8 +456,8 @@ We welcome contributions! Here's the evidence-based roadmap grounded in academic
 - Explains magnetic confinement, thermal quench disruptions, and how our `Neural-FGMRES` SciML preconditioner solves these instabilities 150x faster.
 
 **3. Lean 4 Formal Verification Unified Spec**
-- Successfully resolved and imported all 50+ individual Lean 4 proof modules into a single, cohesive `unified_master_spec.lean`. 
-- Provides an end-to-end, mathematically verified proof of correctness for the entire rusty-SUNDIALS V11 physics engine.
+- A single file `unified_master_spec.lean` imports the individual Lean 4 modules. 
+- It is **not** an end-to-end proof of correctness of the solver: in the 2026-11-15 audit most of the Lean files failed the strict gate (see [Verification status](#verification-status)).
 
 ### v10.0 Experimental Mode — 3 Validated Proposals
 > Activate with `--experimental` or `EXPERIMENTAL=1`
@@ -494,8 +515,8 @@ We believe in transparency. Here is an honest comparison between what a premium 
 | Rust Idioms | ❌ C idioms | ✅ Traits, RAII, Result |
 | Hardware Use | ❌ Sequential | ✅ NEON + 10-core Rayon |
 | Numerical Accuracy | ⚠️ O(ε) finite-diff | ✅ Exact AutoDiff |
-| Formal Proofs | ❌ None | ✅ 21 Lean 4 specs |
-| Trust Level | ⚠️ "Probably correct" | ✅ Mathematically guaranteed |
+| Formal Proofs | ❌ None | ⚠️ Lean 4 specifications, partial (3 files pass the strict gate and none of them is evidence about the solver's numerics; see the [statement review](docs/verification/LEAN_STATEMENT_REVIEW_2026-11-19.md)) |
+| Trust Level | ⚠️ "Probably correct" | ⚠️ Tested; partially specified in Lean |
 | **Total** | **31/80** | **79/80** |
 
 → Full analysis: [docs/NEUROSYMBOLIC_EVALUATION.md](docs/NEUROSYMBOLIC_EVALUATION.md) · [Interactive Demo](webapp/neurosymbolic.html)
@@ -567,7 +588,7 @@ The SpecToRust migration was powered by [SocrateAgora](https://github.com/xavier
 
 ### The Vision
 
-> *Science advances when its tools are both powerful and trustworthy. Rusty-SUNDIALS demonstrates that AI-generated scientific software can be formally verified, hardware-optimized, and openly accessible — bringing supercomputer-class numerical methods to every engineer's laptop.*
+> *Science advances when its tools are both powerful and trustworthy. Rusty-SUNDIALS aims to show that AI-generated scientific software can be formally verified (partly achieved: see Verification status), hardware-optimized, and openly accessible — bringing supercomputer-class numerical methods to every engineer's laptop.*
 >
 > — The Rusty-SUNDIALS Project
 
@@ -585,12 +606,12 @@ If you use `rusty-SUNDIALS`, any derived results, or reference the SymbioticFact
 
 ```bibtex
 @article{callens2026rustysundials,
-  title   = {rusty-SUNDIALS: Formally Verified Scientific Machine Learning Engine},
+  title   = {rusty-SUNDIALS: A Scientific Machine Learning Engine in Rust with Lean 4 Specifications},
   author  = {Callens, Xavier},
   year    = {2026},
   journal = {SocrateAI Lab},
   url     = {https://github.com/xaviercallens/rusty-SUNDIALS},
-  note    = {Lean 4 formally verified. BSD 3-Clause License.}
+  note    = {Partial Lean 4 specifications; see the Verification status section. BSD 3-Clause License.}
 }
 ```
 
@@ -603,7 +624,7 @@ For the SymbioticFactory CCU research specifically:
   year    = {2026},
   journal = {SocrateAI Lab -- SymbioticFactory Research},
   url     = {https://github.com/xaviercallens/rusty-SUNDIALS},
-  note    = {Lean 4 formally verified. rusty-SUNDIALS v8.0}
+  note    = {rusty-SUNDIALS v8.0; Lean 4 specifications are partial, see the Verification status section.}
 }
 ```
 
