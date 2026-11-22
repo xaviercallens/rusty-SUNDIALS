@@ -19,6 +19,10 @@ GATE = ROOT / "docs" / "verification" / "lean_gate_2026-11-15.md"
 TIERS = ("A", "C", "L", "X")
 STATUSES = ("SUPPORTED", "NOT_SUPPORTED", "UNVERIFIED", "NOT_RUN")
 FIELDS = ("id", "claim", "readme_line", "tier", "status", "evidence", "checked_on")
+# Optional fields (added 2026-11-22). "convention": the parametrisation or definition the claim uses (for example
+# r^-s versus r^-2s, open versus closed disks, coverage over source files only). "hypotheses": the exact hypotheses of
+# the cited theorem or measurement. Both are required for tier A rows, where a mis-cited hypothesis does most damage.
+OPTIONAL_FIELDS = ("convention", "hypotheses")
 LEGEND = {
     "A": "kernel-checked (strict Lean gate: compile, axiom whitelist, no sorry, not flagged trivial)",
     "C": "computed and audited (a command or measurement that was actually run)",
@@ -70,6 +74,11 @@ def validate(rows, gate_text):
             datetime.date.fromisoformat(str(r.get("checked_on")))
         except ValueError:
             errs.append(f"{rid}: checked_on is not an ISO date")
+        for f in OPTIONAL_FIELDS:
+            if f in r and (not isinstance(r[f], str) or not r[f].strip()):
+                errs.append(f"{rid}: {f} is present but empty")
+            if r.get("tier") == "A" and f not in r:
+                errs.append(f"{rid}: tier A rows must state {f}")
         if r.get("status") == "SUPPORTED" and r.get("tier") == "X":
             errs.append(f"{rid}: status SUPPORTED is not allowed with tier X")
         if r.get("tier") == "A":
@@ -93,9 +102,10 @@ def render(rows):
         "",
     ]
     lines += [f"- **{t}**: {LEGEND[t]}" for t in TIERS]
-    lines += ["", "| id | claim | readme line | tier | status | evidence | checked on |", "|---|---|---|---|---|---|---|"]
+    lines += ["", "| id | claim | readme line | tier | status | evidence | checked on | convention | hypotheses |",
+              "|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
-        cells = [str(r[f]).replace("|", "\\|").replace("\n", " ") for f in FIELDS]
+        cells = [str(r.get(f, "")).replace("|", "\\|").replace("\n", " ") for f in FIELDS + OPTIONAL_FIELDS]
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines) + "\n"
 
@@ -119,10 +129,14 @@ def selftest(gate_text):
         "tier A naming no PASS file": [dict(good, id="b", tier="A", evidence="nonexistent_file.lean")],
         "tier A naming a flagged PASS file": [dict(good, id="b", tier="A", evidence=flagged[0])],
         "missing field": [{k: v for k, v in good.items() if k != "claim"}],
+        "tier A without convention": [dict(good, id="b", tier="A", evidence=clean[0], hypotheses="h")],
+        "tier A without hypotheses": [dict(good, id="b", tier="A", evidence=clean[0], convention="c")],
+        "empty convention": [dict(good, id="b", convention="  ")],
     }
     failed = 0
     for label, rows in (("a valid row", [good]),
-                        ("a valid tier A row", [dict(good, id="a", tier="A", evidence=clean[0])])):
+                        ("a valid tier A row", [dict(good, id="a", tier="A", evidence=clean[0],
+                                                      convention="c", hypotheses="h")])):
         if validate(rows, gate_text):
             print(f"selftest FAILED: {label} was rejected")
             failed += 1
