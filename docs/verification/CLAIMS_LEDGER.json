@@ -24,7 +24,9 @@
     "tier": "C",
     "status": "NOT_SUPPORTED",
     "evidence": "pytest --cov=autoresearch_agent (coverage.py 7.16.1) at d94055a: 49.0% including test files, 37.5% for source files only (2,002 of 5,338 statements); details in docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md",
-    "checked_on": "2026-11-18"
+    "checked_on": "2026-11-18",
+    "convention": "line coverage over the autoresearch_agent source files; test files excluded (the old 98.4% figure counted test files, which cover themselves)",
+    "hypotheses": "coverage.py 7.16.1 statement coverage, Python 3.11, one run"
   },
   {
     "id": "BENCHMARKS",
@@ -33,7 +35,9 @@
     "tier": "C",
     "status": "NOT_SUPPORTED",
     "evidence": "the ten examples were run at d94055a: step and RHS counts lower in all ten (Lorenz 686 and 2,111); cause not established; details in docs/verification/PYTHON_AND_BENCHMARKS_2026-11-18.md",
-    "checked_on": "2026-11-18"
+    "checked_on": "2026-11-18",
+    "convention": "steps and RHS evaluations as printed by each example; wall time per process includes start-up and is not comparable with the table's script, which timed python3 and perl wrappers",
+    "hypotheses": "release build, rustc 1.96.1, Linux x86-64, one run each"
   },
   {
     "id": "NO-UNSAFE",
@@ -60,7 +64,9 @@
     "tier": "C",
     "status": "SUPPORTED",
     "evidence": "gate PASS (compiled, axioms within the whitelist); review in docs/verification/LEAN_STATEMENT_REVIEW_2026-11-19.md",
-    "checked_on": "2026-11-19"
+    "checked_on": "2026-11-19",
+    "convention": "both the C and the Rust behaviour are hand-written Lean functions modelling three branches of a function prefix; nothing is extracted from the sources",
+    "hypotheses": "none beyond the Option-typed inputs; the post_* theorems carry vacuous hypotheses such as none = none"
   },
   {
     "id": "LEAN-PASS-SOP2-FLAGNO",
@@ -69,7 +75,9 @@
     "tier": "C",
     "status": "NOT_SUPPORTED",
     "evidence": "the file passes the gate but both theorems are existentials over a constant with unused hypotheses and mention no operator or solver (vacuous); review in docs/verification/LEAN_STATEMENT_REVIEW_2026-11-19.md",
-    "checked_on": "2026-11-19"
+    "checked_on": "2026-11-19",
+    "convention": "existential statements over constants; no operator or grid is modelled",
+    "hypotheses": "hypotheses grid_128 = 128 and h_grid > 0 are unused by the proofs"
   },
   {
     "id": "LEAN-PASS-SOP3-CLOUD",
@@ -78,7 +86,9 @@
     "tier": "C",
     "status": "NOT_SUPPORTED",
     "evidence": "the file passes the gate but proves arithmetic on constants asserted in its own hypotheses, with no link to a measured run or a price source; review in docs/verification/LEAN_STATEMENT_REVIEW_2026-11-19.md",
-    "checked_on": "2026-11-19"
+    "checked_on": "2026-11-19",
+    "convention": "arithmetic on real-valued constants asserted in the hypotheses",
+    "hypotheses": "duration_s = 17.8, gpu_rate = 0.00072, cpu_rate = 0.000083 (or t_actual = 18.2) are assumed, not measured"
   },
   {
     "id": "LEAN-MATRIX-REVIEW",
@@ -87,7 +97,9 @@
     "tier": "C",
     "status": "NOT_SUPPORTED",
     "evidence": "theorem new_empty_post_ops_null has the conclusion True; the first ratchet missed it (a ':=' in a hypothesis ended the pattern early), fixed 2026-11-19; the file is now baselined as known failing (VACUITY); review in docs/verification/LEAN_STATEMENT_REVIEW_2026-11-19.md",
-    "checked_on": "2026-11-19"
+    "checked_on": "2026-11-19",
+    "convention": "hand-written Lean models; function pointers modelled as Option Unit",
+    "hypotheses": "new_empty_post_ops_null has the conclusion True"
   },
   {
     "id": "LEAN-OTHER",
